@@ -7,7 +7,7 @@ const Env = use('Env') // for Adonis 4.x
 class AuthController {
   // get User model
   async index({ request,response , auth }) {
-    const baseUrl = Env.get('APP_URL') // contoh: http://localhost:3333
+    const baseUrl = Env.get('BASE_URL') // contoh: http://localhost:3333
 
     const user = await User.query().select('tbl_users.*','roles.name as  role_name').join('roles','roles.id','tbl_users.role_id').where('tbl_users.id', auth.user.id).first()
 

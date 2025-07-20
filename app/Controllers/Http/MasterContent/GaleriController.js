@@ -9,7 +9,7 @@ class GaleriController {
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
     const search = request.input('search', '')
-    const baseUrl = Env.get('APP_URL')
+    const baseUrl = Env.get('BASE_URL')
 
     const galeriQuery = Galeri.query()
 

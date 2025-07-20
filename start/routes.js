@@ -64,4 +64,7 @@ Route.group(() => {
   Route.post('/master-content/artikel/delete', 'MasterContent/ArtikelController.delete')
   Route.post('/master-content/artikel/update', 'MasterContent/ArtikelController.update')
 
+  Route.post('/master-content/web-profile', 'MasterContent/WebProfileController.show')
+  Route.post('/master-content/web-profile-update', 'MasterContent/WebProfileController.update')
+
 }).prefix('api').middleware(['auth:jwt','apikey'])

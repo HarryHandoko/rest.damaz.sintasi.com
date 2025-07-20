@@ -13,7 +13,7 @@ const formatDate = (date) => {
 class KaryawanController {
 
  async index({ request, response }) {
-    const baseUrl = `${request.protocol()}://${request.header('host')}` // contoh: http://localhost:3333
+    const baseUrl = Env.get('APP_URL') // contoh: http://localhost:3333
 
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)

@@ -2,13 +2,14 @@
 
 const Galeri = use('App/Models/MasterContent/Galeri')
 const Database = use('Database') // (Adonis 4.x)
+const Env = use('Env') // for Adonis 4.x
 
 class GaleriController {
  async index({ request, response }) {
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
     const search = request.input('search', '')
-    const baseUrl = `${request.protocol()}://${request.header('host')}`
+    const baseUrl = Env.get('APP_URL')
 
     const galeriQuery = Galeri.query()
 

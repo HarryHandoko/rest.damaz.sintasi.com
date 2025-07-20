@@ -30,5 +30,8 @@
   },
   "autoload": {
     "App": "./app"
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^7.8.2"
   }
 }

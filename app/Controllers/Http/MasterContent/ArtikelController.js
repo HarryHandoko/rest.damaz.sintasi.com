@@ -12,6 +12,7 @@ const slugify = (text) => {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
 }
+const Env = use('Env') // for Adonis 4.x
 
 const formatDate = (date) => {
   if (!date) return null
@@ -26,7 +27,7 @@ class ArtikelController {
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
     const search = request.input('search', '')
-    const baseUrl = `${request.protocol()}://${request.header('host')}`
+    const baseUrl = Env.get('APP_URL')
 
     const dataQuery = Artikel.query()
 

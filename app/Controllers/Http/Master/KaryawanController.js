@@ -2,6 +2,7 @@
 
 const User = use('App/Models/User')
 const Hash = use('Hash')
+const Env = use('Env') // for Adonis 4.x
 const formatDate = (date) => {
   if (!date) return null
   // Pastikan date bertipe Date, jika bukan, parse dulu

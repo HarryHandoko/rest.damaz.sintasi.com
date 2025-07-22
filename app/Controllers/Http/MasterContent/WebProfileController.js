@@ -18,19 +18,22 @@ class WebProfileController {
       ...data.toJSON(),
       banner: data.banner
         ? `${baseUrl}/uploads/web_profile/${data.banner}`
-        : `${baseUrl}/default/banner.png`,
+        : null,
       logo: data.logo
         ? `${baseUrl}/uploads/web_profile/${data.logo}`
-        : `${baseUrl}/default/logo.png`,
-      banner_about: data.logo
+        : null,
+      banner_about: data.banner_about
         ? `${baseUrl}/uploads/web_profile/${data.banner_about}`
-        : `${baseUrl}/default/logo.png`,
-      banner_visi: data.logo
+        : null,
+      banner_visi: data.banner_visi
         ? `${baseUrl}/uploads/web_profile/${data.banner_visi}`
-        : `${baseUrl}/default/logo.png`,
-      banner_misi: data.logo
+        : null,
+      banner_misi: data.banner_misi
         ? `${baseUrl}/uploads/web_profile/${data.banner_misi}`
-        : `${baseUrl}/default/logo.png`
+        : null,
+      banner_sambutan: data.banner_sambutan
+        ? `${baseUrl}/uploads/web_profile/${data.banner_sambutan}`
+        : null
     }
     return response.json(result)
   }
@@ -45,10 +48,26 @@ class WebProfileController {
     const input = request.only([
       'title', 'address', 'whatsapp', 'email',
       'social_fb', 'social_ig', 'social_youtube', 'social_wa','komitmen_kami','tentang_kami','visi','misi',
-      'link_youtube'
+      'link_youtube','sambutan','founder'
     ])
 
     // Upload file ... (copy dari kode kamu sebelumnya)
+    // ---- Sambutan ----
+    const bannerSambutanFile = request.file('banner_sambutan', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (bannerSambutanFile) {
+      const fileName = `banner_sambutan_${Date.now()}.${bannerSambutanFile.subtype}`
+      await bannerSambutanFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!bannerSambutanFile.moved()) {
+        return response.status(400).json({ error: bannerSambutanFile.error() })
+      }
+      input.banner_sambutan = fileName
+    }
     // ---- bannerAbout ----
     const bannerAboutFile = request.file('banner_about', {
       types: ['image'],

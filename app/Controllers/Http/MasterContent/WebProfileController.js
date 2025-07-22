@@ -21,6 +21,15 @@ class WebProfileController {
         : `${baseUrl}/default/banner.png`,
       logo: data.logo
         ? `${baseUrl}/uploads/web_profile/${data.logo}`
+        : `${baseUrl}/default/logo.png`,
+      banner_about: data.logo
+        ? `${baseUrl}/uploads/web_profile/${data.banner_about}`
+        : `${baseUrl}/default/logo.png`,
+      banner_visi: data.logo
+        ? `${baseUrl}/uploads/web_profile/${data.banner_visi}`
+        : `${baseUrl}/default/logo.png`,
+      banner_misi: data.logo
+        ? `${baseUrl}/uploads/web_profile/${data.banner_misi}`
         : `${baseUrl}/default/logo.png`
     }
     return response.json(result)
@@ -35,14 +44,64 @@ class WebProfileController {
     let profile = await WebProfile.first()
     const input = request.only([
       'title', 'address', 'whatsapp', 'email',
-      'social_fb', 'social_ig', 'social_youtube', 'social_wa'
+      'social_fb', 'social_ig', 'social_youtube', 'social_wa','komitmen_kami','tentang_kami','visi','misi',
+      'link_youtube'
     ])
 
     // Upload file ... (copy dari kode kamu sebelumnya)
+    // ---- bannerAbout ----
+    const bannerAboutFile = request.file('banner_about', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (bannerAboutFile) {
+      const fileName = `banner_about_${Date.now()}.${bannerAboutFile.subtype}`
+      await bannerAboutFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!bannerAboutFile.moved()) {
+        return response.status(400).json({ error: bannerAboutFile.error() })
+      }
+      input.banner_about = fileName
+    }
+    // ---- bannerVisi ----
+    const bannerVisiFile = request.file('banner_visi', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (bannerVisiFile) {
+      const fileName = `banner_visi_${Date.now()}.${bannerVisiFile.subtype}`
+      await bannerVisiFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!bannerVisiFile.moved()) {
+        return response.status(400).json({ error: bannerVisiFile.error() })
+      }
+      input.banner_visi = fileName
+    }
+
+    // ---- bannerMisi ----
+    const bannerMisiFile = request.file('banner_misi', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (bannerMisiFile) {
+      const fileName = `banner_misi_${Date.now()}.${bannerMisiFile.subtype}`
+      await bannerMisiFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!bannerMisiFile.moved()) {
+        return response.status(400).json({ error: bannerMisiFile.error() })
+      }
+      input.banner_misi = fileName
+    }
     // ---- banner ----
     const bannerFile = request.file('banner', {
       types: ['image'],
-      size: '2mb'
+      size: '10mb'
     })
     if (bannerFile) {
       const fileName = `banner_${Date.now()}.${bannerFile.subtype}`
@@ -59,7 +118,7 @@ class WebProfileController {
     // ---- logo ----
     const logoFile = request.file('logo', {
       types: ['image'],
-      size: '2mb'
+      size: '10mb'
     })
     if (logoFile) {
       const fileName = `logo_${Date.now()}.${logoFile.subtype}`

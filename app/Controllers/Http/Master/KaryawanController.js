@@ -132,7 +132,7 @@ class KaryawanController {
         })
         data.foto_profile = fileName // Simpan nama file di database
       }
-      data.password = await Hash.make(request.input('password'))
+      data.password = request.input('password')
       data.type_users = 'karyawan'
 
       // Buat user baru

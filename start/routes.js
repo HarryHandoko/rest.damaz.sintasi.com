@@ -19,6 +19,8 @@ const Route = use('Route')
 Route.on('/').render('welcome')
 Route.group(() => {
     Route.post('/login', 'AuthController.login')
+    Route.post('/daftar', 'AuthController.daftar')
+    Route.get('/captcha', 'AuthController.getChaptca')
 }).prefix('api').middleware(['apikey'])
 
 Route.group(() => {
@@ -64,7 +66,33 @@ Route.group(() => {
   Route.post('/master-content/artikel/delete', 'MasterContent/ArtikelController.delete')
   Route.post('/master-content/artikel/update', 'MasterContent/ArtikelController.update')
 
+  // WebProfile
   Route.post('/master-content/web-profile', 'MasterContent/WebProfileController.show')
   Route.post('/master-content/web-profile-update', 'MasterContent/WebProfileController.update')
+
+
+  // Sekolah
+  Route.get('/master-data/sekolah/get', 'MasterData/SekolahController.index')
+  Route.get('/master-data/sekolah/get-select', 'MasterData/SekolahController.indexSelect')
+  Route.post('/master-data/sekolah/get-select-grade', 'MasterData/SekolahController.indexSelectGrade')
+  Route.post('/master-data/sekolah/post', 'MasterData/SekolahController.store')
+  Route.post('/master-data/sekolah/adding-grade', 'MasterData/SekolahController.storeGrade')
+  Route.post('/master-data/sekolah/delete', 'MasterData/SekolahController.delete')
+  Route.post('/master-data/sekolah/update', 'MasterData/SekolahController.update')
+  Route.post('/master-data/sekolah/update-grade', 'MasterData/SekolahController.updateGrade')
+
+  //Register PPDB
+  Route.post('/register-ppdb/get-data', 'PPDB/RegisterController.getData')
+  Route.post('/register-ppdb/create', 'PPDB/RegisterController.create')
+  Route.post('/register-ppdb/update-form', 'PPDB/RegisterController.updateForm')
+  Route.post('/register-ppdb/delete', 'PPDB/RegisterController.delete')
+  Route.post('/register-ppdb/get-detail', 'PPDB/RegisterController.getData')
+
+
+  //Register PPDB
+  Route.get('/province/get-data', 'Ref/WilayahController.getProvince')
+  Route.post('/city/get-data', 'Ref/WilayahController.getCity')
+  Route.post('/district/get-data', 'Ref/WilayahController.getDistrict')
+  Route.post('/village/get-data', 'Ref/WilayahController.getVillage')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

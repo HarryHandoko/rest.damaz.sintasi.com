@@ -116,5 +116,8 @@ Route.group(() => {
   Route.post('/district/get-data', 'Ref/WilayahController.getDistrict')
   Route.post('/village/get-data', 'Ref/WilayahController.getVillage')
 
+  //Verifikasi Email
+  Route.post('/verifikasi/resend-otp', 'VerifikasiEmailController.sendEmail')
+  Route.post('/verifikasi/verify-email', 'VerifikasiEmailController.verifikasiEmail')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

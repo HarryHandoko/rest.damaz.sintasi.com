@@ -33,6 +33,9 @@ class WebProfileController {
         : null,
       banner_sambutan: data.banner_sambutan
         ? `${baseUrl}/uploads/web_profile/${data.banner_sambutan}`
+        : null,
+      brosur: data.brosur
+        ? `${baseUrl}/uploads/web_profile/${data.brosur}`
         : null
     }
     return response.json(result)
@@ -149,6 +152,33 @@ class WebProfileController {
         return response.status(400).json({ error: logoFile.error() })
       }
       input.logo = fileName
+    }
+
+
+
+    const brosurFile = request.file('brosur', {
+      types: ['pdf'],
+      size: '10mb'
+    })
+
+    if (brosurFile) {
+      const fileName = `brosur_${Date.now()}.${brosurFile.subtype}`
+
+      await brosurFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+
+      if (!brosurFile.moved()) {
+        return response.status(400).json({
+          success: false,
+          message: 'Gagal memindahkan file brosur.',
+          error: brosurFile.error()
+        })
+      }
+
+      // Simpan nama file ke input atau model
+      input.brosur = fileName
     }
 
     // --- SIMPAN DATA ---

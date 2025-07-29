@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 10px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .card {
+        width: 360px;
+        height: 240px;
+        border: 1px solid #333;
+        padding: 10px;
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      .header {
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 3px;
+      }
+
+      .row {
+        display: flex;
+        margin-top: 8px;
+      }
+
+      .foto {
+        width: 100px;
+        height: 120px;
+        object-fit: cover;
+        border: 1px solid #000;
+      }
+
+      .info {
+        flex: 1;
+        padding-left: 10px;
+      }
+
+      .info p {
+        margin: 3px 0;
+        font-size: 10px;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        text-align: center;
+        font-size: 8px;
+        border-top: 1px dashed #333;
+        padding-top: 3px;
+      }
+
+      .qr {
+        position: absolute;
+        top: 50px;
+        right: 10px;
+        width: 60px;
+        height: 60px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header">KARTU TANDA SISWA</div>
+
+      <div class="row">
+        <img class="foto" src="{{ fotoSiswa }}" alt="Foto Siswa" />
+        <div class="info">
+          <p><strong>Nama:</strong> {{ siswa.nama_depan }} {{ siswa.nama_belakang }}</p>
+          <p><strong>NIS:</strong> {{ siswa.nis }}</p>
+          <p><strong>TTL:</strong> {{ siswa.tempat_lahir }}, {{ formattedTanggalLahir }}</p>
+          <p><strong>Alamat:</strong> {{ siswa.alamat_jalan || '-' }}</p>
+        </div>
+      </div>
+
+      <img class="qr" src="{{ qr }}" alt="QR Code" />
+
+      <div class="footer">
+        Dicetak pada: {{ printTimestamp }}<br>
+        Kartu ini berlaku selama siswa aktif terdaftar.
+      </div>
+    </div>
+  </body>
+</html>

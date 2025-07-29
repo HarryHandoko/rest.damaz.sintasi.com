@@ -58,6 +58,14 @@ Route.group(() => {
   Route.post('/master-content/galeri/delete', 'MasterContent/GaleriController.delete')
   Route.post('/master-content/galeri/update', 'MasterContent/GaleriController.update')
 
+
+  // Master Bank Account
+  Route.get('/master-data/bank-account/get', 'Master/BankAccountController.index')
+  Route.get('/master-data/bank-account/get-payment', 'Master/BankAccountController.indexPayment')
+  Route.post('/master-data/bank-account/post', 'Master/BankAccountController.store')
+  Route.post('/master-data/bank-account/delete', 'Master/BankAccountController.delete')
+  Route.post('/master-data/bank-account/update', 'Master/BankAccountController.update')
+
   // Master Konten Artikel
   Route.get('/master-content/artikel/get', 'MasterContent/ArtikelController.index')
   Route.get('/master-content/artikel/get-tag', 'MasterContent/ArtikelController.indexTag')
@@ -87,6 +95,19 @@ Route.group(() => {
   Route.post('/register-ppdb/update-form', 'PPDB/RegisterController.updateForm')
   Route.post('/register-ppdb/delete', 'PPDB/RegisterController.delete')
   Route.post('/register-ppdb/get-detail', 'PPDB/RegisterController.getData')
+  Route.post('/register-ppdb/get-regist', 'PPDB/RegisterController.getRegist')
+  Route.post('/register-ppdb/generate-pdf', 'PPDB/RegisterController.generatePDF')
+  Route.post('/register-ppdb/generate-kts-pdf', 'PPDB/RegisterController.generateKTSPDF')
+  Route.post('/register-ppdb/approval', 'PPDB/RegisterController.Approval')
+  Route.post('/register-ppdb/daftar-ulang', 'PPDB/RegisterController.daftarUlang')
+  Route.post('/register-ppdb/get-daftar-ulang', 'PPDB/RegisterController.getDaftarUlang')
+  Route.post('/register-ppdb/pay-reg-ulang', 'PPDB/RegisterController.payRegUlang')
+  Route.post('/register-ppdb/get-pendaftaran-ulang', 'PPDB/RegisterController.getPendfataranUlangList')
+  Route.post('/register-ppdb/pendaftaran-ulang-approval', 'PPDB/RegisterController.ApprovalRegisUlang')
+
+
+  Route.get('/register-ppdb/statistik-pendaftar', 'PPDB/RegisterController.statistikPendaftar')
+  Route.get('/register-ppdb/statistik-pendaftar-ulang', 'PPDB/RegisterController.statistikPendaftarUlang')
 
 
   //Register PPDB
@@ -94,5 +115,6 @@ Route.group(() => {
   Route.post('/city/get-data', 'Ref/WilayahController.getCity')
   Route.post('/district/get-data', 'Ref/WilayahController.getDistrict')
   Route.post('/village/get-data', 'Ref/WilayahController.getVillage')
+
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

@@ -33,6 +33,9 @@ class SekolahController {
         dataSekolah.logo = dataSekolah.logo
           ? `${baseUrl}/uploads/sekolah/${dataSekolah.logo}`
           : null
+        dataSekolah.foto_kontent_sekolah = dataSekolah.foto_kontent_sekolah
+          ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_kontent_sekolah}`
+          : null
       })
     )
 
@@ -50,7 +53,7 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent']);
 
       const logo = request.file('logo', {
         extnames: ['jpg', 'jpeg', 'png', 'webp'],
@@ -64,8 +67,22 @@ class SekolahController {
         });
         data.logo = fileName;
       } else {
-        await trx.rollback();
         return response.status(400).json({ message: 'logo is required' });
+      }
+
+
+      const foto_kontent_sekolah = request.file('foto_kontent_sekolah', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (foto_kontent_sekolah) {
+        const fileName = `${Date.now()}.${foto_kontent_sekolah.extname}`;
+        await foto_kontent_sekolah.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        data.foto_kontent_sekolah = fileName;
+      } else {
+        return response.status(400).json({ message: 'Foto Sekolah is required' });
       }
 
       // Simpan ke database
@@ -170,6 +187,36 @@ class SekolahController {
       sekolah.name = request.input('name')
       sekolah.biaya_admin = request.input('biaya_admin')
       sekolah.biaya_pendaftaran = request.input('biaya_pendaftaran')
+      sekolah.kontent = request.input('kontent')
+
+
+      const logo = request.file('logo', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (logo) {
+        const fileName = `${Date.now()}.${logo.extname}`;
+        await logo.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.logo = fileName;
+      }
+
+
+
+      const foto_kontent_sekolah = request.file('foto_kontent_sekolah', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (foto_kontent_sekolah) {
+        const fileName = `${Date.now()}.${foto_kontent_sekolah.extname}`;
+        await foto_kontent_sekolah.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.foto_kontent_sekolah = fileName;
+      }
+
+
       sekolah.save()
 
       return response.status(201).json({

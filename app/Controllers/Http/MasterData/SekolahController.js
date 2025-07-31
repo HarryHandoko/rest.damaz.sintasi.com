@@ -56,7 +56,7 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug']);
 
       const logo = request.file('logo', {
         extnames: ['jpg', 'jpeg', 'png', 'webp'],
@@ -207,6 +207,7 @@ class SekolahController {
       sekolah.biaya_pendaftaran = request.input('biaya_pendaftaran')
       sekolah.kontent = request.input('kontent')
       sekolah.kontent_detail = request.input('kontent_detail')
+      sekolah.slug = request.input('slug')
 
 
       const logo = request.file('logo', {

@@ -699,23 +699,45 @@ class RegisterController {
   }
 
 
-  async statistikPendaftar({ response }) {
+  async statistikPendaftar({ response ,auth}) {
     try {
-      // .count() returns an array with string value, so we extract and convert to number
-      const totalPendaftar = await RegisterPPDB.query().where('is_submit', '1').count()
-      const totalDiterima = await RegisterPPDB.query().where('status_pendaftaran', 'P01').where('is_submit', '1').count()
-      const totalDitolak = await RegisterPPDB.query().where('status_pendaftaran', 'P02').where('is_submit', '1').count()
-      const totalDalamProses = await RegisterPPDB.query().where('status_pendaftaran', 'P00').where('is_submit', '1').count()
+      const dataUser = await User.query()
+      .select('roles.name as role_name','tbl_users.*')
+      .join('roles','roles.id','tbl_users.role_id')
+      .where('tbl_users.id',auth.user.id).first();
+      if(dataUser.role_name == 'Admin'){
+        // .count() returns an array with string value, so we extract and convert to number
+        const totalPendaftar = await RegisterPPDB.query().where('is_submit', '1').count()
+        const totalDiterima = await RegisterPPDB.query().where('status_pendaftaran', 'P01').where('is_submit', '1').count()
+        const totalDitolak = await RegisterPPDB.query().where('status_pendaftaran', 'P02').where('is_submit', '1').count()
+        const totalDalamProses = await RegisterPPDB.query().where('status_pendaftaran', 'P00').where('is_submit', '1').count()
 
-      return response.json({
-        success: true,
-        data: {
-          total: Number(totalPendaftar[0]['count(*)']),
-          diterima: Number(totalDiterima[0]['count(*)']),
-          ditolak: Number(totalDitolak[0]['count(*)']),
-          diproses: Number(totalDalamProses[0]['count(*)']),
-        }
-      })
+        return response.json({
+          success: true,
+          data: {
+            total: Number(totalPendaftar[0]['count(*)']),
+            diterima: Number(totalDiterima[0]['count(*)']),
+            ditolak: Number(totalDitolak[0]['count(*)']),
+            diproses: Number(totalDalamProses[0]['count(*)']),
+          }
+        })
+      }else{
+        // .count() returns an array with string value, so we extract and convert to number
+        const totalPendaftar = await RegisterPPDB.query().where('is_submit', '1').where('registed_by',auth.user.id).count()
+        const totalDiterima = await RegisterPPDB.query().where('status_pendaftaran', 'P01').where('registed_by',auth.user.id).where('is_submit', '1').count()
+        const totalDitolak = await RegisterPPDB.query().where('status_pendaftaran', 'P02').where('registed_by',auth.user.id).where('is_submit', '1').count()
+        const totalDalamProses = await RegisterPPDB.query().where('status_pendaftaran', 'P00').where('registed_by',auth.user.id).where('is_submit', '1').count()
+
+        return response.json({
+          success: true,
+          data: {
+            total: Number(totalPendaftar[0]['count(*)']),
+            diterima: Number(totalDiterima[0]['count(*)']),
+            ditolak: Number(totalDitolak[0]['count(*)']),
+            diproses: Number(totalDalamProses[0]['count(*)']),
+          }
+        })
+      }
     } catch (error) {
       return response.status(500).json({
         success: false,

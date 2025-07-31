@@ -36,6 +36,9 @@ class SekolahController {
         dataSekolah.foto_kontent_sekolah = dataSekolah.foto_kontent_sekolah
           ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_kontent_sekolah}`
           : null
+        dataSekolah.foto_kontent = dataSekolah.foto_kontent
+          ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_kontent}`
+          : null
       })
     )
 
@@ -53,7 +56,7 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail']);
 
       const logo = request.file('logo', {
         extnames: ['jpg', 'jpeg', 'png', 'webp'],
@@ -81,6 +84,21 @@ class SekolahController {
           overwrite: true
         });
         data.foto_kontent_sekolah = fileName;
+      } else {
+        return response.status(400).json({ message: 'Foto Sekolah is required' });
+      }
+
+
+      const foto_kontent = request.file('foto_kontent', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (foto_kontent) {
+        const fileName = `${Date.now()}.${foto_kontent.extname}`;
+        await foto_kontent.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        data.foto_kontent = fileName;
       } else {
         return response.status(400).json({ message: 'Foto Sekolah is required' });
       }
@@ -188,6 +206,7 @@ class SekolahController {
       sekolah.biaya_admin = request.input('biaya_admin')
       sekolah.biaya_pendaftaran = request.input('biaya_pendaftaran')
       sekolah.kontent = request.input('kontent')
+      sekolah.kontent_detail = request.input('kontent_detail')
 
 
       const logo = request.file('logo', {
@@ -214,6 +233,20 @@ class SekolahController {
           overwrite: true
         });
         sekolah.foto_kontent_sekolah = fileName;
+      }
+
+
+
+      const foto_kontent = request.file('foto_kontent', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (foto_kontent) {
+        const fileName = `${Date.now()}.${foto_kontent.extname}`;
+        await foto_kontent.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.foto_kontent = fileName;
       }
 
 

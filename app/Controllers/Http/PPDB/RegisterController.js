@@ -377,6 +377,10 @@ class RegisterController {
         .first()
 
 
+        const dataRegister = await User.query()
+          .where('id', item.registed_by)
+          .first()
+
         const dataSiswaOrtu = await RegParent.query()
           .where('register_id', item.id)
           .first()
@@ -428,6 +432,7 @@ class RegisterController {
         dataRegis[index].siswa_address = siswaAddress
         dataRegis[index].siswa_parent = siswaOru
         dataRegis[index].payment = PaymentData
+        dataRegis[index].register = dataRegister?.toJSON() || null
         dataRegis[index].registrasi_ulang = dataRegistrasiUlang?.toJSON() || null
         dataRegis[index].sekolah = dataSekolah?.toJSON() || null
         dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null

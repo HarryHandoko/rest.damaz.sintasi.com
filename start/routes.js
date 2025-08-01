@@ -120,4 +120,13 @@ Route.group(() => {
   Route.post('/verifikasi/resend-otp', 'VerifikasiEmailController.sendEmail')
   Route.post('/verifikasi/verify-email', 'VerifikasiEmailController.verifikasiEmail')
 
+
+
+
+  // Master Konten Galeri
+  Route.get('/testimoni/get', 'TestimoniController.index')
+  Route.post('/testimoni/post', 'TestimoniController.store')
+  Route.post('/testimoni/delete', 'TestimoniController.delete')
+  Route.post('/testimoni/update', 'TestimoniController.update')
+
 }).prefix('api').middleware(['auth:jwt','apikey'])

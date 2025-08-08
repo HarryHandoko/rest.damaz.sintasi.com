@@ -59,6 +59,13 @@ Route.group(() => {
   Route.post('/master-content/galeri/update', 'MasterContent/GaleriController.update')
 
 
+  // Master Konten Fasilitas
+  Route.get('/master-content/fasilitas/get', 'MasterContent/FasilitaController.index')
+  Route.post('/master-content/fasilitas/post', 'MasterContent/FasilitaController.store')
+  Route.post('/master-content/fasilitas/delete', 'MasterContent/FasilitaController.delete')
+  Route.post('/master-content/fasilitas/update', 'MasterContent/FasilitaController.update')
+
+
   // Master Bank Account
   Route.get('/master-data/bank-account/get', 'Master/BankAccountController.index')
   Route.get('/master-data/bank-account/get-payment', 'Master/BankAccountController.indexPayment')
@@ -123,10 +130,19 @@ Route.group(() => {
 
 
 
-  // Master Konten Galeri
+  // Master Konten Testimoni
   Route.get('/testimoni/get', 'TestimoniController.index')
   Route.post('/testimoni/post', 'TestimoniController.store')
   Route.post('/testimoni/delete', 'TestimoniController.delete')
   Route.post('/testimoni/update', 'TestimoniController.update')
+
+
+
+  // Master Pendaftar
+  Route.get('/master/pendaftar/get', 'Master/PendaftarController.index')
+  Route.post('/master/pendaftar/post', 'Master/PendaftarController.store')
+  Route.post('/master/pendaftar/delete', 'Master/PendaftarController.delete')
+  Route.post('/master/pendaftar/update', 'Master/PendaftarController.update')
+  Route.post('/master/pendaftar/update-data', 'Master/PendaftarController.updateData')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

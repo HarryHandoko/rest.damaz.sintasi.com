@@ -36,6 +36,9 @@ class WebProfileController {
         : null,
       brosur: data.brosur
         ? `${baseUrl}/uploads/web_profile/${data.brosur}`
+        : null,
+      kopsurat: data.kopsurat
+        ? `${baseUrl}/uploads/web_profile/${data.kopsurat}`
         : null
     }
     return response.json(result)
@@ -152,6 +155,23 @@ class WebProfileController {
         return response.status(400).json({ error: logoFile.error() })
       }
       input.logo = fileName
+    }
+
+    // ---- kopSurat ----
+    const kopSurat = request.file('kopsurat', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (kopSurat) {
+      const fileName = `kopsurat_${Date.now()}.${kopSurat.subtype}`
+      await kopSurat.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!kopSurat.moved()) {
+        return response.status(400).json({ error: kopSurat.error() })
+      }
+      input.kopsurat = fileName
     }
 
 

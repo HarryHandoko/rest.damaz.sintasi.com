@@ -2,132 +2,449 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Bukti Pendaftaran PPDB</title>
+  <title>Formulir Pendaftaran {{ data.sekolah.name.toUpperCase() }}</title>
   <style>
+    /* === LAYOUT PDF === */
+    @page { margin: 10px 40px 60px 40px; }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
+      font-family: 'Times New Roman', Times, serif;
       color: #000;
-      font-size: 15px
+      font-size: 15px;
+      margin: 0;
     }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
+    /* Header (kop) per halaman */
+    header img { width: 100%; max-height: 120px; object-fit: contain; display: block; }
+
+    /* Watermark/logo latar per halaman */
+    .bg-fixed {
+      position: fixed; inset: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain; /* gunakan 'cover' jika ingin penuh */
+      opacity: 0.08;
+      z-index: -1;
     }
+
+    h1, h2, h3, h4, h5 { margin: 0; }
+
+    .title {
+      text-align: center;
+      font-weight: bold;
+      margin: 6px 0 16px 0;
+      text-transform: uppercase;
+    }
+
+    .meta { width: 100%; margin-top: 6px; }
+    .meta td { font-size: 14px; }
 
     .section-title {
-      background: #e0e0e0;
-      padding: 5px 10px;
       font-weight: bold;
-      margin-top: 30px;
+      margin: 18px 0 8px 0;
+      text-transform: uppercase;
     }
 
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+    .info-table { width: 100%; border-collapse: collapse; }
+    .info-table td { padding: 4px 6px; vertical-align: top; }
+    .num { width: 24px; }
+    .sep { width: 10px; text-align: center; }
+    /* .wide { width: 100%; } */
 
-    .info-table td {
-      padding: 5px;
-      vertical-align: top;
-    }
+    .muted { color: #111; }
 
-    .small-note {
-      font-size: 11px;
-      margin-top: 20px;
-    }
+    .row { display: flex; gap: 8px; }
+    .col { flex: 1; }
 
-    .qr-section {
-      margin-top: 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
+    .box { display: inline-block; width: 14px; height: 14px; border: 1px solid #000; margin-right: 6px; }
+    .check { display: inline-block; width: 14px; height: 14px; border: 1px solid #000; background: #000; margin-right: 6px; }
+    .opt { margin-right: 16px; }
 
-    .qr-section img {
-      width: 100px;
-    }
-   .page_break {
-      page-break-before: always; /* atau page-break-after: always */
-      break-before: page;
-    }
+    .page_break { page-break-before: always; break-before: page; }
+
+    .sign-wrap { display: flex; justify-content: space-between; margin-top: 28px; }
+    .sign-col { width: 48%; text-align: center; }
+    .sign-space { height: 64px; }
+
+    .qr-section { margin-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .qr-section img { width: 100px; }
+
+    .small-note { font-size: 11px; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h2>Bukti Pendaftaran PPDB Tahun {{ currentYear }}</h2>
+  {{-- === HEADER / KOP SURAT (muncul di setiap halaman) === --}}
 
-  <div class="flex-biodata" style="display: flex; justify-content: space-between;">
-    <div style="width: 70%;">
-      <table class="info-table">
-        <tr><td>Nama Lengkap</td><td>: {{ data.siswa.nama_depan }} {{ data.siswa.nama_belakang }}</td></tr>
-        <tr><td>NISN</td><td>: {{ data.siswa.nisn }}</td></tr>
-        <tr><td>Tempat, Tanggal Lahir</td><td>: {{ data.siswa.tempat_lahir }} , {{ data.siswa.tgl_lahir }}</td></tr>
-        <tr><td>Jenis Kelamin</td><td>: {{ data.siswa.jenis_kelamin }}</td></tr>
-        <tr><td>Bahasa Sehari-hari</td><td>: {{ data.siswa.bahasa_sehari_hari }}</td></tr>
-        <tr>
-          <td>Alamat</td>
-          <td>
-            : {{ data.siswa_address.alamat }}<br />
-            RT {{ data.siswa_address.rt }} / RW {{ data.siswa_address.rw }}<br />
-            {{ data.siswa_address.desa }}, {{ data.siswa_address.district }}, {{ data.siswa_address.kota }}<br />
-            Provinsi {{ data.siswa_address.provinsi }}
-          </td>
-        </tr>
-        <tr><td>No Handphone</td><td>: {{ data.register.no_handphone }}</td></tr>
-        <tr><td>Email</td><td>: {{ data.register.email }}</td></tr>
-      </table>
+  <img src="{{ kopSuratUrl }}" alt="Kop Surat" style="width:100%">
+
+  {{-- === WATERMARK / LOGO LATAR (opsional) === --}}
+  @if(logo)
+    <div class="bg-fixed" style="background-image:url('{{ logo }}');"></div>
+  @endif
+
+  <main>
+    <div class="title">
+      FORMULIR PENDAFTARAN {{ data.sekolah.name.toUpperCase() }}
     </div>
-    <div style="width: 25%; text-align: center;">
-      <img src="{{ data.siswa.foto_siswa }}" alt="Foto Siswa" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
-      <p style="font-size: 13px; margin-top: 5px;">Foto Siswa</p>
+
+    <table class="meta">
+      <tr>
+        <td style="text-align:right">
+          <b>Nomor Formulir : {{ data.code_pendaftaran || '-' }}</b><br>
+        </td>
+      </tr>
+    </table>
+
+
+    <div class="section-title">DATA SISWA</div>
+    <table class="info-table">
+      <tr>
+        <td class="num">1.</td>
+        <td class="wide">Nama Siswa</td>
+        <td class="sep"></td>
+        <td class="wide">
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td  rowspan="100">
+          <div style="width: 25%; text-align: center;">
+            <img src="{{ data.siswa.foto_siswa }}" alt="Foto Siswa" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="wide">a. Lengkap</td>
+        <td class="sep">:</td>
+        <td class="wide">{{ data.siswa.nama_depan }} {{ data.siswa.nama_belakang }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="wide">b. Panggilan</td>
+        <td class="sep">:</td>
+        <td class="wide">{{ data.siswa.nama_depan }}</td>
+      </tr>
+
+      <tr>
+        <td class="num">2.</td>
+        <td class="wide">Jenis Kelamin</td>
+        <td class="sep">:</td>
+        <td>
+          {{data.siswa.jenis_kelamin}}
+        </td>
+      </tr>
+
+      <tr>
+        <td class="num">3.</td>
+        <td class="wide">Kelahiran</td>
+        <td class="sep"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="wide">a. Tempat</td>
+        <td class="sep">:</td>
+        <td class="wide">{{ data.siswa.tempat_lahir || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="wide">b. Tanggal</td>
+        <td class="sep">:</td>
+        <td class="wide">{{ birth || '-' }}</td>
+      </tr>
+
+      <tr>
+        <td class="num">4.</td>
+        <td class="wide">Agama</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.agama || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">5.</td>
+        <td class="wide">Kewarganegaraan</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.kewarganegaraan || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">6.</td>
+        <td class="wide">NISN</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.nisn || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">7.</td>
+        <td class="wide">Nomor Induk Kependudukan</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.nik || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">8.</td>
+        <td class="wide">Nomor Akta Kelahiran</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.no_akte_kelahiran || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">9.</td>
+        <td class="wide">Anak ke-</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.anak_ke || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">10.</td>
+        <td class="wide">Jumlah Saudara</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.jumlah_saudara || '-' }} Bersaudara</td>
+      </tr>
+      <tr>
+        <td class="num">11.</td>
+        <td class="wide">Tinggi Badan</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.tinggi_badan || '-' }} Cm &nbsp;&nbsp; Berat Badan : {{ data.siswa.berat_badan || '-' }} Kg</td>
+      </tr>
+      <tr>
+        <td class="num">12.</td>
+        <td class="wide">Hobby</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.hobby || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">13.</td>
+        <td class="wide">Cita – cita</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.cita_cita || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">14.</td>
+        <td class="wide">Golongan Darah</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.goldarah || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">15.</td>
+        <td class="wide">Alamat</td>
+        <td class="sep">:</td>
+        <td>
+          {{ data.siswa_address.alamat }}<br />
+          RT {{ data.siswa_address.rt }} / RW {{ data.siswa_address.rw }}<br />
+          {{ data.siswa_address.desa }}, {{ data.siswa_address.district }}, {{ data.siswa_address.kota }}<br />
+          Provinsi {{ data.siswa_address.provinsi }}
+        </td>
+      </tr>
+      <tr>
+        <td class="num">16.</td>
+        <td class="wide">Telp/HP</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.no_handphone || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">17.</td>
+        <td class="wide">Status Pendaftaran</td>
+        <td class="sep">:</td>
+        <td>{{ data.status_pendaftaran_siswa || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">18.</td>
+        <td class="wide">Jarak ke Sekolah</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa_address.jarak_rumah_sekolah || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">19.</td>
+        <td class="wide">Asal Sekolah</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.asal_sekolah || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">20.</td>
+        <td class="wide">Sekolah</td>
+        <td class="sep">:</td>
+        <td>{{ data.sekolah.name || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">21.</td>
+        <td class="wide">Jenjang Pendidikan</td>
+        <td class="sep">:</td>
+        <td>{{ data.sekolah_grade.name || '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">22.</td>
+        <td class="wide">Prestasi yang pernah diperoleh</td>
+        <td class="sep">:</td>
+        <td>{{data.siswa_award != null ? data.siswa_award.award : '-'}}</td>
+      </tr>
+      <tr>
+        <td class="num">23.</td>
+        <td class="wide">Pilihan Kelas (Siswa Pindahan)</td>
+        <td class="sep">:</td>
+        <td>{{ data.status_pendaftaran_siswa == 'Siswa Pindahan' ? data.sekolah_grade.name || '-' : '-' }}</td>
+      </tr>
+      <tr>
+        <td class="num">24.</td>
+        <td class="wide">Riwayat Kesehatan (penyakit yang pernah diderita)</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa.riwayat_kesehatan || '-' }}</td>
+      </tr>
+    </table>
+
+    <div class="page_break"></div>
+
+    <div class="section-title">DATA ORANGTUA/WALI</div>
+
+    {{-- === AYAH === --}}
+    <table class="info-table">
+      <tr>
+        <td class="num">1.</td>
+        <td class="wide" style="width:160px"><b>Ayah</b></td>
+        <td class="sep"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>a. Nama Lengkap</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa_parent.nama_ayah}}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>b. Pendidikan terakhir</td>
+        <td class="sep">:</td>
+        <td>
+         {{data.siswa_parent.pendidikan_terakhir_ayah}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>c. Pekerjaan</td>
+        <td class="sep">:</td>
+        <td>
+         {{data.siswa_parent.pekerjaan_ayah}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>d. Alamat</td>
+        <td class="sep">:</td>
+        <td>
+          {{ data.siswa_parent.alamat_ayah || '-' }}<br/>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>e. Telp / HP</td>
+        <td class="sep">:</td>
+        <td>Tlp {{ data.siswa_parent.telepon_ayah || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ayah || '-' }}</td>
+      </tr>
+    </table>
+
+    {{-- === IBU === --}}
+    <table class="info-table" style="margin-top:10px;">
+      <tr>
+        <td class="num">2.</td>
+        <td class="wide" style="width:160px"><b>Ibu</b></td>
+        <td class="sep"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>a. Nama Lengkap</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa_parent.nama_ibu || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>b. Pendidikan terakhir</td>
+        <td class="sep">:</td>
+        <td>
+          {{data.siswa_parent.pendidikan_terakhir_ibu}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>c. Pekerjaan</td>
+        <td class="sep">:</td>
+        <td>
+         {{data.siswa_parent.pekerjaan_ibu}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>d. Alamat</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa_parent.alamat_ibu || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>e. Telp / HP</td>
+        <td class="sep">:</td>
+        <td>Tlp {{ data.siswa_parent.telepon_ibu || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ibu || '-' }}</td>
+      </tr>
+    </table>
+
+    {{-- === WALI === --}}
+    <table class="info-table" style="margin-top:10px;">
+      <tr>
+        <td class="num">3.</td>
+        <td class="wide" style="width:160px"><b>Wali</b></td>
+        <td class="sep"></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>a. Nama Lengkap</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa_parent.nama_wali || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>b. Pendidikan terakhir</td>
+        <td class="sep">:</td>
+        <td>
+          {{data.siswa_parent.pendidikan_terakhir_wali}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>c. Pekerjaan</td>
+        <td class="sep">:</td>
+        <td>
+          {{data.siswa_parent.pekerjaan_wali}}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>d. Alamat</td>
+        <td class="sep">:</td>
+        <td>{{ data.siswa_parent.alamat_wali || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>e. Telp / HP</td>
+        <td class="sep">:</td>
+        <td>Tlp {{ data.siswa_parent.telepon_wali || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_wali || '-' }}</td>
+      </tr>
+    </table>
+
+    <div class="sign-wrap">
+      <div class="sign-col">
+        <div class="small-note">&nbsp;</div>
+        <div><b>Petugas Pendaftaran</b></div>
+        <div class="sign-space"></div>
+        <br><br>
+        <div>( {{ !petugas ? '.............................................' : petugas.nama_depan + ' ' + petugas.nama_belakang }} )</div>
+      </div>
+      <div class="sign-col">
+        <div>&nbsp;</div>
+        <div class="small-note">&nbsp;</div>
+        <div><b>Orang Tua/Wali</b></div>
+        <div class="sign-space"></div>
+        <br><br>
+        <div>( {{ data.register.nama_depan + ' ' + data.register.nama_belakang }} )</div>
+      </div>
     </div>
-  </div>
-
-
-  <div class="section-title">Data Orang Tua</div>
-  <table class="info-table">
-    <tr><td>Nama Ayah</td><td>: {{ data.siswa_parent.nama_ayah }}</td></tr>
-    <tr><td>Pendidikan Ayah</td><td>: {{ data.siswa_parent.pendidikan_terakhir_ayah }}</td></tr>
-    <tr><td>Pekerjaan Ayah</td><td>: {{ data.siswa_parent.pekerjaan_ayah }}</td></tr>
-    <tr><td>Penghasilan Ayah</td><td>: {{ data.siswa_parent.penghasilan_ayah }}</td></tr>
-    <tr><td>Nama Ibu</td><td>: {{ data.siswa_parent.nama_ibu }}</td></tr>
-    <tr><td>Pendidikan Ibu</td><td>: {{ data.siswa_parent.pendidikan_terakhir_ibu }}</td></tr>
-    <tr><td>Pekerjaan Ibu</td><td>: {{ data.siswa_parent.pekerjaan_ibu }}</td></tr>
-    <tr><td>Penghasilan Ibu</td><td>: {{ data.siswa_parent.penghasilan_ibu }}</td></tr>
-  </table>
-
-  <div class="section-title">Data Pendaftaran PPDB</div>
-  <table class="info-table">
-    <tr><td>Kode Pendaftaran</td><td>: {{ data.code_pendaftaran }}</td></tr>
-    <tr><td>Tanggal Pendaftaran</td><td>: {{ data.tanggal_pendaftaran }}</td></tr>
-    <tr><td>Status Pendaftaran</td><td>: {{ data.status_pendaftaran_siswa }}</td></tr>
-    <tr><td>Jenjang</td><td>: {{ data.sekolah_grade.name }}</td></tr>
-    <tr><td>Sekolah</td><td>: {{ data.sekolah.name }}</td></tr>
-    <tr><td>Biaya Pendaftaran</td><td>: Rp {{ data.biaya_pendaftaran }}</td></tr>
-    <tr><td>Biaya Admin</td><td>: Rp {{ data.biaya_admin }}</td></tr>
-  </table>
-  <div class="page_break"></div>
-  <div class="section-title" >Prestasi Siswa</div>
-  <table class="info-table">
-    <tr><td>Jenis Prestasi</td><td>: {{ data.siswa_award != null ? data.siswa_award.award : '-' }}</td></tr>
-    <tr><td>Tanggal</td><td>: {{ data.siswa_award != null ? data.siswa_award.tgl_didapat : '-'}}</td></tr>
-    <tr><td>Bukti</td><td><img src="{{ data.siswa_award != null ? data.siswa_award.image : '-'}}" alt="Award" style="width:100px"/></td></tr>
-  </table>
-
-  <p style="margin-top: 30px">
-    Dengan ini menyatakan bahwa data di atas telah disetujui oleh pihak orang tua dan sekolah pada tanggal {{ data.updated_at }}.
-  </p>
-
-  <div class="small-note">
-    * Tanggal cetak {{ timestamp }}<br />
-    * Untuk info lanjut kunjungi: <a href="https://damaz.sintasi.com/">https://damaz.sintasi.com/</a>
-  </div>
-
-  <div class="qr-section">
-    <div></div>
-    <img src="{{ qr }}" alt="QR Code" />
-  </div>
+  </main>
 </body>
 </html>

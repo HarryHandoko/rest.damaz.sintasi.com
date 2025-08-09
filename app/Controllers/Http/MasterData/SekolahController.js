@@ -26,6 +26,7 @@ class SekolahController {
           .select('tbl_sekolah_grades.*','m_sekolas.name as nama_sekolah')
           .join('m_sekolas','m_sekolas.id','tbl_sekolah_grades.sekolah_id')
           .where('tbl_sekolah_grades.sekolah_id', dataSekolah.id)
+          .orderBy('tbl_sekolah_grades.sort','asc')
           .fetch()
 
         // Tambahkan ke objek utama
@@ -56,8 +57,9 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug']);
-
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug','code_formulir']);
+      data.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
+      data.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
       const logo = request.file('logo', {
         extnames: ['jpg', 'jpeg', 'png', 'webp'],
       });
@@ -139,15 +141,11 @@ class SekolahController {
   }
 
 
-
   async deleteGrade({ request, response, auth }) {
     try {
       const { id } = request.only(['id'])
       const data = await SekolahGrade.findOrFail(id)
-
-      data.destroy()
-
-      await data.save()
+      await data.delete()
       return response.status(200).json({
         message: 'Data deleted successfully'
       })
@@ -164,6 +162,8 @@ class SekolahController {
   async storeGrade({ request, response }) {
     try {
       const data = request.only(['name','sekolah_id']);
+      const getSort = await SekolahGrade.query().where('sekolah_id',request.input('sekolah_id')).orderBy('sort','desc').first();
+      data.sort = getSort != null ? parseInt(getSort.sort) + 1 : 0 ;
       const grade = await SekolahGrade.create(data)
 
       return response.status(201).json({
@@ -204,10 +204,13 @@ class SekolahController {
 
       sekolah.name = request.input('name')
       sekolah.biaya_admin = request.input('biaya_admin')
+      sekolah.code_formulir = request.input('code_formulir')
       sekolah.biaya_pendaftaran = request.input('biaya_pendaftaran')
       sekolah.kontent = request.input('kontent')
       sekolah.kontent_detail = request.input('kontent_detail')
       sekolah.slug = request.input('slug')
+      sekolah.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
+      sekolah.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
 
 
       const logo = request.file('logo', {
@@ -282,6 +285,53 @@ class SekolahController {
     })
   }
 
+  async updateSortGrade({ request, response}){
+    try {
+        const { id, type } = request.only(['id', 'type'])
+        const dataGrade = await SekolahGrade.findOrFail(id)
+
+        let GradeUpSort
+        if (type === 'up') {
+          // dataGrade dengan sort lebih kecil (di atas)
+          GradeUpSort = await SekolahGrade.query()
+            .where('sekolah_id', dataGrade.sekolah_id)
+            .where('sort', '<', dataGrade.sort)
+            .orderBy('sort', 'desc') // Ambil yang paling dekat ke atas
+            .first()
+        } else if (type === 'down') {
+          // dataGrade dengan sort lebih besar (di bawah)
+          GradeUpSort = await SekolahGrade.query()
+            .where('sekolah_id', dataGrade.sekolah_id)
+            .where('sort', '>', dataGrade.sort)
+            .orderBy('sort', 'asc') // Ambil yang paling dekat ke bawah
+            .first()
+        }
+
+        if (!GradeUpSort) {
+          return response.status(400).json({
+            message: 'Tidak bisa dipindahkan',
+          })
+        }
+
+        // Tukar nilai sort
+        const tempSort = dataGrade.sort
+        dataGrade.sort = GradeUpSort.sort
+        GradeUpSort.sort = tempSort
+
+        await dataGrade.save()
+        await GradeUpSort.save()
+
+        return response.status(200).json({
+          message: 'Data updated successfully',
+          data: dataGrade
+        })
+      } catch (error) {
+        return response.status(500).json({
+          message: 'Error updating Data',
+          error: error.message
+        })
+      }
+  }
 }
 
 module.exports = SekolahController

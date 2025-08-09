@@ -93,8 +93,10 @@ Route.group(() => {
   Route.post('/master-data/sekolah/post', 'MasterData/SekolahController.store')
   Route.post('/master-data/sekolah/adding-grade', 'MasterData/SekolahController.storeGrade')
   Route.post('/master-data/sekolah/delete', 'MasterData/SekolahController.delete')
+  Route.post('/master-data/sekolah-grade/delete', 'MasterData/SekolahController.deleteGrade')
   Route.post('/master-data/sekolah/update', 'MasterData/SekolahController.update')
   Route.post('/master-data/sekolah/update-grade', 'MasterData/SekolahController.updateGrade')
+  Route.post('/master-data/sekolah/update-sort', 'MasterData/SekolahController.updateSortGrade')
 
   //Register PPDB
   Route.post('/register-ppdb/get-data', 'PPDB/RegisterController.getData')

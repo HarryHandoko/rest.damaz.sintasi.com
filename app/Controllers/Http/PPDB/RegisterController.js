@@ -533,6 +533,8 @@ class RegisterController {
         dataRegis[index].siswa_address = siswaAddress
         dataRegis[index].siswa_parent = siswaOru
         dataRegis[index].payment = PaymentData
+
+        dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
         dataRegis[index].register = dataRegister?.toJSON() || null
         dataRegis[index].registrasi_ulang = dataRegistrasiUlang?.toJSON() || null
         dataRegis[index].sekolah = dataSekolah?.toJSON() || null
@@ -673,6 +675,7 @@ class RegisterController {
         dataRegis[index].siswa_award = siswaAwards
         dataRegis[index].siswa_address = siswaAddress
         dataRegis[index].siswa_parent = siswaOru
+        dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
         dataRegis[index].payment = PaymentData
         dataRegis[index].register = dataRegister?.toJSON() || null
         dataRegis[index].sekolah = dataSekolah?.toJSON() || null
@@ -868,6 +871,7 @@ class RegisterController {
   async Approval({ response, request , auth}) {
     try {
       const code = request.input('code_ppdb')
+      const tgl_test = request.input('tgl_test')
       const type = request.input('type') // 'Approve' atau 'Reject'
 
       const data = await RegisterPPDB
@@ -906,6 +910,9 @@ class RegisterController {
       if (type === 'Approve') {
         data.status_pendaftaran = 'P01';
         data.petugas_id = auth.user.id;
+        if(tgl_test != null){
+          data.tgl_test = tgl_test;
+        }
         if (payment) payment.status_payment = '01'
 
         // Kirim Email
@@ -948,14 +955,15 @@ class RegisterController {
 
             <br>
 
-            <p>Salam,<br><strong>Tim PPDB SDIT Darul Mazah</strong></p>
+            <p>Salam,<br><strong>Tim PPDB SDIT Darul Maza</strong></p>
           `
 
-          await EmailService.send(user.email, 'Pendaftaran Anda Disetujui', emailHtml)
+          await EmailService.send(user.email, 'Pemberitahuan PPDB Damaz', emailHtml)
         }
       } else if (type === 'Reject') {
         data.petugas_id = auth.user.id;
-        data.status_pendaftaran = 'P02'
+        data.status_pendaftaran = 'P02';
+        data.tgl_test = null;
         if (payment) payment.status_payment = '02'
 
         const fullName =
@@ -999,10 +1007,10 @@ class RegisterController {
 
           <br>
 
-          <p>Salam,<br><strong>Tim PPDB SDIT Darul Mazah</strong></p>
+          <p>Salam,<br><strong>Tim PPDB SDIT Darul Maza</strong></p>
         `
 
-        await EmailService.send(user.email, 'Pendaftaran Anda Ditolak', emailHtml)
+        await EmailService.send(user.email, 'Pemberitahuan PPDB Damaz', emailHtml)
 
       } else {
         return response.status(400).json({
@@ -1065,6 +1073,7 @@ class RegisterController {
         register_id : request.input('id'),
         code_registrasi_ulang : kodePendaftaran,
         register_by : auth.user.id,
+        status_pembayaran : '00',
         biaya_pendaftaran : request.input('sekolah')['biaya_pendaftaran']
       });
 
@@ -1262,10 +1271,28 @@ class RegisterController {
           error: error.message,
         })
       }else{
-        if(request.input('type') == 'Approve'){
+        const dataRegist = await RegisterPPDB.query().where('id', data.register_id).firstOrFail()
+        const dataSiswa = await SiswaPpdb.query().where('id', request.input('siswa_id')).firstOrFail()
+        const user = await User.find(dataRegist.registed_by)
 
-          const dataRegist = await RegisterPPDB.query().where('id', data.register_id).firstOrFail()
-          const dataSiswa = await SiswaPpdb.query().where('id', request.input('siswa_id')).firstOrFail()
+        const dataSekolah = await Sekolah.query().where('id', dataRegist.sekolah_id).firstOrFail()
+        const dataSekolahGrade = await SekolahGrade.query().where('id', dataRegist.grade_id).firstOrFail()
+        const dataSiswaAddress = await RegAddress.query()
+          .select(
+            'tbl_register_ppdb_addresses.*',
+            'indonesia_provinces.name as provinsi',
+            'indonesia_cities.name as kota',
+            'indonesia_districts.name as district',
+            'indonesia_villages.name as desa'
+          )
+          .joinRaw(`JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`)
+          .joinRaw(`JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`)
+          .joinRaw(`JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`)
+          .joinRaw(`JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`)
+          .where('tbl_register_ppdb_addresses.register_id', dataRegist.id)
+          .first()
+
+        if(request.input('type') == 'Approve'){
 
           const sekolahId = dataRegist.sekolah_id.toString().padStart(2, '0')
           const gradeId = dataRegist.grade_id.toString().padStart(2, '0')
@@ -1291,9 +1318,98 @@ class RegisterController {
             await dataSiswa.save()
           }
           data.status_pembayaran = '01'
+
+          if (user && user.email) {
+            const emailHtml = `
+                <h2>Halo ${user.nama_depan},</h2>
+
+                <p>
+                  Pendaftaran siswa berikut telah <strong>DISETUJUI</strong>:
+                </p>
+
+                <table cellpadding="6" cellspacing="0" border="0" style="border-collapse: collapse; font-family: sans-serif;">
+                  <tr>
+                    <td><strong>Nama Siswa</strong></td>
+                    <td>: ${dataSiswa.nama_depan + ' ' +  dataSiswa.nama_belakang || '-'}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sekolah</strong></td>
+                    <td>: ${dataSekolah.name || '-'}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Jejang</strong></td>
+                    <td>: ${dataSekolahGrade.name || '-'}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Kode Pendaftaran</strong></td>
+                    <td>: ${dataRegist.code_pendaftaran}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tempat, Tanggal Lahir</strong></td>
+                    <td>: ${dataSiswa.tempat_lahir || '-'},  ${moment(dataSiswa.tgl_lahir).locale('id').format('D MMMM YYYY')}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Alamat</strong></td>
+                    <td>: ${dataSiswaAddress.alamat || '-'}</td>
+                  </tr>
+                </table>
+
+                <p>Silakan lanjutkan proses berikutnya melalui portal PPDB kami.</p>
+
+                <br>
+
+                <p>Salam,<br><strong>Tim PPDB SDIT Darul Maza</strong></p>
+              `
+
+              await EmailService.send(user.email, 'Pemberitahuan PPDB Damaz', emailHtml)
+            }
           data.save()
         }else if(request.input('type') == 'Reject'){
           data.status_pembayaran = '02'
+          if (user && user.email) {
+          const emailHtml = `
+              <h2>Halo ${user.nama_depan},</h2>
+
+              <p>
+                Pendaftaran siswa berikut telah <strong>DITOLAK</strong>:
+              </p>
+
+              <table cellpadding="6" cellspacing="0" border="0" style="border-collapse: collapse; font-family: sans-serif;">
+                <tr>
+                  <td><strong>Nama Siswa</strong></td>
+                  <td>: ${dataSiswa.nama_depan + ' ' +  dataSiswa.nama_belakang || '-'}</td>
+                </tr>
+                <tr>
+                  <td><strong>Sekolah</strong></td>
+                  <td>: ${dataSekolah.name || '-'}</td>
+                </tr>
+                <tr>
+                  <td><strong>Jejang</strong></td>
+                  <td>: ${dataSekolahGrade.name || '-'}</td>
+                </tr>
+                <tr>
+                  <td><strong>Kode Pendaftaran</strong></td>
+                  <td>: ${dataRegist.code_pendaftaran}</td>
+                </tr>
+                <tr>
+                  <td><strong>Tempat, Tanggal Lahir</strong></td>
+                  <td>: ${dataSiswa.tempat_lahir || '-'},  ${moment(dataSiswa.tgl_lahir).locale('id').format('D MMMM YYYY')}</td>
+                </tr>
+                <tr>
+                  <td><strong>Alamat</strong></td>
+                  <td>: ${dataSiswaAddress.alamat || '-'}</td>
+                </tr>
+              </table>
+
+              <p>Silakan hubungi tim kami melalui portal PPDB jika Anda membutuhkan klarifikasi lebih lanjut.</p>
+
+              <br>
+
+              <p>Salam,<br><strong>Tim PPDB SDIT Darul Maza</strong></p>
+            `
+
+            await EmailService.send(user.email, 'Pemberitahuan PPDB Damaz', emailHtml)
+          }
           data.save()
         }
       }

@@ -39,6 +39,12 @@ class SekolahController {
           : null
         dataSekolah.foto_kontent = dataSekolah.foto_kontent
           ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_kontent}`
+          : null,
+        dataSekolah.foto_kepala_unit = dataSekolah.foto_kepala_unit
+          ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_kepala_unit}`
+          : null,
+        dataSekolah.foto_guru_unit = dataSekolah.foto_guru_unit
+          ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_guru_unit}`
           : null
       })
     )
@@ -57,7 +63,7 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug','code_formulir']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug','code_formulir','moto','visi','misi','sambutan_kepala_unit']);
       data.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
       data.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
       const logo = request.file('logo', {
@@ -88,6 +94,39 @@ class SekolahController {
         data.foto_kontent_sekolah = fileName;
       } else {
         return response.status(400).json({ message: 'Foto Sekolah is required' });
+      }
+
+      const foto_kepala_unit = request.file('foto_kepala_unit', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+
+      if (foto_kepala_unit) {
+        const fileName = `${Date.now()}.${foto_kepala_unit.extname}`;
+        await foto_kepala_unit.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        data.foto_kepala_unit = fileName;
+      } else {
+        return response.status(400).json({ message: 'foto_kepala_unit is required' });
+      }
+
+
+
+
+      const foto_guru_unit = request.file('foto_guru_unit', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+
+      if (foto_guru_unit) {
+        const fileName = `${Date.now()}.${foto_guru_unit.extname}`;
+        await foto_guru_unit.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        data.foto_guru_unit = fileName;
+      } else {
+        return response.status(400).json({ message: 'foto_guru_unit is required' });
       }
 
 
@@ -208,6 +247,10 @@ class SekolahController {
       sekolah.biaya_pendaftaran = request.input('biaya_pendaftaran')
       sekolah.kontent = request.input('kontent')
       sekolah.kontent_detail = request.input('kontent_detail')
+      sekolah.sambutan_kepala_unit = request.input('sambutan_kepala_unit')
+      sekolah.moto = request.input('moto')
+      sekolah.visi = request.input('visi')
+      sekolah.misi = request.input('misi')
       sekolah.slug = request.input('slug')
       sekolah.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
       sekolah.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
@@ -225,6 +268,30 @@ class SekolahController {
         sekolah.logo = fileName;
       }
 
+      const foto_kepala_unit = request.file('foto_kepala_unit', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (foto_kepala_unit) {
+        const fileName = `${Date.now()}.${foto_kepala_unit.extname}`;
+        await foto_kepala_unit.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.foto_kepala_unit = fileName;
+      }
+
+
+      const foto_guru_unit = request.file('foto_guru_unit', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (foto_guru_unit) {
+        const fileName = `${Date.now()}.${foto_guru_unit.extname}`;
+        await foto_guru_unit.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.foto_guru_unit = fileName;
+      }
 
 
       const foto_kontent_sekolah = request.file('foto_kontent_sekolah', {

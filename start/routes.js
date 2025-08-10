@@ -65,6 +65,12 @@ Route.group(() => {
   Route.post('/master-content/fasilitas/delete', 'MasterContent/FasilitaController.delete')
   Route.post('/master-content/fasilitas/update', 'MasterContent/FasilitaController.update')
 
+  // Master Konten Siswa Prestasi
+  Route.get('/master-content/siswa-prestasi/get', 'MasterContent/SiswaPrestasiController.index')
+  Route.post('/master-content/siswa-prestasi/post', 'MasterContent/SiswaPrestasiController.store')
+  Route.post('/master-content/siswa-prestasi/delete', 'MasterContent/SiswaPrestasiController.delete')
+  Route.post('/master-content/siswa-prestasi/update', 'MasterContent/SiswaPrestasiController.update')
+
 
   // Master Bank Account
   Route.get('/master-data/bank-account/get', 'Master/BankAccountController.index')
@@ -146,5 +152,11 @@ Route.group(() => {
   Route.post('/master/pendaftar/delete', 'Master/PendaftarController.delete')
   Route.post('/master/pendaftar/update', 'Master/PendaftarController.update')
   Route.post('/master/pendaftar/update-data', 'Master/PendaftarController.updateData')
+
+
+  //Register Proses Test
+  Route.post('/register-test/get-data', 'PPDB/ProsesTestController.getData')
+  Route.get('/register-test/statistik', 'PPDB/ProsesTestController.statistik')
+  Route.post('/register-test/approval', 'PPDB/ProsesTestController.Approval')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

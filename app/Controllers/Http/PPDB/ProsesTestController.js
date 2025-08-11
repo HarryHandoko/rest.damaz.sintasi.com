@@ -150,7 +150,7 @@ class ProsesTestController {
 
           // Tambahkan ke item (update langsung ke dataRegis[index])
           dataRegis[index].siswa = siswa
-          dataRegis[index].siswa_award = siswaAwards
+          dataRegis[index].siswa_award = null
           dataRegis[index].siswa_address = siswaAddress
           dataRegis[index].siswa_parent = siswaOru
           dataRegis[index].payment = PaymentData

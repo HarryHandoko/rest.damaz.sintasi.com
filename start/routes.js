@@ -65,6 +65,12 @@ Route.group(() => {
   Route.post('/master-content/fasilitas/delete', 'MasterContent/FasilitaController.delete')
   Route.post('/master-content/fasilitas/update', 'MasterContent/FasilitaController.update')
 
+  // Master Konten Pengurus
+  Route.get('/master-content/pengurus/get', 'MasterContent/PengurusYayasanController.index')
+  Route.post('/master-content/pengurus/post', 'MasterContent/PengurusYayasanController.store')
+  Route.post('/master-content/pengurus/delete', 'MasterContent/PengurusYayasanController.delete')
+  Route.post('/master-content/pengurus/update', 'MasterContent/PengurusYayasanController.update')
+
   // Master Konten Siswa Prestasi
   Route.get('/master-content/siswa-prestasi/get', 'MasterContent/SiswaPrestasiController.index')
   Route.post('/master-content/siswa-prestasi/post', 'MasterContent/SiswaPrestasiController.store')

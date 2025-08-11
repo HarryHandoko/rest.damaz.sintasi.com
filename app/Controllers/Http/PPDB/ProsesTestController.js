@@ -157,7 +157,7 @@ class ProsesTestController {
 
           dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
           dataRegis[index].register = dataRegister?.toJSON() || null
-          dataRegis[index].registrasi_ulang = dataRegistrasiUlang?.toJSON() || null
+          // dataRegis[index].registrasi_ulang = dataRegistrasiUlang?.toJSON() || null
           dataRegis[index].sekolah = dataSekolah?.toJSON() || null
           dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null
           dataRegis[index].file_raport = dataRegis[index].file_raport

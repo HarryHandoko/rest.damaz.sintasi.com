@@ -54,7 +54,7 @@ class WebProfileController {
     const input = request.only([
       'title', 'address', 'whatsapp', 'email',
       'social_fb', 'social_ig', 'social_youtube', 'social_wa','komitmen_kami','tentang_kami','visi','misi',
-      'link_youtube','sambutan','founder','tiktok'
+      'link_youtube','sambutan','founder','tiktok','tentang_beranda'
     ])
 
     // Upload file ... (copy dari kode kamu sebelumnya)

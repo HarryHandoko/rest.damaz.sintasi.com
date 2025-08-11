@@ -95,6 +95,12 @@ Route.group(() => {
   Route.post('/master-content/prestasi-unit/delete', 'Master/PrestasiUnitController.delete')
   Route.post('/master-content/prestasi-unit/update', 'Master/PrestasiUnitController.update')
 
+  // Master Konten program unggulan-unit
+  Route.post('/master-content/program-unggulan-unit/get', 'Master/ProgramUnggulanUnitController.index')
+  Route.post('/master-content/program-unggulan-unit/post', 'Master/ProgramUnggulanUnitController.store')
+  Route.post('/master-content/program-unggulan-unit/delete', 'Master/ProgramUnggulanUnitController.delete')
+  Route.post('/master-content/program-unggulan-unit/update', 'Master/ProgramUnggulanUnitController.update')
+
   // Master Bank Account
   Route.get('/master-data/bank-account/get', 'Master/BankAccountController.index')
   Route.get('/master-data/bank-account/get-payment', 'Master/BankAccountController.indexPayment')

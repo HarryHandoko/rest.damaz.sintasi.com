@@ -72,6 +72,17 @@ Route.group(() => {
   Route.post('/master-content/siswa-prestasi/update', 'MasterContent/SiswaPrestasiController.update')
 
 
+  // Master Konten eskull-unit
+  Route.post('/master-content/eskull-unit/get', 'Master/EskullUnitController.index')
+  Route.post('/master-content/eskull-unit/post', 'Master/EskullUnitController.store')
+  Route.post('/master-content/eskull-unit/delete', 'Master/EskullUnitController.delete')
+  Route.post('/master-content/eskull-unit/update', 'Master/EskullUnitController.update')
+  // Master Konten Prestasi Unit
+  Route.post('/master-content/prestasi-unit/get', 'Master/PrestasiUnitController.index')
+  Route.post('/master-content/prestasi-unit/post', 'Master/PrestasiUnitController.store')
+  Route.post('/master-content/prestasi-unit/delete', 'Master/PrestasiUnitController.delete')
+  Route.post('/master-content/prestasi-unit/update', 'Master/PrestasiUnitController.update')
+
   // Master Bank Account
   Route.get('/master-data/bank-account/get', 'Master/BankAccountController.index')
   Route.get('/master-data/bank-account/get-payment', 'Master/BankAccountController.indexPayment')

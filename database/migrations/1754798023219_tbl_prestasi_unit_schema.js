@@ -3,18 +3,18 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
 
-class MSiswaBerprestasiSchema extends Schema {
+class TblPrestasiUnitSchema extends Schema {
   up () {
-    this.table('m_siswa_berprestasis', (table) => {
+    this.table('tbl_prestasi_units', (table) => {
       table.string('is_active').default('1')
     })
   }
 
   down () {
-    this.table('m_siswa_berprestasis', (table) => {
+    this.table('tbl_prestasi_units', (table) => {
       // reverse alternations
     })
   }
 }
 
-module.exports = MSiswaBerprestasiSchema
+module.exports = TblPrestasiUnitSchema

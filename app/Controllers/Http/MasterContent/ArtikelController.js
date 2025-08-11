@@ -1,6 +1,7 @@
 'use strict'
 
 const Artikel = use('App/Models/MasterContent/Artikel')
+const User = use('App/Models/User')
 const Tag = use('App/Models/MasterContent/Tag')
 const Database = use('Database') // (Adonis 4.x)
 const slugify = (text) => {
@@ -45,6 +46,8 @@ class ArtikelController {
         : null
 
       artikel.scheduled_at = formatDate(artikel.scheduled_at);
+      const Creator =  await User.find(artikel.user_id);
+      artikel.creator = Creator.nama_depan + ' ' + Creator.nama_belakang;
 
       // Query tags for this article from tbl_artikel_tag
       const tags = await Database
@@ -96,6 +99,11 @@ class ArtikelController {
       }
 
       data.user_id = auth.user.id;
+      if(data.status == 'published'){
+        const datenow = new Date();
+        data.scheduled_at = datenow
+        data.scheduled_at = datenow
+      }
 
       // Insert artikel (pakai Query Builder)
       const [artikelId] = await Database.table('tbl_artikel').transacting(trx).insert(data).returning('id');

@@ -128,7 +128,7 @@ class ProsesTestController {
           ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
           : null
 
-          const siswaAwards = dataSiswaAward?.toJSON() || null;
+          const siswaAwards = dataSiswaAward != null ? dataSiswaAward?.toJSON() || null : null;
           if(siswaAwards != null){
             siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat);
             siswaAwards.image = siswaAwards.image
@@ -179,7 +179,7 @@ class ProsesTestController {
         return response.status(500).json({
           status: 'error',
           message: 'Server error',
-          error: error
+          error: error.message
         })
       }
     }

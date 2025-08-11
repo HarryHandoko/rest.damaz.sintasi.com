@@ -60,7 +60,6 @@ class ProsesTestController {
 
         await Promise.all(dataRegis.map(async (item, index) => {
           const dataSiswa = await SiswaPpdb.query()
-            .where('registed_by', auth.user.id)
             .where('id', item.siswa_id)
             .first()
 
@@ -128,7 +127,7 @@ class ProsesTestController {
           ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
           : null
 
-          const siswaAwards = dataSiswaAward != null ? dataSiswaAward?.toJSON() || null : null;
+          const siswaAwards = dataSiswaAward?.toJSON() || null;
           if(siswaAwards != null){
             siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat);
             siswaAwards.image = siswaAwards.image
@@ -150,14 +149,14 @@ class ProsesTestController {
 
           // Tambahkan ke item (update langsung ke dataRegis[index])
           dataRegis[index].siswa = siswa
-          dataRegis[index].siswa_award = null
+          dataRegis[index].siswa_award = siswaAwards
           dataRegis[index].siswa_address = siswaAddress
           dataRegis[index].siswa_parent = siswaOru
           dataRegis[index].payment = PaymentData
 
           dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
           dataRegis[index].register = dataRegister?.toJSON() || null
-          // dataRegis[index].registrasi_ulang = dataRegistrasiUlang?.toJSON() || null
+          dataRegis[index].registrasi_ulang = dataRegistrasiUlang?.toJSON() || null
           dataRegis[index].sekolah = dataSekolah?.toJSON() || null
           dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null
           dataRegis[index].file_raport = dataRegis[index].file_raport
@@ -179,7 +178,7 @@ class ProsesTestController {
         return response.status(500).json({
           status: 'error',
           message: 'Server error',
-          error: `${error}`
+          error: error.message
         })
       }
     }

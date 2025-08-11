@@ -77,6 +77,13 @@ Route.group(() => {
   Route.post('/master-content/prestasi-sekolah/update', 'Master/PrestasiSekolahController.update')
 
 
+  // Master Konten Program Unggulan
+  Route.get('/master-content/program-unggulan/get', 'MasterContent/ProgramUnggulanController.index')
+  Route.post('/master-content/program-unggulan/post', 'MasterContent/ProgramUnggulanController.store')
+  Route.post('/master-content/program-unggulan/delete', 'MasterContent/ProgramUnggulanController.delete')
+  Route.post('/master-content/program-unggulan/update', 'MasterContent/ProgramUnggulanController.update')
+
+
   // Master Konten eskull-unit
   Route.post('/master-content/eskull-unit/get', 'Master/EskullUnitController.index')
   Route.post('/master-content/eskull-unit/post', 'Master/EskullUnitController.store')

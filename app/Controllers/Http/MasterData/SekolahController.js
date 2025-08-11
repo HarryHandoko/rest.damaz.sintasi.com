@@ -46,6 +46,12 @@ class SekolahController {
           : null,
         dataSekolah.foto_guru_unit = dataSekolah.foto_guru_unit
           ? `${baseUrl}/uploads/sekolah/${dataSekolah.foto_guru_unit}`
+          : null,
+        dataSekolah.banner_visi = dataSekolah.banner_visi
+          ? `${baseUrl}/uploads/sekolah/${dataSekolah.banner_visi}`
+          : null,
+        dataSekolah.banner_misi = dataSekolah.banner_misi
+          ? `${baseUrl}/uploads/sekolah/${dataSekolah.banner_misi}`
           : null
       })
     )
@@ -143,6 +149,32 @@ class SekolahController {
         data.foto_kontent = fileName;
       } else {
         return response.status(400).json({ message: 'Foto Sekolah is required' });
+      }
+
+
+
+      const banner_misi = request.file('banner_misi', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (banner_misi) {
+        const fileName = `${Date.now()}.${banner_misi.extname}`;
+        await banner_misi.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        data.banner_misi = fileName;
+      }
+
+      const banner_visi = request.file('banner_visi', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (banner_visi) {
+        const fileName = `${Date.now()}.${banner_visi.extname}`;
+        await banner_visi.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        data.banner_visi = fileName;
       }
 
       // Simpan ke database
@@ -267,6 +299,31 @@ class SekolahController {
           overwrite: true
         });
         sekolah.logo = fileName;
+      }
+
+
+      const banner_misi = request.file('banner_misi', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (banner_misi) {
+        const fileName = `${Date.now()}.${banner_misi.extname}`;
+        await banner_misi.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.banner_misi = fileName;
+      }
+
+      const banner_visi = request.file('banner_visi', {
+        extnames: ['jpg', 'jpeg', 'png', 'webp'],
+      });
+      if (banner_visi) {
+        const fileName = `${Date.now()}.${banner_visi.extname}`;
+        await banner_visi.move('public/uploads/sekolah', {
+          name: fileName,
+          overwrite: true
+        });
+        sekolah.banner_visi = fileName;
       }
 
       const foto_kepala_unit = request.file('foto_kepala_unit', {

@@ -70,6 +70,11 @@ Route.group(() => {
   Route.post('/master-content/siswa-prestasi/post', 'MasterContent/SiswaPrestasiController.store')
   Route.post('/master-content/siswa-prestasi/delete', 'MasterContent/SiswaPrestasiController.delete')
   Route.post('/master-content/siswa-prestasi/update', 'MasterContent/SiswaPrestasiController.update')
+  // Master Konten Prestasi Sekolah
+  Route.get('/master-content/prestasi-sekolah/get', 'Master/PrestasiSekolahController.index')
+  Route.post('/master-content/prestasi-sekolah/post', 'Master/PrestasiSekolahController.store')
+  Route.post('/master-content/prestasi-sekolah/delete', 'Master/PrestasiSekolahController.delete')
+  Route.post('/master-content/prestasi-sekolah/update', 'Master/PrestasiSekolahController.update')
 
 
   // Master Konten eskull-unit

@@ -20,10 +20,10 @@ class WebProfileController {
         ? `${baseUrl}/uploads/web_profile/${data.banner}`
         : null,
       bannerdua: data.banner
-        ? `${baseUrl}/uploads/bannerdua/${data.bannerdua}`
+        ? `${baseUrl}/uploads/web_profile/${data.bannerdua}`
         : null,
       bannertiga: data.banner
-        ? `${baseUrl}/uploads/bannertiga/${data.bannertiga}`
+        ? `${baseUrl}/uploads/web_profile/${data.bannertiga}`
         : null,
       logo: data.logo
         ? `${baseUrl}/uploads/web_profile/${data.logo}`

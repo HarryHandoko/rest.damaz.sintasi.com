@@ -37,7 +37,7 @@ class PrestasiUnitController {
   async store({ request, response }) {
     try {
       // Get the title from the request
-      const data = request.only(['name','sekolah_id'])
+      const data = request.only(['name','sekolah_id','type'])
       const sekolahID = await Sekolah.query().whereRaw('MD5(id) = ?',request.input('sekolah_id')).first();
 
       // Get the image file (required or optional, up to you)
@@ -109,6 +109,11 @@ class PrestasiUnitController {
       const name = request.input('name')
       if (name) {
         data.name = name
+      }
+      // Update name jika ada
+      const type = request.input('type')
+      if (type) {
+        data.type = type
       }
 
       // Jika ada file image baru

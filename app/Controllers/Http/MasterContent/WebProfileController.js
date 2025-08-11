@@ -19,6 +19,12 @@ class WebProfileController {
       banner: data.banner
         ? `${baseUrl}/uploads/web_profile/${data.banner}`
         : null,
+      bannerdua: data.banner
+        ? `${baseUrl}/uploads/bannerdua/${data.bannerdua}`
+        : null,
+      bannertiga: data.banner
+        ? `${baseUrl}/uploads/bannertiga/${data.bannertiga}`
+        : null,
       logo: data.logo
         ? `${baseUrl}/uploads/web_profile/${data.logo}`
         : null,
@@ -105,6 +111,42 @@ class WebProfileController {
         return response.status(400).json({ error: bannerVisiFile.error() })
       }
       input.banner_visi = fileName
+    }
+
+
+    // ---- bannerDua ----
+    const bannerDuaFile = request.file('bannerdua', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (bannerDuaFile) {
+      const fileName = `bannerdua_${Date.now()}.${bannerDuaFile.subtype}`
+      await bannerDuaFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!bannerDuaFile.moved()) {
+        return response.status(400).json({ error: bannerDuaFile.error() })
+      }
+      input.bannerdua = fileName
+    }
+
+
+    // ---- bannertiga ----
+    const bannertigaFile = request.file('bannertiga', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (bannertigaFile) {
+      const fileName = `bannertiga_${Date.now()}.${bannertigaFile.subtype}`
+      await bannertigaFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!bannertigaFile.moved()) {
+        return response.status(400).json({ error: bannertigaFile.error() })
+      }
+      input.bannertiga = fileName
     }
 
     // ---- bannerMisi ----

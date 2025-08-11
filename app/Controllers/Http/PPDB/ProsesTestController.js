@@ -179,7 +179,7 @@ class ProsesTestController {
         return response.status(500).json({
           status: 'error',
           message: 'Server error',
-          error: error.message
+          error: error
         })
       }
     }

@@ -13,6 +13,7 @@ class SekolahController {
     // Paginate sekolah
     const data = await Sekolah.query()
       .where('is_delete', '0')
+      .orderBy('sort', 'asc')
       .paginate(page, perPage)
 
     // Convert to plain JSON
@@ -391,6 +392,55 @@ class SekolahController {
         return response.status(200).json({
           message: 'Data updated successfully',
           data: dataGrade
+        })
+      } catch (error) {
+        return response.status(500).json({
+          message: 'Error updating Data',
+          error: error.message
+        })
+      }
+  }
+
+
+
+
+  async updateSort({ request, response}){
+    try {
+        const { id, type } = request.only(['id', 'type'])
+        const dataSekolah = await Sekolah.findOrFail(id)
+
+        let GradeUpSort
+        if (type === 'up') {
+          // dataSekolah dengan sort lebih kecil (di atas)
+          GradeUpSort = await Sekolah.query()
+            .where('sort', '<', dataSekolah.sort)
+            .orderBy('sort', 'desc') // Ambil yang paling dekat ke atas
+            .first()
+        } else if (type === 'down') {
+          // dataSekolah dengan sort lebih besar (di bawah)
+          GradeUpSort = await Sekolah.query()
+            .where('sort', '>', dataSekolah.sort)
+            .orderBy('sort', 'asc') // Ambil yang paling dekat ke bawah
+            .first()
+        }
+
+        if (!GradeUpSort) {
+          return response.status(400).json({
+            message: 'Tidak bisa dipindahkan',
+          })
+        }
+
+        // Tukar nilai sort
+        const tempSort = dataSekolah.sort
+        dataSekolah.sort = GradeUpSort.sort
+        GradeUpSort.sort = tempSort
+
+        await dataSekolah.save()
+        await GradeUpSort.save()
+
+        return response.status(200).json({
+          message: 'Data updated successfully',
+          data: dataSekolah
         })
       } catch (error) {
         return response.status(500).json({

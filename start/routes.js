@@ -126,6 +126,7 @@ Route.group(() => {
   Route.post('/master-data/sekolah/update', 'MasterData/SekolahController.update')
   Route.post('/master-data/sekolah/update-grade', 'MasterData/SekolahController.updateGrade')
   Route.post('/master-data/sekolah/update-sort', 'MasterData/SekolahController.updateSortGrade')
+  Route.post('/master-data/sekolah/update-sort-sekolah', 'MasterData/SekolahController.updateSort')
 
   //Register PPDB
   Route.post('/register-ppdb/get-data', 'PPDB/RegisterController.getData')

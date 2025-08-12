@@ -211,5 +211,7 @@ Route.group(() => {
   // analiticDashboard
 
   Route.post('/dashboard/analitic-total-per-tahun', 'Report/DashboardAnalitycController.totalPertahun')
+  Route.post('/dashboard/analitic-total-per-unit', 'Report/DashboardAnalitycController.totalUnitPertahun')
+  Route.post('/dashboard/analitic-total-per-gender', 'Report/DashboardAnalitycController.totalPerGender')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

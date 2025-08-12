@@ -34,7 +34,7 @@ class PengurusYayasanController {
   async store({ request, response }) {
     try {
       // Get the title from the request
-      const data = request.only(['pengurus','jabatan','header','sambutan'])
+      const data = request.only(['pengurus','jabatan','header','sambutan','tipe'])
 
       // Get the image file (required or optional, up to you)
       const image = request.file('image', {
@@ -115,6 +115,13 @@ class PengurusYayasanController {
       const sambutan = request.input('sambutan')
       if (sambutan) {
         DataPengurus.sambutan = sambutan
+      }
+
+
+      // Update tipe jika ada
+      const tipe = request.input('tipe')
+      if (tipe) {
+        DataPengurus.tipe = tipe
       }
 
       // Jika ada file image baru

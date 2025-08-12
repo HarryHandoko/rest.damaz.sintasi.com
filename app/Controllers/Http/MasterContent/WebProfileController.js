@@ -19,6 +19,12 @@ class WebProfileController {
       banner: data.banner
         ? `${baseUrl}/uploads/web_profile/${data.banner}`
         : null,
+      banner_tentang_satu: data.banner
+        ? `${baseUrl}/uploads/web_profile/${data.banner_tentang_satu}`
+        : null,
+      banner_tentang_dua: data.banner
+        ? `${baseUrl}/uploads/web_profile/${data.banner_tentang_dua}`
+        : null,
       bannerdua: data.banner
         ? `${baseUrl}/uploads/web_profile/${data.bannerdua}`
         : null,
@@ -60,7 +66,7 @@ class WebProfileController {
     const input = request.only([
       'title', 'address', 'whatsapp', 'email',
       'social_fb', 'social_ig', 'social_youtube', 'social_wa','komitmen_kami','tentang_kami','visi','misi',
-      'link_youtube','sambutan','founder','tiktok','tentang_beranda','moto'
+      'link_youtube','sambutan','founder','tiktok','tentang_beranda','moto','tentang_dua'
     ])
 
     // Upload file ... (copy dari kode kamu sebelumnya)
@@ -95,6 +101,41 @@ class WebProfileController {
         return response.status(400).json({ error: bannerAboutFile.error() })
       }
       input.banner_about = fileName
+    }
+
+    // ---- banner_tentang_satu ----
+    const banner_tentang_satuFile = request.file('banner_tentang_satu', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (banner_tentang_satuFile) {
+      const fileName = `banner_tentang_satu_${Date.now()}.${banner_tentang_satuFile.subtype}`
+      await banner_tentang_satuFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!banner_tentang_satuFile.moved()) {
+        return response.status(400).json({ error: banner_tentang_satuFile.error() })
+      }
+      input.banner_tentang_satu = fileName
+    }
+
+
+    // ---- banner_tentang_dua ----
+    const banner_tentang_duaFile = request.file('banner_tentang_dua', {
+      types: ['image'],
+      size: '10mb'
+    })
+    if (banner_tentang_duaFile) {
+      const fileName = `banner_tentang_dua_${Date.now()}.${banner_tentang_duaFile.subtype}`
+      await banner_tentang_duaFile.move(Helpers.publicPath('uploads/web_profile'), {
+        name: fileName,
+        overwrite: true
+      })
+      if (!banner_tentang_duaFile.moved()) {
+        return response.status(400).json({ error: banner_tentang_duaFile.error() })
+      }
+      input.banner_tentang_dua = fileName
     }
     // ---- bannerVisi ----
     const bannerVisiFile = request.file('banner_visi', {

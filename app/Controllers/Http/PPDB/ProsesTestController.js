@@ -46,15 +46,30 @@ class ProsesTestController {
   async getData({ request, response, auth }) {
       try {
         const baseUrl = Env.get('BASE_URL')
-        let data = await RegisterPPDB.query()
+        const filter = request.input('filter', {})
+        let data =  RegisterPPDB.query()
           .where('is_need_test','1')
           .where('status_pendaftaran','P01')
-          .fetch()
-        if(request.input('register_id')){
-          data = await RegisterPPDB.query()
-          .where('code_pendaftaran', request.input('register_id'))
-          .fetch()
+
+        if (filter.status) {
+          if (filter.status === 'Lulus') {
+            data.where('status_test', '01')
+          } else if (filter.status === 'Tidak Lulus') {
+            data.where('status_test', '02')
+          } else if (filter.status === 'Dalam Proses') {
+            data.where('status_test', '00')
+          }
         }
+
+        if (filter.tahun_periodik) {
+          const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
+          data.whereBetween('tanggal_pendaftaran', [
+            `${startYear}-01-01`,
+            `${endYear}-12-31`
+          ])
+        }
+
+        data = await data.fetch();
 
         const dataRegis = data.toJSON()
 
@@ -185,17 +200,31 @@ class ProsesTestController {
 
 
 
-    async statistik({ response ,auth}) {
+    async statistik({request, response ,auth}) {
     try {
       const dataUser = await User.query()
       .select('roles.name as role_name','tbl_users.*')
       .join('roles','roles.id','tbl_users.role_id')
       .where('tbl_users.id',auth.user.id).first();
+
+      let data = RegisterPPDB.query();
+      const tahun_periodik = request.input('tahun_periodik');
+      const status = request.input('status');
+
       // .count() returns an array with string value, so we extract and convert to number
-      const totalPendaftar = await RegisterPPDB.query().where('is_need_test','1').where('is_submit', '1').count()
-      const totalDiterima = await RegisterPPDB.query().where('is_need_test','1').where('status_test', '01').where('is_submit', '1').count()
-      const totalDitolak = await RegisterPPDB.query().where('is_need_test','1').where('status_test', '02').where('is_submit', '1').count()
-      const totalDalamProses = await RegisterPPDB.query().where('is_need_test','1').where('status_test', '00').where('is_submit', '1').count()
+      if (tahun_periodik) {
+        const [startYear, endYear] = tahun_periodik.split('/').map(Number)
+        data.whereBetween('tanggal_pendaftaran', [
+          `${startYear}-01-01`,
+          `${endYear}-12-31`
+        ])
+      }
+
+      // .count() returns an array with string value, so we extract and convert to number
+      const totalPendaftar = await data.where('is_need_test','1').where('is_submit', '1').count()
+      const totalDiterima = await data.where('is_need_test','1').where('status_test', '01').where('is_submit', '1').count()
+      const totalDitolak = await data.where('is_need_test','1').where('status_test', '02').where('is_submit', '1').count()
+      const totalDalamProses = await data.where('is_need_test','1').where('status_test', '00').where('is_submit', '1').count()
 
       return response.json({
         success: true,

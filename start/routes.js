@@ -159,6 +159,7 @@ Route.group(() => {
 
   Route.get('/register-ppdb/statistik-pendaftar', 'PPDB/RegisterController.statistikPendaftar')
   Route.get('/register-ppdb/statistik-pendaftar-ulang', 'PPDB/RegisterController.statistikPendaftarUlang')
+  Route.get('/register-ppdb/ref-tahun-periodik', 'PPDB/RegisterController.getTahunPeriodik')
 
 
   //Register PPDB
@@ -194,5 +195,13 @@ Route.group(() => {
   Route.post('/register-test/get-data', 'PPDB/ProsesTestController.getData')
   Route.get('/register-test/statistik', 'PPDB/ProsesTestController.statistik')
   Route.post('/register-test/approval', 'PPDB/ProsesTestController.Approval')
+
+
+// generate report
+  Route.post('/report/reg-ppdb/download-excel', 'Report/GenerateReportController.generateRegisterPPDB')
+  Route.post('/report/reg-ppdb/download-bundle', 'Report/GenerateReportController.generateBundlePDF')
+  // Seleksi
+  Route.post('/report/seleksi-ppdb/download-excel', 'Report/GenerateReportSeleksiController.generateRegisterPPDB')
+  Route.post('/report/seleksi-ppdb/download-bundle', 'Report/GenerateReportSeleksiController.generateBundlePDF')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

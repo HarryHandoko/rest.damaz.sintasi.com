@@ -203,5 +203,13 @@ Route.group(() => {
   // Seleksi
   Route.post('/report/seleksi-ppdb/download-excel', 'Report/GenerateReportSeleksiController.generateRegisterPPDB')
   Route.post('/report/seleksi-ppdb/download-bundle', 'Report/GenerateReportSeleksiController.generateBundlePDF')
+  // Daftar Ulang
+  Route.post('/report/register-ulang/download-excel', 'Report/GenerateReportDaftarUlangController.generateRegisterPPDB')
+  Route.post('/report/register-ulang/download-bundle', 'Report/GenerateReportDaftarUlangController.generateBundlePDF')
+
+
+  // analiticDashboard
+
+  Route.post('/dashboard/analitic-total-per-tahun', 'Report/DashboardAnalitycController.totalPertahun')
 
 }).prefix('api').middleware(['auth:jwt','apikey'])

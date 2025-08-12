@@ -8,6 +8,7 @@ const SiswaAward = use('App/Models/PPDB/SiswaAward')
 const RegAddress = use('App/Models/PPDB/RegAddress')
 const RegParent = use('App/Models/PPDB/RegParent')
 const Payment = use('App/Models/PPDB/Payment')
+const DaftarUlang = use('App/Models/PPDB/DaftarUlang')
 const moment = require('moment')
 
 const Sekolah = use('App/Models/MasterData/Sekolah')
@@ -51,44 +52,42 @@ class GenerateReportDaftarController {
   async generateRegisterPPDB({ request,response }) {
     try {
       const workbook = new Excel.Workbook()
-      const worksheet = workbook.addWorksheet('List Daftar Ulang SPMB')
-
-
+      const worksheet = workbook.addWorksheet('List Daftar Ulang')
       const baseUrl = Env.get('BASE_URL')
       const filter = request.input('filter', {})
 
-      let query =  RegisterPPDB.query()
-          .where('is_need_test','1')
-          .where('status_pendaftaran','P01')
+      // Base query from DaftarUlang
+      let data = DaftarUlang.query()
+        .join('tbl_register_ppdbs', 'tbl_register_ppdbs.id', 'tbl_daftar_ulangs.register_id')
+        .select('tbl_daftar_ulangs.*', 'tbl_register_ppdbs.*') // select all base columns
 
+      // Apply filters
       if (filter.status) {
-        if (filter.status === 'Lulus') {
-          query.where('status_test', '01')
-        } else if (filter.status === 'Tidak Lulus') {
-          query.where('status_test', '02')
+        if (filter.status === 'Diterima') {
+          data.where('tbl_daftar_ulangs.status_pembayaran', '01')
         } else if (filter.status === 'Dalam Proses') {
-          query.where('status_test', '00')
+          data.where('tbl_daftar_ulangs.status_pembayaran', '00')
+        } else if (filter.status === 'Ditolak') {
+          data.where('tbl_daftar_ulangs.status_pembayaran', '02')
         }
       }
 
       if (filter.tahun_periodik) {
         const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        query.whereBetween('tanggal_pendaftaran', [
+        data.whereBetween('tbl_daftar_ulangs.created_at', [
           `${startYear}-01-01`,
           `${endYear}-12-31`
         ])
       }
 
-
-      const data = await query.fetch()
+      // Execute
+      data = await data.fetch()
       const dataRegis = data.toJSON()
-
 
       await Promise.all(dataRegis.map(async (item, index) => {
         const dataSiswa = await SiswaPpdb.query()
           .where('id', item.siswa_id)
           .first()
-
 
         const dataSiswaAward = await SiswaAward.query()
           .where('siswa_id', item.siswa_id)
@@ -102,82 +101,77 @@ class GenerateReportDaftarController {
           .where('id', item.grade_id)
           .first()
 
+        const dataSiswaAddress = await RegAddress.query()
+          .select(
+            'tbl_register_ppdb_addresses.*',
+            'indonesia_provinces.name as provinsi',
+            'indonesia_cities.name as kota',
+            'indonesia_districts.name as district',
+            'indonesia_villages.name as desa'
+          )
+          .joinRaw(`JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`)
+          .joinRaw(`JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`)
+          .joinRaw(`JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`)
+          .joinRaw(`JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`)
+          .where('tbl_register_ppdb_addresses.register_id', item.register_id)
+          .first()
 
         const dataRegister = await User.query()
           .where('id', item.registed_by)
           .first()
 
-
-        const dataSiswaAddress = await RegAddress.query()
-        .select(
-          'tbl_register_ppdb_addresses.*',
-          'indonesia_provinces.name as provinsi',
-          'indonesia_cities.name as kota',
-          'indonesia_districts.name as district',
-          'indonesia_villages.name as desa'
-        )
-        .joinRaw(`JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`)
-        .joinRaw(`JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`)
-        .joinRaw(`JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`)
-        .joinRaw(`JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`)
-        .where('tbl_register_ppdb_addresses.register_id', item.id)
-        .first()
-
-
-
-
         const dataSiswaOrtu = await RegParent.query()
-          .where('register_id', item.id)
+          .where('register_id', item.register_id)
           .first()
+
         const dataPayment = await Payment.query()
-          .where('register_id', item.id)
+          .where('register_id', item.register_id)
           .first()
 
-        // Konversi siswa ke JSON
-        const siswa = dataSiswa.toJSON()
-
-        // Hitung usia langsung
-        const today = new Date()
-        const birth = new Date(siswa.tgl_lahir)
-        let usia = today.getFullYear() - birth.getFullYear()
-        const m = today.getMonth() - birth.getMonth()
-        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-          usia--
+        // siswa
+        const siswa = dataSiswa?.toJSON() || null
+        if (siswa) {
+          const today = new Date()
+          const birth = new Date(siswa.tgl_lahir)
+          let usia = today.getFullYear() - birth.getFullYear()
+          const m = today.getMonth() - birth.getMonth()
+          if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            usia--
+          }
+          siswa.usia = usia
+          siswa.tgl_lahir = formatDate(siswa.tgl_lahir)
+          siswa.foto_siswa = siswa.foto_siswa
+            ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
+            : null
         }
-        siswa.usia = usia
-        siswa.tgl_lahir = formatDate(siswa.tgl_lahir);
 
-        siswa.foto_siswa = siswa.foto_siswa
-        ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
-        : null
-
-        const siswaAwards = dataSiswaAward?.toJSON() || null;
-        if(siswaAwards != null){
-          siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat);
+        // awards
+        const siswaAwards = dataSiswaAward?.toJSON() || null
+        if (siswaAwards) {
+          siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat)
           siswaAwards.image = siswaAwards.image
-          ? `${baseUrl}/uploads/award_siswa/${siswaAwards.image}`
-          : null
+            ? `${baseUrl}/uploads/award_siswa/${siswaAwards.image}`
+            : null
         }
 
-        const siswaAddress = dataSiswaAddress?.toJSON() || null;
-        const siswaOru = dataSiswaOrtu?.toJSON() || null;
-
-
-        const PaymentData = dataPayment?.toJSON() || null;
-        if(PaymentData != null){
-          PaymentData.tanggal_transaksi = formatDate(PaymentData.tanggal_transaksi);
+        // payment
+        const PaymentData = dataPayment?.toJSON() || null
+        if (PaymentData) {
+          PaymentData.tanggal_transaksi = formatDate(PaymentData.tanggal_transaksi)
           PaymentData.bukti_transfer = PaymentData.bukti_transfer
-          ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
-          : null
+            ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
+            : null
         }
 
-        // Tambahkan ke item (update langsung ke dataRegis[index])
+        // attach enriched data
         dataRegis[index].siswa = siswa
         dataRegis[index].siswa_award = siswaAwards
-        dataRegis[index].siswa_address = siswaAddress
-        dataRegis[index].siswa_parent = siswaOru
-        dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
+        dataRegis[index].siswa_address = dataSiswaAddress?.toJSON() || null
+        dataRegis[index].siswa_parent = dataSiswaOrtu?.toJSON() || null
         dataRegis[index].payment = PaymentData
+        dataRegis[index].tgl_test = dataRegis[index].tgl_test
+          ? formatDateNormal(dataRegis[index].tgl_test)
+          : null
         dataRegis[index].register = dataRegister?.toJSON() || null
         dataRegis[index].sekolah = dataSekolah?.toJSON() || null
         dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null
@@ -186,6 +180,10 @@ class GenerateReportDaftarController {
           : null
         dataRegis[index].file_akte_lahir = dataRegis[index].file_akte_lahir
           ? `${baseUrl}/uploads/ppdb/akte_lahir/${dataRegis[index].file_akte_lahir}`
+          : null
+
+        dataRegis[index].bukti_pembayaran = dataRegis[index].bukti_pembayaran
+          ? `${baseUrl}/uploads/ppdb/bukti_pembayaran_reg_ulang/${dataRegis[index].bukti_pembayaran}`
           : null
         dataRegis[index].file_kartu_keluarga = dataRegis[index].file_kartu_keluarga
           ? `${baseUrl}/uploads/ppdb/kartu_keluarga/${dataRegis[index].file_kartu_keluarga}`
@@ -262,7 +260,7 @@ class GenerateReportDaftarController {
         alamatsiswa : item.siswa_address ?
         `${item.siswa_address.alamat || ''} RT ${item.siswa_address.rt || ''} RW ${item.siswa_address.rw || ''}, ${item.siswa_address.desa || ''}, ${item.siswa_address.district || ''}, ${item.siswa_address.kota || ''}, ${item.siswa_address.provinsi || ''}`
         : '',
-        status_pendaftaran : item.status_test == '00' ? 'Menunggu Proses' :  item.status_test == '01' ?  'Lulus' : 'Tidak Lulus',
+        status_pendaftaran : item.status_pembayaran == '00' ? 'Menunggu Proses' :  item.status_pembayaran == '01' ?  'Diterima' : 'Ditolak',
 
         // Ayah
         nama_ayah: item.siswa_parent ? `${item.siswa_parent.nama_ayah || ''}`.trim() : '',
@@ -325,37 +323,50 @@ class GenerateReportDaftarController {
 
       const filter = request.input('filter', {})
 
-      let query =  RegisterPPDB.query()
-          .where('is_need_test','1')
-          .where('status_pendaftaran','P01')
+      // Base query from DaftarUlang
+      let query = DaftarUlang.query()
+        .join('tbl_register_ppdbs', 'tbl_register_ppdbs.id', 'tbl_daftar_ulangs.register_id')
+        .select('tbl_daftar_ulangs.*', 'tbl_register_ppdbs.*') // select all base columns
 
+      // Apply filters
       if (filter.status) {
-        if (filter.status === 'Lulus') {
-          query.where('status_test', '01')
-        } else if (filter.status === 'Tidak Lulus') {
-          query.where('status_test', '02')
+        if (filter.status === 'Diterima') {
+          query.where('tbl_daftar_ulangs.status_pembayaran', '01')
         } else if (filter.status === 'Dalam Proses') {
-          query.where('status_test', '00')
+          query.where('tbl_daftar_ulangs.status_pembayaran', '00')
+        } else if (filter.status === 'Ditolak') {
+          query.where('tbl_daftar_ulangs.status_pembayaran', '02')
         }
       }
 
       if (filter.tahun_periodik) {
         const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        query.whereBetween('tanggal_pendaftaran', [
+        query.whereBetween('tbl_daftar_ulangs.created_at', [
           `${startYear}-01-01`,
           `${endYear}-12-31`
         ])
       }
 
-      const data = await query.fetch()
-      const dataRegis = data.toJSON()
+      // Execute
+      query = await query.fetch()
+      const dataRegis = query.toJSON()
 
       await Promise.all(dataRegis.map(async (item, index) => {
-        const dataSiswa = await SiswaPpdb.query().where('id', item.siswa_id).first()
-        const dataSiswaAward = await SiswaAward.query().where('siswa_id', item.siswa_id).first()
-        const dataSekolah = await Sekolah.query().where('id', item.sekolah_id).first()
-        const dataSekolahGrade = await SekolahGrade.query().where('id', item.grade_id).first()
-        const dataRegister = await User.query().where('id', item.registed_by).first()
+        const dataSiswa = await SiswaPpdb.query()
+          .where('id', item.siswa_id)
+          .first()
+
+        const dataSiswaAward = await SiswaAward.query()
+          .where('siswa_id', item.siswa_id)
+          .first()
+
+        const dataSekolah = await Sekolah.query()
+          .where('id', item.sekolah_id)
+          .first()
+
+        const dataSekolahGrade = await SekolahGrade.query()
+          .where('id', item.grade_id)
+          .first()
 
         const dataSiswaAddress = await RegAddress.query()
           .select(
@@ -369,49 +380,81 @@ class GenerateReportDaftarController {
           .joinRaw(`JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`)
           .joinRaw(`JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`)
           .joinRaw(`JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`)
-          .where('tbl_register_ppdb_addresses.register_id', item.id)
+          .where('tbl_register_ppdb_addresses.register_id', item.register_id)
           .first()
 
-        const dataSiswaOrtu = await RegParent.query().where('register_id', item.id).first()
-        const dataPayment = await Payment.query().where('register_id', item.id).first()
+        const dataRegister = await User.query()
+          .where('id', item.registed_by)
+          .first()
 
-        const siswa = dataSiswa.toJSON()
-        const today = new Date()
-        const birth = new Date(siswa.tgl_lahir)
-        let usia = today.getFullYear() - birth.getFullYear()
-        const m = today.getMonth() - birth.getMonth()
-        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) usia--
-        siswa.usia = usia
-        siswa.tgl_lahir = formatDate(siswa.tgl_lahir);
-        siswa.foto_siswa = siswa.foto_siswa ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}` : null
+        const dataSiswaOrtu = await RegParent.query()
+          .where('register_id', item.register_id)
+          .first()
 
-        const siswaAwards = dataSiswaAward?.toJSON() || null;
-        if (siswaAwards != null) {
-          siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat);
-          siswaAwards.image = siswaAwards.image ? `${baseUrl}/uploads/award_siswa/${siswaAwards.image}` : null
+        const dataPayment = await Payment.query()
+          .where('register_id', item.register_id)
+          .first()
+
+        // siswa
+        const siswa = dataSiswa?.toJSON() || null
+        if (siswa) {
+          const today = new Date()
+          const birth = new Date(siswa.tgl_lahir)
+          let usia = today.getFullYear() - birth.getFullYear()
+          const m = today.getMonth() - birth.getMonth()
+          if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            usia--
+          }
+          siswa.usia = usia
+          siswa.tgl_lahir = formatDate(siswa.tgl_lahir)
+          siswa.foto_siswa = siswa.foto_siswa
+            ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
+            : null
         }
 
-        const siswaAddress = dataSiswaAddress?.toJSON() || null;
-        const siswaOru = dataSiswaOrtu?.toJSON() || null;
-
-        const PaymentData = dataPayment?.toJSON() || null;
-        if (PaymentData != null) {
-          PaymentData.tanggal_transaksi = formatDate(PaymentData.tanggal_transaksi);
-          PaymentData.bukti_transfer = PaymentData.bukti_transfer ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}` : null
+        // awards
+        const siswaAwards = dataSiswaAward?.toJSON() || null
+        if (siswaAwards) {
+          siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat)
+          siswaAwards.image = siswaAwards.image
+            ? `${baseUrl}/uploads/award_siswa/${siswaAwards.image}`
+            : null
         }
 
+        // payment
+        const PaymentData = dataPayment?.toJSON() || null
+        if (PaymentData) {
+          PaymentData.tanggal_transaksi = formatDate(PaymentData.tanggal_transaksi)
+          PaymentData.bukti_transfer = PaymentData.bukti_transfer
+            ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
+            : null
+        }
+
+        // attach enriched data
         dataRegis[index].siswa = siswa
         dataRegis[index].siswa_award = siswaAwards
-        dataRegis[index].siswa_address = siswaAddress
-        dataRegis[index].siswa_parent = siswaOru
-        dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null
+        dataRegis[index].siswa_address = dataSiswaAddress?.toJSON() || null
+        dataRegis[index].siswa_parent = dataSiswaOrtu?.toJSON() || null
         dataRegis[index].payment = PaymentData
+        dataRegis[index].tgl_test = dataRegis[index].tgl_test
+          ? formatDateNormal(dataRegis[index].tgl_test)
+          : null
         dataRegis[index].register = dataRegister?.toJSON() || null
         dataRegis[index].sekolah = dataSekolah?.toJSON() || null
         dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null
-        dataRegis[index].file_raport = dataRegis[index].file_raport ? `${baseUrl}/uploads/ppdb/raport/${dataRegis[index].file_raport}` : null
-        dataRegis[index].file_akte_lahir = dataRegis[index].file_akte_lahir ? `${baseUrl}/uploads/ppdb/akte_lahir/${dataRegis[index].file_akte_lahir}` : null
-        dataRegis[index].file_kartu_keluarga = dataRegis[index].file_kartu_keluarga ? `${baseUrl}/uploads/ppdb/kartu_keluarga/${dataRegis[index].file_kartu_keluarga}` : null
+        dataRegis[index].file_raport = dataRegis[index].file_raport
+          ? `${baseUrl}/uploads/ppdb/raport/${dataRegis[index].file_raport}`
+          : null
+        dataRegis[index].file_akte_lahir = dataRegis[index].file_akte_lahir
+          ? `${baseUrl}/uploads/ppdb/akte_lahir/${dataRegis[index].file_akte_lahir}`
+          : null
+
+        dataRegis[index].bukti_pembayaran = dataRegis[index].bukti_pembayaran
+          ? `${baseUrl}/uploads/ppdb/bukti_pembayaran_reg_ulang/${dataRegis[index].bukti_pembayaran}`
+          : null
+        dataRegis[index].file_kartu_keluarga = dataRegis[index].file_kartu_keluarga
+          ? `${baseUrl}/uploads/ppdb/kartu_keluarga/${dataRegis[index].file_kartu_keluarga}`
+          : null
       }))
 
       const dataProfileSekolah = await WebProfile.first()

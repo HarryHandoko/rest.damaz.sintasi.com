@@ -11,7 +11,7 @@ class MenuController {
     const parentMenus = await Menu.query()
       .where('parent_id', 0)
       .orderBy('sort', 'asc')
-      .paginate(page, perPage)
+      .paginate(page, 9999)
 
     // 2. Convert to JSON
     const parentMenusJSON = parentMenus.toJSON()

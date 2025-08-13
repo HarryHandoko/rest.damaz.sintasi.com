@@ -16,7 +16,7 @@ class ProgramUnggulanController {
     if (search) {
       galeriQuery.where('name', 'like', `%${search}%`)
     }
-    const data = await galeriQuery.paginate(page, perPage)
+    const data = await galeriQuery.paginate(page, 9999)
     const result = data.toJSON()
     result.data = result.data.map(data => {
       return {

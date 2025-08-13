@@ -14,7 +14,7 @@ class SekolahController {
     const data = await Sekolah.query()
       .where('is_delete', '0')
       .orderBy('sort', 'asc')
-      .paginate(page, perPage)
+      .paginate(page, 9999)
 
     // Convert to plain JSON
     const dataJSON = data.toJSON()

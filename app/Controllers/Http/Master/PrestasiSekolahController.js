@@ -16,7 +16,7 @@ class PrestasiSekolahController {
     if (search) {
       dataQuery.where('prestasi', 'like', `%${search}%`)
     }
-    const data = await dataQuery.paginate(page, perPage)
+    const data = await dataQuery.paginate(page, 9999)
     const result = data.toJSON()
     result.data = result.data.map(data => {
       return {

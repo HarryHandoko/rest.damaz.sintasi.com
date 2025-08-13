@@ -24,7 +24,7 @@ class KaryawanController {
         type_users: 'karyawan',
         is_delete: 0
       })
-      .paginate(page, perPage)
+      .paginate(page, 9999)
 
     // data (paginator) = { data: [], meta: {} }
     const result = data.toJSON()

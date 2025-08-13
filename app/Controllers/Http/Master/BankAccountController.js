@@ -16,7 +16,7 @@ class BankAccountController {
     if (search) {
       bankQuery.where('name', 'like', `%${search}%`)
     }
-    const data = await bankQuery.paginate(page, perPage)
+    const data = await bankQuery.paginate(page, 9999)
     const result = data.toJSON()
     result.data = result.data.map(data => {
       return {

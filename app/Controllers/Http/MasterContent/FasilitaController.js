@@ -16,7 +16,7 @@ class FasilitaController {
     if (search) {
       fasilitaQuery.where('title', 'like', `%${search}%`)
     }
-    const data = await fasilitaQuery.paginate(page, perPage)
+    const data = await fasilitaQuery.paginate(page, 9999)
     const result = data.toJSON()
     result.data = result.data.map(data => {
       return {

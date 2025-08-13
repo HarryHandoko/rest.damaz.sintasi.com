@@ -19,7 +19,7 @@ class PrestasiUnitController {
     if (search) {
       dataQuery.where('name', 'like', `%${search}%`)
     }
-    const data = await dataQuery.paginate(page, perPage)
+    const data = await dataQuery.paginate(page, 9999)
     const result = data.toJSON()
     result.data = result.data.map(data => {
       return {

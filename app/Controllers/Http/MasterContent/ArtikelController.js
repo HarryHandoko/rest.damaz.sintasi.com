@@ -36,7 +36,7 @@ class ArtikelController {
       dataQuery.where('title', 'like', `%${search}%`)
     }
 
-    const data = await dataQuery.paginate(page, perPage)
+    const data = await dataQuery.paginate(page, 9999)
     const result = data.toJSON()
 
     // Add image URL and tags to each article

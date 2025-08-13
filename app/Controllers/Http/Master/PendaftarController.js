@@ -24,7 +24,7 @@ class PendaftarController {
         type_users: 'pendaftar',
         is_delete: 0
       })
-      .paginate(page, perPage)
+      .paginate(page, 9999)
 
     // data (paginator) = { data: [], meta: {} }
     const result = data.toJSON()

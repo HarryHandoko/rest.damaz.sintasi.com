@@ -6,7 +6,7 @@ class RoleController {
   async index({ request, response }) {
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 10)
-    const roles = await Role.query().paginate(page, perPage)
+    const roles = await Role.query().paginate(page, 9999)
     return response.json(roles)
   }
 

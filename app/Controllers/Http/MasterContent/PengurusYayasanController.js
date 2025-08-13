@@ -106,10 +106,10 @@ class PengurusYayasanController {
       }
 
 
-      // Update header jika ada
-      const header = request.input('header')
-      if (header) {
-        DataPengurus.header = header
+      // Update jabatan jika ada
+      const jabatan = request.input('jabatan')
+      if (jabatan) {
+        DataPengurus.jabatan = jabatan
       }
       // Update sambutan jika ada
       const sambutan = request.input('sambutan')

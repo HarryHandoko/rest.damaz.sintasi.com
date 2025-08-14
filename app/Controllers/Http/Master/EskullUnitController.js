@@ -77,7 +77,7 @@ class EskullUnitController {
   async delete({ request, response, auth }) {
     try {
       const { id } = request.only(['id'])
-      const data = await dataEskull.findOrFail(id)
+      const data = await EskullUnit.findOrFail(id)
 
       await data.delete()
       return response.status(200).json({
@@ -99,7 +99,7 @@ class EskullUnitController {
         return response.status(400).json({ message: 'ID tidak ditemukan' })
       }
 
-      const data = await dataEskull.find(id)
+      const data = await EskullUnit.find(id)
       if (!data) {
         return response.status(404).json({ message: 'Data tidak ditemukan' })
       }

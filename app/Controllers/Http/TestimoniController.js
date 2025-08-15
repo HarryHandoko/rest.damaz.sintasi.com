@@ -105,7 +105,7 @@ class TestimoniController {
   }
 
 
-  async update({ request, response }) {
+  async update({ request, response, auth }) {
     try {
       const dataUser = await User.query()
       .select('roles.name as role_name','tbl_users.*')

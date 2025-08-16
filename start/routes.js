@@ -21,10 +21,13 @@ Route.group(() => {
     Route.post('/login', 'AuthController.login')
     Route.post('/daftar', 'AuthController.daftar')
     Route.get('/captcha', 'AuthController.getChaptca')
+    Route.post('/auth/google', 'AuthController.googleLogin')
 }).prefix('api').middleware(['apikey'])
 
 Route.group(() => {
   Route.get('/users', 'AuthController.index')
+  Route.post('/users/update', 'AuthController.updateData')
+  Route.post('/users/change-password', 'AuthController.changePassword')
 
   // roles
   Route.get('/roles/get', 'RoleController.index')

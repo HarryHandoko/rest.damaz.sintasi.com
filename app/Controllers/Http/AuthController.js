@@ -5,6 +5,8 @@ const Role = use('App/Models/Role')
 const Menu = use('App/Models/Menu')
 const Hash = use('Hash')
 const Env = use('Env')
+const { OAuth2Client } = require('google-auth-library')
+const client = new OAuth2Client("459746861160-sufkjqinf1hqc0lqk31i27ndvqoabt93.apps.googleusercontent.com")
 const { createCanvas } = require('canvas')
 
 class AuthController {
@@ -188,6 +190,160 @@ class AuthController {
 
     // 4. Kirim ke frontend
     return response.json({ image, token })
+  }
+
+
+  async updateData({ request, response , auth}) {
+    try {
+      const {
+        id,
+        nama_depan,
+        nama_belakang,
+        email,
+        no_handphone,
+      } = request.only([
+        'nama_depan', 'nama_belakang', 'email','no_handphone'
+      ])
+      const data = await User.findOrFail(auth.user.id)
+      const emailCount = await User.query()
+        .where('email', email)
+        .whereNot('id', auth.user.id)
+        .count()
+
+      if (Number(emailCount[0]['count(*)']) > 0) {
+        return response.status(400).json({
+          message: 'Email sudah digunakan oleh akun lain',
+        })
+      }
+
+      // Cek no_handphone unik (selain user ini)
+      const phoneCount = await User.query()
+        .where('no_handphone', no_handphone)
+        .whereNot('id', auth.user.id)
+        .count()
+
+      if (Number(phoneCount[0]['count(*)']) > 0) {
+        return response.status(400).json({
+          message: 'No Handphone sudah digunakan oleh akun lain',
+        })
+      }
+
+      // Handle upload foto_profile jika ada
+      const foto = request.file('foto_profile', {
+        extnames: ['jpg', 'jpeg', 'png'],
+        size: '2mb'
+      })
+
+      if (foto) {
+        // Optional: hapus foto lama dari folder jika perlu
+        const fileName = `${Date.now()}.${foto.extname}`
+        await foto.move('public/uploads/foto', {
+          name: fileName,
+          overwrite: true
+        })
+        data.foto_profile = fileName
+      }
+
+      // Update field lain
+      data.nama_depan = nama_depan
+      data.nama_belakang = nama_belakang
+      data.email = email
+      data.no_handphone = no_handphone
+
+      await data.save()
+
+      return response.status(200).json({
+        message: 'Data updated successfully',
+        data: data
+      })
+    } catch (error) {
+      return response.status(500).json({
+        message: 'Error updating user',
+        error: error.message
+      })
+    }
+  }
+
+  async changePassword({ request, response, auth }) {
+    try {
+      const { old_password, new_password } = request.only(['old_password', 'new_password'])
+      if (!old_password || !new_password) {
+        return response.status(400).json({ message: 'Password lama dan baru wajib diisi' })
+      }
+
+      const user = await User.findOrFail(auth.user.id)
+      const passwordVerified = await Hash.verify(old_password, user.password)
+      if (!passwordVerified) {
+        return response.status(400).json({ message: 'Password lama salah' })
+      }
+
+      user.password = new_password
+      await user.save()
+
+      return response.status(200).json({ message: 'Password berhasil diubah' })
+    } catch (error) {
+      return response.status(500).json({ message: 'Gagal mengubah password', error: error.message })
+    }
+  }
+
+
+
+  async googleLogin({ request, auth, response }) {
+    try {
+      const { token } = request.only(['token'])
+
+      // Verify token
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: "459746861160-sufkjqinf1hqc0lqk31i27ndvqoabt93.apps.googleusercontent.com"
+      })
+
+      const payload = ticket.getPayload()
+      const email = payload.email
+      const name = payload.name
+      const picture = payload.picture
+
+      // Find or create user
+      let user = await User.findBy('email', email)
+      if (!user) {
+
+      let roleData = await Role.query().where('slug', 'pendaftar').first();
+      if (!roleData) {
+        roleData = await Role.create({
+          name: 'Pendaftar',
+          slug: 'pendaftar'
+        });
+      }
+      const roleId = roleData.id;
+        user = await User.create({
+          email,
+          username: email,
+          nama_depan: name,
+          nama_belakang: '',
+          tempat_lahir : '-',
+          tanggal_lahir : '1999-01-01',
+          jenis_kelamin : 'Laki-laki',
+          no_handphone: '',
+          type_users: 'pendaftar',
+          role_id: roleId,
+          password: Math.random().toString(36).slice(-8), // random password
+          is_active: 1,
+          is_active_email: 1,
+          google_id: payload.sub,
+        })
+      }
+
+      // Generate JWT
+      const apiToken = await auth.authenticator('jwt').generate(user.toJSON())
+      user.token = apiToken.token
+
+      return response.json({
+        user,
+        token: apiToken
+      })
+    } catch (error) {
+      return response.status(401).json({ message: 'Invalid Google token' })
+    }
   }
 
 

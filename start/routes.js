@@ -79,6 +79,8 @@ Route.group(() => {
   Route.post('/master-content/siswa-prestasi/post', 'MasterContent/SiswaPrestasiController.store')
   Route.post('/master-content/siswa-prestasi/delete', 'MasterContent/SiswaPrestasiController.delete')
   Route.post('/master-content/siswa-prestasi/update', 'MasterContent/SiswaPrestasiController.update')
+
+
   // Master Konten Prestasi Sekolah
   Route.get('/master-content/prestasi-sekolah/get', 'Master/PrestasiSekolahController.index')
   Route.post('/master-content/prestasi-sekolah/post', 'Master/PrestasiSekolahController.store')
@@ -103,6 +105,11 @@ Route.group(() => {
   Route.post('/master-content/prestasi-unit/post', 'Master/PrestasiUnitController.store')
   Route.post('/master-content/prestasi-unit/delete', 'Master/PrestasiUnitController.delete')
   Route.post('/master-content/prestasi-unit/update', 'Master/PrestasiUnitController.update')
+
+
+  // Master Konten Background Prestasi Unit
+  Route.post('/master-content/background-prestasi-unit/get', 'MasterContent/BackgroundPrestasiController.index')
+  Route.post('/master-content/background-prestasi-unit/post', 'MasterContent/BackgroundPrestasiController.store')
 
   // Master Konten program unggulan-unit
   Route.post('/master-content/program-unggulan-unit/get', 'Master/ProgramUnggulanUnitController.index')

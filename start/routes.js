@@ -18,10 +18,10 @@ const Route = use('Route')
 
 Route.on('/').render('welcome')
 Route.group(() => {
-    Route.post('/login', 'AuthController.login')
-    Route.post('/daftar', 'AuthController.daftar')
-    Route.get('/captcha', 'AuthController.getChaptca')
-    Route.post('/auth/google', 'AuthController.googleLogin')
+  Route.post('/login', 'AuthController.login')
+  Route.post('/daftar', 'AuthController.daftar')
+  Route.get('/captcha', 'AuthController.getChaptca')
+  Route.post('/auth/google', 'AuthController.googleLogin')
 }).prefix('api').middleware(['apikey'])
 
 Route.group(() => {
@@ -150,6 +150,12 @@ Route.group(() => {
   Route.post('/master-data/sekolah/update-sort', 'MasterData/SekolahController.updateSortGrade')
   Route.post('/master-data/sekolah/update-sort-sekolah', 'MasterData/SekolahController.updateSort')
 
+  // Beasiswa
+  Route.get('/master-data/beasiswa/get', 'Master/BeasiswaController.index')
+  Route.post('/master-data/beasiswa/post', 'Master/BeasiswaController.store')
+  Route.post('/master-data/beasiswa/update', 'Master/BeasiswaController.update')
+  Route.post('/master-data/beasiswa/delete', 'Master/BeasiswaController.delete')
+
   //Register PPDB
   Route.post('/register-ppdb/get-data', 'PPDB/RegisterController.getData')
   Route.post('/register-ppdb/create', 'PPDB/RegisterController.create')
@@ -207,7 +213,7 @@ Route.group(() => {
   Route.post('/register-test/approval', 'PPDB/ProsesTestController.Approval')
 
 
-// generate report
+  // generate report
   Route.post('/report/reg-ppdb/download-excel', 'Report/GenerateReportController.generateRegisterPPDB')
   Route.post('/report/reg-ppdb/download-bundle', 'Report/GenerateReportController.generateBundlePDF')
   // Seleksi
@@ -224,4 +230,4 @@ Route.group(() => {
   Route.post('/dashboard/analitic-total-per-unit', 'Report/DashboardAnalitycController.totalUnitPertahun')
   Route.post('/dashboard/analitic-total-per-gender', 'Report/DashboardAnalitycController.totalPerGender')
 
-}).prefix('api').middleware(['auth:jwt','apikey'])
+}).prefix('api').middleware(['auth:jwt', 'apikey'])

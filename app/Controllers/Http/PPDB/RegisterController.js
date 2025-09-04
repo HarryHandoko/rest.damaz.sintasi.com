@@ -8,6 +8,7 @@ const Payment = use('App/Models/PPDB/Payment')
 const DaftarUlang = use('App/Models/PPDB/DaftarUlang')
 const WebProfile = use('App/Models/MasterContent/WebProfile')
 const Beasiswa = use('App/Models/Beasiswa')
+const Diskon = use('App/Models/Master/Diskon')
 
 const Sekolah = use('App/Models/MasterData/Sekolah')
 const User = use('App/Models/User')
@@ -134,6 +135,7 @@ class RegisterController {
           updatePPDB.code_pendaftaran = kodePendaftaran;
         }
 
+
         updatePPDB.sekolah_id = request.input('sekolah_id');
         updatePPDB.grade_id = request.input('grade_id');
         updatePPDB.tanggal_pendaftaran = new Date().toISOString().slice(0, 10);
@@ -167,6 +169,7 @@ class RegisterController {
         getSiswaPPDB.beasiswa_id = request.input('beasiswa_id');
         getSiswaPPDB.bahasa_sehari_hari = request.input('bahasa_sehari_hari');
         getSiswaPPDB.kebutuhan_spesial = request.input('kebutuhan_spesial') == 'true' ? '1' : '0';
+        getSiswaPPDB.is_alumni = request.input('is_alumni') == 'true' ? '1' : '0';
 
         // Foto Siswa
         const fotoSiswa = request.file('foto_siswa', {
@@ -269,6 +272,10 @@ class RegisterController {
 
         updatePPDB.status_pendaftaran_siswa = request.input('status_pendaftaran_siswa');
         updatePPDB.nem = request.input('nilai_nem');
+        const diskon = await Diskon.query().first()
+        console.log(diskon,request.input('is_alumni'))
+        updatePPDB.diskon_id = request.input('is_alumni') == 'true' ? diskon.id : null;
+
         updatePPDB.save();
       }else if(request.input('step') == '3'){
         const cekData = await RegAddress.query().where('register_id',updatePPDB.id).first();
@@ -489,6 +496,12 @@ class RegisterController {
           .where('register_id', item.id)
           .first()
 
+        const dataDiskon = await Diskon.query()
+          .where('id', item.diskon_id)
+          .first()
+
+      const diskon = dataDiskon?.toJSON() || null
+
         // Konversi siswa ke JSON
         const siswa = dataSiswa.toJSON()
 
@@ -533,6 +546,7 @@ class RegisterController {
         dataRegis[index].siswa_address = siswaAddress
         dataRegis[index].siswa_parent = siswaOru
         dataRegis[index].payment = PaymentData
+        dataRegis[index].diskon = diskon.diskon
 
         dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
         dataRegis[index].register = dataRegister?.toJSON() || null

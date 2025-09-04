@@ -157,6 +157,12 @@ Route.group(() => {
   Route.post('/master-data/beasiswa/update', 'Master/BeasiswaController.update')
   Route.post('/master-data/beasiswa/delete', 'Master/BeasiswaController.delete')
 
+  // Diskon
+  Route.get('/master-data/diskon/get', 'Master/DiskonController.index')
+  Route.post('/master-data/diskon/post', 'Master/DiskonController.store')
+  Route.post('/master-data/diskon/update', 'Master/DiskonController.update')
+  Route.post('/master-data/diskon/delete', 'Master/DiskonController.delete')
+
   //Register PPDB
   Route.post('/register-ppdb/get-data', 'PPDB/RegisterController.getData')
   Route.post('/register-ppdb/create', 'PPDB/RegisterController.create')

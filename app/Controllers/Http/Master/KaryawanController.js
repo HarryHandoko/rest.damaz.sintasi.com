@@ -118,6 +118,42 @@ class KaryawanController {
         'jenis_kelamin'
       ])
 
+
+      // Cek email unik (selain user ini)
+      const emailCount = await User.query()
+        .where('email', email)
+        .count()
+
+      if (Number(emailCount[0]['count(*)']) > 0) {
+        return response.status(400).json({
+          message: 'Email sudah digunakan oleh akun lain',
+        })
+      }
+
+      // Cek no_handphone unik (selain user ini)
+      const phoneCount = await User.query()
+        .where('no_handphone', no_handphone)
+        .count()
+
+      if (Number(phoneCount[0]['count(*)']) > 0) {
+        return response.status(400).json({
+          message: 'No Handphone sudah digunakan oleh akun lain',
+        })
+      }
+
+      // Cek username unik (selain user ini, dan jika diisi)
+      if (username) {
+        const usernameCount = await User.query()
+          .where('username', username)
+          .count()
+        if (Number(usernameCount[0]['count(*)']) > 0) {
+          return response.status(400).json({
+            message: 'Username sudah digunakan oleh akun lain',
+          })
+        }
+        data.username = username
+      }
+
       // Ambil file foto (opsional)
       const foto = request.file('foto', {
         extnames: ['jpg', 'jpeg', 'png'],

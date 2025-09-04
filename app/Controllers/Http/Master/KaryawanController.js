@@ -121,7 +121,7 @@ class KaryawanController {
 
       // Cek email unik (selain user ini)
       const emailCount = await User.query()
-        .where('email', email)
+        .where('email', data.email)
         .count()
 
       if (Number(emailCount[0]['count(*)']) > 0) {
@@ -132,7 +132,7 @@ class KaryawanController {
 
       // Cek no_handphone unik (selain user ini)
       const phoneCount = await User.query()
-        .where('no_handphone', no_handphone)
+        .where('no_handphone', data.no_handphone)
         .count()
 
       if (Number(phoneCount[0]['count(*)']) > 0) {
@@ -144,7 +144,7 @@ class KaryawanController {
       // Cek username unik (selain user ini, dan jika diisi)
       if (username) {
         const usernameCount = await User.query()
-          .where('username', username)
+          .where('username', data.username)
           .count()
         if (Number(usernameCount[0]['count(*)']) > 0) {
           return response.status(400).json({

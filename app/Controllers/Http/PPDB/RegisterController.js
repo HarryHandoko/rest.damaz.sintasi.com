@@ -273,7 +273,6 @@ class RegisterController {
         updatePPDB.status_pendaftaran_siswa = request.input('status_pendaftaran_siswa');
         updatePPDB.nem = request.input('nilai_nem');
         const diskon = await Diskon.query().first()
-        console.log(diskon,request.input('is_alumni'))
         updatePPDB.diskon_id = request.input('is_alumni') == 'true' ? diskon.id : null;
 
         updatePPDB.save();
@@ -496,11 +495,6 @@ class RegisterController {
           .where('register_id', item.id)
           .first()
 
-        const dataDiskon = await Diskon.query()
-          .where('id', item.diskon_id)
-          .first()
-
-      const diskon = dataDiskon?.toJSON() || null
 
         // Konversi siswa ke JSON
         const siswa = dataSiswa.toJSON()
@@ -546,7 +540,14 @@ class RegisterController {
         dataRegis[index].siswa_address = siswaAddress
         dataRegis[index].siswa_parent = siswaOru
         dataRegis[index].payment = PaymentData
-        dataRegis[index].diskon = diskon.diskon
+        const dataDiskon = await Diskon.query()
+          .where('id', item.diskon_id)
+          .first()
+
+      const diskon = dataDiskon?.toJSON() || null
+        if(diskon){
+          dataRegis[index].diskon = diskon.diskon
+        }
 
         dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;
         dataRegis[index].register = dataRegister?.toJSON() || null

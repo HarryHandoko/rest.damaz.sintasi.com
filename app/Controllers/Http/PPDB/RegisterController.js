@@ -546,7 +546,7 @@ class RegisterController {
 
       const diskon = dataDiskon?.toJSON() || null
         if(diskon){
-          dataRegis[index].diskon = diskon.diskon
+          dataRegis[index].diskon = diskon?.diskon
         }
 
         dataRegis[index].tgl_test = dataRegis[index].tgl_test != null ? formatDateNormal(dataRegis[index].tgl_test) : null;

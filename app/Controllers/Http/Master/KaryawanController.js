@@ -140,7 +140,6 @@ class KaryawanController {
             message: 'Username sudah digunakan oleh akun lain',
           })
         }
-        data.username = username
       }
 
       // Ambil file foto (opsional)

@@ -198,9 +198,10 @@ class KaryawanController {
         email,
         alamat,
         no_handphone,
-        username
+        username,
+        role_id,
       } = request.only([
-        'id', 'nama_depan', 'nama_belakang', 'nik', 'email', 'alamat', 'no_handphone', 'username'
+        'id', 'nama_depan', 'nama_belakang', 'nik', 'email', 'alamat', 'no_handphone', 'username','role_id'
       ])
 
       // Cari user yang akan diupdate

@@ -267,6 +267,8 @@ class KaryawanController {
       data.email = email
       data.alamat = alamat
       data.no_handphone = no_handphone
+      data.role_id = role_id
+      data.type_users = role_id != 6 ? 'karyawan' : 'pendaftar'
 
       await data.save()
 

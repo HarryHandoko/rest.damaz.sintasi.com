@@ -7,6 +7,7 @@ const RegParent = use('App/Models/PPDB/RegParent')
 const Payment = use('App/Models/PPDB/Payment')
 const DaftarUlang = use('App/Models/PPDB/DaftarUlang')
 const WebProfile = use('App/Models/MasterContent/WebProfile')
+const Beasiswa = use('App/Models/Beasiswa')
 
 const Sekolah = use('App/Models/MasterData/Sekolah')
 const User = use('App/Models/User')
@@ -163,6 +164,7 @@ class RegisterController {
         getSiswaPPDB.tempat_lahir = request.input('tempat_lahir');
         getSiswaPPDB.jenis_kelamin = request.input('jenis_kelamin');
         getSiswaPPDB.nisn = request.input('nisn');
+        getSiswaPPDB.beasiswa_id = request.input('beasiswa_id');
         getSiswaPPDB.bahasa_sehari_hari = request.input('bahasa_sehari_hari');
         getSiswaPPDB.kebutuhan_spesial = request.input('kebutuhan_spesial') == 'true' ? '1' : '0';
 
@@ -459,7 +461,6 @@ class RegisterController {
         const dataRegistrasiUlang = await DaftarUlang.query()
           .where('register_id', item.id)
           .first()
-
 
         const dataSiswaAddress = await RegAddress.query()
         .select(

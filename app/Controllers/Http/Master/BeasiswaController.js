@@ -19,6 +19,29 @@ class BeasiswaController {
     return response.json(data)
   }
 
+  async indexSelect({ request, response }) {
+    const data = await Beasiswa.query().fetch()
+    return response.json({
+      data: data,
+    })
+  }
+
+  async index({ request, response }) {
+    const page = request.input('page', 1)
+    const perPage = request.input('perPage', 10)
+    const search = request.input('search', '')
+
+    const dataQuery = Beasiswa.query()
+
+    if (search) {
+      dataQuery.where('nama', 'like', `%${search}%`)
+    }
+
+    const data = await dataQuery.paginate(page, perPage)
+
+    return response.json(data)
+  }
+
   async store({ request, response }) {
     try {
       const data = request.only(['nama']);

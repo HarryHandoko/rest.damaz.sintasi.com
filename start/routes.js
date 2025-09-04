@@ -152,6 +152,7 @@ Route.group(() => {
 
   // Beasiswa
   Route.get('/master-data/beasiswa/get', 'Master/BeasiswaController.index')
+  Route.get('/master-data/beasiswa/get-select', 'Master/BeasiswaController.indexSelect')
   Route.post('/master-data/beasiswa/post', 'Master/BeasiswaController.store')
   Route.post('/master-data/beasiswa/update', 'Master/BeasiswaController.update')
   Route.post('/master-data/beasiswa/delete', 'Master/BeasiswaController.delete')

@@ -131,7 +131,7 @@ class KaryawanController {
       }
 
       // Cek username unik (selain user ini, dan jika diisi)
-      if (username) {
+      if (data.username) {
         const usernameCount = await User.query()
           .where('username', data.username)
           .count()

@@ -198,9 +198,10 @@ class PendaftarController {
         email,
         alamat,
         no_handphone,
-        username
+        username,
+        role_id
       } = request.only([
-        'id', 'nama_depan', 'nama_belakang', 'nik', 'email', 'alamat', 'no_handphone', 'username'
+        'id', 'nama_depan', 'nama_belakang', 'nik', 'email', 'alamat', 'no_handphone', 'username','role_id'
       ])
 
       // Cari user yang akan diupdate
@@ -267,6 +268,8 @@ class PendaftarController {
       data.email = email
       data.alamat = alamat
       data.no_handphone = no_handphone
+      data.role_id = role_id
+      data.type_users = role_id != 6 ? 'karyawan' : 'pendaftar'
 
       await data.save()
 

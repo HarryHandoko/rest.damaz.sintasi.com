@@ -1,19 +1,19 @@
 'use strict'
 
 const axios = require('axios')
+const WhatsappSetting = use('App/Models/WhatsappSetting')
 
 class WhatsappService {
   constructor() {
-    this.apiKey = '49815c4ec77584611895cbae4d806303'
-    this.baseUrl = 'https://wabot.sintasi.com/api' // bisa dari .env
-    this.senderPhone = '082299215090'
+    this.baseUrl = 'https://wabot.sintasi.com/api'
+    this.whatsappSetting = WhatsappSetting.first()
   }
 
   async getDevices() {
     try {
       const response = await axios.get(`${this.baseUrl}/api/devices`, {
         headers: {
-          'secret-key': this.apiKey,
+          'secret-key': this.whatsappSetting.api_key,
         },
       })
 
@@ -41,7 +41,7 @@ class WhatsappService {
 
   async sendMessage(message, phoneNumber) {
     try {
-      const id = await this.getDeviceIdByPhoneNumber(this.senderPhone)
+      const id = await this.getDeviceIdByPhoneNumber(this.whatsappSetting.phone_number)
 
       const response = await axios.post(
         `${this.baseUrl}/api/devices/${id}/send/${phoneNumber}`,
@@ -50,7 +50,7 @@ class WhatsappService {
         },
         {
           headers: {
-            'secret-key': this.apiKey,
+            'secret-key': this.whatsappSetting.api_key,
           },
         }
       )

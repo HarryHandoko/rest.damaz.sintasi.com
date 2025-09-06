@@ -237,4 +237,8 @@ Route.group(() => {
   Route.post('/dashboard/analitic-total-per-unit', 'Report/DashboardAnalitycController.totalUnitPertahun')
   Route.post('/dashboard/analitic-total-per-gender', 'Report/DashboardAnalitycController.totalPerGender')
 
+  // Whatsapp Setting
+  Route.get('/whatsapp-setting/get', 'WhatsappSettingController.index')
+  Route.post('/whatsapp-setting/post', 'WhatsappSettingController.store')
+
 }).prefix('api').middleware(['auth:jwt', 'apikey'])

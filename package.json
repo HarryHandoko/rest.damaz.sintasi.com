@@ -27,6 +27,7 @@
     "@adonisjs/mail": "^9.2.2",
     "@adonisjs/session": "^1.0.27",
     "@adonisjs/shield": "^1.0.8",
+    "axios": "^1.11.0",
     "canvas": "^3.1.2",
     "exceljs": "^4.4.0",
     "google-auth-library": "^10.2.1",

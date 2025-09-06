@@ -495,8 +495,7 @@ class RegisterController {
         const grade = await SekolahGrade.query()
           .where("id", updatePPDB.grade_id)
           .first();
-        const jenisKelamin =
-          siswa.jenis_kelamin == "L" ? "Laki-Laki" : "Perempuan";
+        const jenisKelamin = siswa.jenis_kelamin;
         const jenjang = sekolah ? sekolah.name : "-";
         const kategori = grade ? grade.name : "-";
 
@@ -1182,6 +1181,20 @@ class RegisterController {
             emailHtml
           );
         }
+
+        // kirim whatsapp
+        if (user && user.no_handphone) {
+          const message = WhatsappService.formatApprovalMessage({
+            user,
+            dataSiswa,
+            dataSekolah,
+            dataSekolahGrade,
+            data,
+            dataSiswaAddress,
+          });
+
+          await WhatsappService.sendMessage(message, user.no_handphone);
+        }
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
         data.status_pendaftaran = "P02";
@@ -1241,6 +1254,20 @@ class RegisterController {
           "Pemberitahuan PPDB Damaz",
           emailHtml
         );
+
+        // kirim whatsapp
+        if (user && user.no_handphone) {
+          const message = WhatsappService.formatRejectedMessage({
+            user,
+            fullName,
+            dataSekolah,
+            dataSekolahGrade,
+            data,
+            dataSiswaAddress,
+          });
+
+          await WhatsappService.sendMessage(message, user.no_handphone);
+        }
       } else {
         return response.status(400).json({
           success: false,

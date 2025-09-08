@@ -178,6 +178,7 @@ Route.group(() => {
   Route.post('/register-ppdb/pay-reg-ulang', 'PPDB/RegisterController.payRegUlang')
   Route.post('/register-ppdb/get-pendaftaran-ulang', 'PPDB/RegisterController.getPendfataranUlangList')
   Route.post('/register-ppdb/pendaftaran-ulang-approval', 'PPDB/RegisterController.ApprovalRegisUlang')
+  Route.post('/register-ppdb/apply-voucher', 'PPDB/RegisterController.applyVoucher')
 
 
   Route.get('/register-ppdb/statistik-pendaftar', 'PPDB/RegisterController.statistikPendaftar')

@@ -299,9 +299,6 @@ class RegisterController {
           "status_pendaftaran_siswa"
         );
         updatePPDB.nem = request.input("nilai_nem");
-        const diskon = await Diskon.query().first();
-        updatePPDB.diskon_id =
-          request.input("is_alumni") == "true" ? diskon.id : null;
 
         updatePPDB.save();
       } else if (request.input("step") == "3") {
@@ -645,19 +642,21 @@ class RegisterController {
               : null;
           }
 
+
           // Tambahkan ke item (update langsung ke dataRegis[index])
           dataRegis[index].siswa = siswa;
           dataRegis[index].siswa_award = siswaAwards;
           dataRegis[index].siswa_address = siswaAddress;
           dataRegis[index].siswa_parent = siswaOru;
           dataRegis[index].payment = PaymentData;
-          const dataDiskon = await Diskon.query()
-            .where("id", item.diskon_id)
-            .first();
 
-          const diskon = dataDiskon?.toJSON() || null;
-          if (diskon) {
-            dataRegis[index].diskon = diskon?.diskon;
+          const dataDiskon = await Diskon.query()
+            .where('id', dataRegis[index].diskon_id)
+            .first();
+          if (dataDiskon) {
+            dataRegis[index].voucher_diskon = dataDiskon.kode;
+            dataRegis[index].nominal_diskon = dataDiskon.nominal;
+            console.log(dataRegis[index].nominal_diskon,dataRegis[index].voucher_diskon);
           }
 
           dataRegis[index].tgl_test =
@@ -1952,6 +1951,56 @@ class RegisterController {
         success: false,
         message: "Gagal mendapatkan data",
         error: error.message,
+      });
+    }
+  }
+
+  async applyVoucher({ request, response }) {
+    try {
+      const { code_ppdb, voucher_diskon } = request.only([
+        "code_ppdb",
+        "voucher_diskon",
+      ]);
+      console.log(code_ppdb, voucher_diskon);
+      const register = await RegisterPPDB.query()
+        .where("code_pendaftaran", code_ppdb)
+        .first();
+      if (!register) {
+        return response.status(404).json({
+          success: false,
+          message: "Pendaftaran tidak ditemukan",
+        });
+      }
+
+
+      const diskon = await Diskon.query().where("kode", voucher_diskon).first();
+
+      if (!diskon) {
+        return response.status(404).json({
+          success: false,
+          message: "Voucher tidak ditemukan",
+        });
+      }
+
+      if(register.diskon_id !== diskon.id) {
+        diskon.kuota = Math.max(0, diskon.kuota - 1); // Kurangi kuota tapi tidak boleh kurang dari 0
+      }
+      register.diskon_id = diskon.id;
+
+      await diskon.save();
+      await register.save();
+
+      response.status(200).json({
+        success: true,
+        data: {
+          voucher: diskon.toJSON(),
+        },
+      });
+    } catch (err) {
+      response.status(500).json({
+        success: false,
+        message: "Gagal menerapkan voucher",
+        error: err.message,
       });
     }
   }

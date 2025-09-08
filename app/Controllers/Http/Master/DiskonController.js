@@ -11,7 +11,7 @@ class DiskonController {
     const dataQuery = Diskon.query()
 
     if (search) {
-      dataQuery.where('diskon', 'like', `%${search}%`)
+      dataQuery.where('nama', 'like', `%${search}%`)
     }
 
     const data = await dataQuery.paginate(page, perPage)
@@ -21,7 +21,7 @@ class DiskonController {
 
   async store({ request, response }) {
     try {
-      const data = request.only(['diskon']);
+      const data = request.only(['nama', 'nominal', 'kode', 'kuota']);
 
       await Diskon.create(data)
 
@@ -37,7 +37,7 @@ class DiskonController {
   async update({ request, response }) {
     try {
       const id = request.input('id')
-      const data = request.only(['diskon'])
+      const data = request.only(['nama', 'nominal', 'kode', 'kuota'])
 
       const diskon = await Diskon.find(id)
 
@@ -47,7 +47,10 @@ class DiskonController {
         })
       }
 
-      diskon.diskon = data.diskon
+      diskon.nominal = data.nominal
+      diskon.nama = data.nama
+      diskon.kode = data.kode
+      diskon.kuota = data.kuota
       await diskon.save()
 
       return response.json({

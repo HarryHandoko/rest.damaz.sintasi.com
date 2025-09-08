@@ -70,7 +70,7 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug','code_formulir','moto','visi','misi','sambutan_kepala_unit','biaya_admin_sdit','biaya_pendaftaran_sdit','is_sdit']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug','code_formulir','moto','visi','misi','sambutan_kepala_unit','biaya_admin_sdit','biaya_pendaftaran_sdit','is_sdit','batas_usia']);
       data.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
       data.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
       const logo = request.file('logo', {
@@ -271,7 +271,7 @@ class SekolahController {
 
   async update({ request, response }) {
     try {
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','biaya_admin_sdit','biaya_pendaftaran_sdit']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','biaya_admin_sdit','biaya_pendaftaran_sdit','batas_usia']);
       const sekolah = await Sekolah.findOrFail(request.input('id'))
 
       sekolah.name = request.input('name')
@@ -286,9 +286,9 @@ class SekolahController {
       sekolah.misi = request.input('misi')
       sekolah.slug = request.input('slug')
       sekolah.is_sdit = request.input('is_sdit') == 'true' ? 1 : 0;
-      console.log(request.input('is_sdit'),request.input('biaya_admin_sdit'))
       sekolah.biaya_admin_sdit = request.input('biaya_admin_sdit')
       sekolah.biaya_pendaftaran_sdit = request.input('biaya_pendaftaran_sdit')
+      sekolah.batas_usia = request.input('batas_usia') ? request.input('batas_usia') : null;
       sekolah.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
       sekolah.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
 

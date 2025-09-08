@@ -656,7 +656,6 @@ class RegisterController {
           if (dataDiskon) {
             dataRegis[index].voucher_diskon = dataDiskon.kode;
             dataRegis[index].nominal_diskon = dataDiskon.nominal;
-            console.log(dataRegis[index].nominal_diskon,dataRegis[index].voucher_diskon);
           }
 
           dataRegis[index].tgl_test =
@@ -1961,7 +1960,6 @@ class RegisterController {
         "code_ppdb",
         "voucher_diskon",
       ]);
-      console.log(code_ppdb, voucher_diskon);
       const register = await RegisterPPDB.query()
         .where("code_pendaftaran", code_ppdb)
         .first();

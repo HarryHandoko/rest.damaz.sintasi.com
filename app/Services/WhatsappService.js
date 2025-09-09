@@ -2,6 +2,10 @@
 
 const axios = require("axios");
 const WhatsappSetting = use("App/Models/WhatsappSetting");
+const RegisterPPDB = use("App/Models/PPDB/RegisterPpdb");
+const SiswaPPDB = use("App/Models/PPDB/SiswaPpdb");
+const Sekolah = use("App/Models/MasterData/Sekolah");
+const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
 const moment = require("moment");
 
 class WhatsappService {
@@ -47,7 +51,7 @@ class WhatsappService {
   async sendMessage(message, phoneNumber) {
     const setting = await this.getSetting();
     try {
-      const id = await this.getDeviceIdByPhoneNumber(setting.phone_number);
+      const id = await this.getDeviceIdByPhoneNumber(setting.no_handphone);
       const response = await axios.post(
         `${this.baseUrl}/api/devices/${id}/send/${phoneNumber}`,
         { message },
@@ -59,87 +63,67 @@ class WhatsappService {
     }
   }
 
-  formatRegisterMessage({ namaLengkap, jenisKelamin, jenjang, kategori }) {
-    return `*Assalamu'alaikum warahmatullahi wabarakatuh*
-
-Alhamdulillah, pendaftaran *PSB Darul Quran Mulia* atas nama:
-
-👤 *Nama:* ${namaLengkap}
-👫 *Jenis Kelamin:* ${jenisKelamin}
-🏫 *Jenjang:* ${jenjang}
-📚 *Kategori:* ${kategori}
-
-telah berhasil kami terima. Terima kasih atas kepercayaannya kepada Darul Quran Mulia sebagai pilihan pendidikan untuk ananda.
-
-Selanjutnya, silakan menunggu informasi lanjutan dari panitia PSB.
-Apabila ada pertanyaan, jangan ragu menghubungi kami melalui nomor resmi Darul Quran Mulia:
-
-📞 *CS Putri:* 0812-8882-9847
-📞 *CS Putra:* 0851-7307-7975
-
-Barakallahu fiikum.
-
-*Wassalamu'alaikum warahmatullahi wabarakatuh*
-_Panitia PSB Darul Quran Mulia_`;
+  // Fungsi untuk mengganti placeholder di template dengan data
+  replacePlaceholders(template, data) {
+    let result = template;
+    Object.keys(data).forEach((key) => {
+      result = result.replace(new RegExp(`\\{${key}\\}`, "g"), data[key]);
+    });
+    return result;
   }
 
-  formatApprovalMessage({
-    user,
-    dataSiswa,
-    dataSekolah,
-    dataSekolahGrade,
-    data,
-    dataSiswaAddress,
-  }) {
-    return `*Halo ${user.nama_depan},*
+  async getData(kodePendaftaran) {
+    const ppdb = await RegisterPPDB.query()
+      .where("code_pendaftaran", kodePendaftaran)
+      .first();
 
-Pendaftaran siswa berikut telah *DISETUJUI*:
+    const siswa = await SiswaPPDB.query().where("id", ppdb.siswa_id).first();
+    const sekolah = await Sekolah.query().where("id", ppdb.sekolah_id).first();
+    const grade = await SekolahGrade.query().where("id", ppdb.grade_id).first();
 
-👤 *Nama Siswa:* ${dataSiswa.nama_depan + " " + (dataSiswa.nama_belakang || "")}
-🏫 *Sekolah:* ${dataSekolah.name || "-"}
-📚 *Jenjang:* ${dataSekolahGrade.name || "-"}
-🔑 *Kode Pendaftaran:* ${data.code_pendaftaran}
-🎂 *Tempat, Tanggal Lahir:* ${dataSiswa.tempat_lahir || "-"}, ${moment(
-      dataSiswa.tgl_lahir
-    )
-      .locale("id")
-      .format("D MMMM YYYY")}
-🏠 *Alamat:* ${dataSiswaAddress.alamat || "-"}
-
-Silakan lanjutkan proses berikutnya melalui portal PPDB kami.
-
-Salam,
-*Tim PPDB SDIT Darul Maza*`;
+    return {
+      nama: `${siswa.nama_depan} ${siswa.nama_belakang}`,
+      sekolah: sekolah.name,
+      jenjang: grade.name,
+      jenis_kelamin: siswa.jenis_kelamin,
+      kode_pendaftaran: ppdb.code_pendaftaran,
+    };
   }
 
-  formatRejectedMessage({
-    user,
-    fullName,
-    dataSekolah,
-    dataSekolahGrade,
-    data,
-    dataSiswa,
-    dataSiswaAddress,
-  }) {
-    return `*Halo ${user.nama_depan},*
+  async sendRegisterMessage(phoneNumber, kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_registrasi;
+    if (!template) throw new Error("Template pesan registrasi belum disetting");
+    const data = await this.getData(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, phoneNumber);
+  }
 
-Mohon maaf, pendaftaran siswa berikut telah *DITOLAK*:
 
-👤 *Nama Siswa:* ${fullName.trim() || "-"}
-🏫 *Sekolah:* ${dataSekolah?.name || "-"}
-📚 *Jenjang:* ${dataSekolahGrade?.name || "-"}
-🔑 *Kode Pendaftaran:* ${data.code_pendaftaran}
-🎂 *Tempat, Tanggal Lahir:* ${dataSiswa.tempat_lahir || "-"}, ${moment(
-      dataSiswa.tgl_lahir
-    )
-      .locale("id")
-      .format("D MMMM YYYY")}
-🏠 *Alamat:* ${dataSiswaAddress?.alamat || "-"}
+  /**
+   * @param {string} phoneNumber
+   * @param {{ nama: string, jenjang: string, kategori: string, jenis_kelamin: string }} data
+   */
+  async sendApprovalMessage(phoneNumber, kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_diterima;
+    if (!template) throw new Error("Template pesan diterima belum disetting");
+    const data = await this.getData(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, phoneNumber);
+  }
 
-Silakan hubungi tim kami melalui portal PPDB jika Anda membutuhkan klarifikasi lebih lanjut.
-
-Salam,
-*Tim PPDB SDIT Darul Maza*`;
+  /**
+   * @param {string} phoneNumber
+   * @param {{ nama: string, jenjang: string, kategori: string, jenis_kelamin: string }} data
+   */
+  async sendRejectedMessage(phoneNumber, kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_ditolak;
+    if (!template) throw new Error("Template pesan ditolak belum disetting");
+    const data = await this.getData(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, phoneNumber);
   }
 }
 

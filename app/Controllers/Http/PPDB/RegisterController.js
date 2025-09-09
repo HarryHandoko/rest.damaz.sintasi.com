@@ -185,7 +185,7 @@ class RegisterController {
         getSiswaPPDB.tempat_lahir = request.input("tempat_lahir");
         getSiswaPPDB.jenis_kelamin = request.input("jenis_kelamin");
         getSiswaPPDB.nisn = request.input("nisn");
-        getSiswaPPDB.beasiswa_id = request.input("beasiswa_id")
+        getSiswaPPDB.beasiswa_id = request.input("beasiswa_id") != 'null'
           ? request.input("beasiswa_id")
           : null;
         getSiswaPPDB.bahasa_sehari_hari = request.input("bahasa_sehari_hari");
@@ -482,46 +482,24 @@ class RegisterController {
           cekData.save();
         }
 
-        const siswa = await SiswaPpdb.query()
-          .where("id", updatePPDB.siswa_id)
-          .first();
-        const namaLengkap = `${siswa.nama_depan} ${siswa.nama_belakang}`;
-        const sekolah = await Sekolah.query()
-          .where("id", updatePPDB.sekolah_id)
-          .first();
-        const grade = await SekolahGrade.query()
-          .where("id", updatePPDB.grade_id)
-          .first();
-        const jenisKelamin = siswa.jenis_kelamin;
-        const jenjang = sekolah ? sekolah.name : "-";
-        const kategori = grade ? grade.name : "-";
-
         const currentUser = await User.query()
-          .where("id", siswa.registed_by)
+          .where("id", updatePPDB.registed_by)
           .first();
 
-        const registerMessage = WhatsappService.formatRegisterMessage({
-          namaLengkap,
-          jenisKelamin,
-          jenjang,
-          kategori,
-        });
-
-        // Contoh kirim via service WhatsApp
-        await WhatsappService.sendMessage(
-          registerMessage,
-          currentUser.no_handphone
+        WhatsappService.sendRegisterMessage(
+          currentUser.no_handphone,
+          updatePPDB.code_pendaftaran
         );
+
+        await trx.commit();
+
+        return response.json({
+          status_code: "200",
+          status: "success",
+          message: "Update berhasil",
+          data: updatePPDB,
+        });
       }
-
-      await trx.commit();
-
-      return response.json({
-        status_code: "200",
-        status: "success",
-        message: "Update berhasil",
-        data: updatePPDB,
-      });
     } catch (error) {
       await trx.rollback();
       return response.status(500).json({
@@ -642,7 +620,6 @@ class RegisterController {
               : null;
           }
 
-
           // Tambahkan ke item (update langsung ke dataRegis[index])
           dataRegis[index].siswa = siswa;
           dataRegis[index].siswa_award = siswaAwards;
@@ -651,7 +628,7 @@ class RegisterController {
           dataRegis[index].payment = PaymentData;
 
           const dataDiskon = await Diskon.query()
-            .where('id', dataRegis[index].diskon_id)
+            .where("id", dataRegis[index].diskon_id)
             .first();
           if (dataDiskon) {
             dataRegis[index].voucher_diskon = dataDiskon.kode;
@@ -1179,19 +1156,9 @@ class RegisterController {
             emailHtml
           );
         }
-
         // kirim whatsapp
         if (user && user.no_handphone) {
-          const message = WhatsappService.formatApprovalMessage({
-            user,
-            dataSiswa,
-            dataSekolah,
-            dataSekolahGrade,
-            data,
-            dataSiswaAddress,
-          });
-
-          await WhatsappService.sendMessage(message, user.no_handphone);
+          await WhatsappService.sendApprovalMessage(user.no_handphone,data.code_pendaftaran);
         }
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
@@ -1255,16 +1222,7 @@ class RegisterController {
 
         // kirim whatsapp
         if (user && user.no_handphone) {
-          const message = WhatsappService.formatRejectedMessage({
-            user,
-            fullName,
-            dataSekolah,
-            dataSekolahGrade,
-            data,
-            dataSiswaAddress,
-          });
-
-          await WhatsappService.sendMessage(message, user.no_handphone);
+          await WhatsappService.sendRejectedMessage(user.no_handphone,data.code_pendaftaran);
         }
       } else {
         return response.status(400).json({
@@ -1970,7 +1928,6 @@ class RegisterController {
         });
       }
 
-
       const diskon = await Diskon.query().where("kode", voucher_diskon).first();
 
       if (!diskon) {
@@ -1980,7 +1937,7 @@ class RegisterController {
         });
       }
 
-      if(register.diskon_id !== diskon.id) {
+      if (register.diskon_id !== diskon.id) {
         diskon.kuota = Math.max(0, diskon.kuota - 1); // Kurangi kuota tapi tidak boleh kurang dari 0
       }
       register.diskon_id = diskon.id;

@@ -1,6 +1,11 @@
 "use strict";
 const WhatsappSetting = use("App/Models/WhatsappSetting");
 
+function toWhatsappFormat(text) {
+  // Format *text* langsung dipakai untuk WhatsApp
+  return text;
+}
+
 class WhatsappSettingController {
   async index({ response }) {
     const setting = await WhatsappSetting.first();
@@ -8,12 +13,11 @@ class WhatsappSettingController {
   }
 
   async store({ request, response }) {
-    const data = request.only(["api_key", "phone_number"]);
+    const data = request.only(["api_key", "no_handphone", "format_pesan_registrasi", "format_pesan_diterima", "format_pesan_ditolak"]);
     let setting = await WhatsappSetting.first();
 
     if (setting) {
-      setting.api_key = data.api_key;
-      setting.phone_number = data.phone_number;
+      Object.assign(setting, data);
       await setting.save();
     } else {
       setting = await WhatsappSetting.create(data);

@@ -223,47 +223,51 @@ class RegisterController {
         getSiswaPPDB.save();
 
         if (request.input("award") == "Ada") {
-          const cekAward = await SiswaAward.query()
-            .where("siswa_id", updatePPDB.siswa_id)
-            .first();
-          if (!cekAward) {
-            const dataAward = {
-              siswa_id: updatePPDB.siswa_id,
-              award: request.input("award_name"),
-              tgl_didapat: request.input("award_date"),
-            };
-            const award_image = request.file("award_image", {
-              extnames: ["jpg", "jpeg", "png", "webp"],
-            });
-
-            if (award_image) {
-              const fileName = `${Date.now()}.${award_image.extname}`;
-              await award_image.move("public/uploads/award_siswa", {
-                name: fileName,
-                overwrite: true,
-              });
-              dataAward.image = fileName;
+          const awards = request.input("awards") || [];
+          for (let i = 0; i < awards.length; i++) {
+            const awardData = awards[i];
+            let cekAward = null;
+            if (awardData.id) {
+              cekAward = await SiswaAward.query()
+                .where("id", awardData.id)
+                .where("siswa_id", updatePPDB.siswa_id)
+                .first();
             }
-
-            await SiswaAward.create(dataAward);
-          } else {
-            const award_image = request.file("award_image", {
-              extnames: ["jpg", "jpeg", "png", "webp"],
-            });
-
-            if (award_image) {
-              const fileName = `${Date.now()}.${award_image.extname}`;
-              await award_image.move("public/uploads/award_siswa", {
-                name: fileName,
-                overwrite: true,
+            if (!cekAward) {
+              const dataAward = {
+                siswa_id: updatePPDB.siswa_id,
+                award: awardData.award_name,
+                tgl_didapat: awardData.award_date,
+              };
+              const award_image = request.file(`awards[${i}][award_image]`, {
+                extnames: ["jpg", "jpeg", "png", "webp"],
               });
-              cekAward.image = fileName;
+              if (award_image) {
+                const fileName = `${Date.now()}_${i}.${award_image.extname}`;
+                await award_image.move("public/uploads/award_siswa", {
+                  name: fileName,
+                  overwrite: true,
+                });
+                dataAward.image = fileName;
+              }
+              await SiswaAward.create(dataAward);
+            } else {
+              // Update award yang sudah ada
+              const award_image = request.file(`awards[${i}][award_image]`, {
+                extnames: ["jpg", "jpeg", "png", "webp"],
+              });
+              if (award_image) {
+                const fileName = `${Date.now()}_${i}.${award_image.extname}`;
+                await award_image.move("public/uploads/award_siswa", {
+                  name: fileName,
+                  overwrite: true,
+                });
+                cekAward.image = fileName;
+              }
+              cekAward.award = awardData.award_name;
+              cekAward.tgl_didapat = awardData.award_date;
+              await cekAward.save();
             }
-            cekAward.siswa_id = updatePPDB.siswa_id;
-            cekAward.award = request.input("award_name");
-            cekAward.tgl_didapat = request.input("award_date");
-
-            await cekAward.save();
           }
         }
 
@@ -467,6 +471,7 @@ class RegisterController {
         if (!cekData) {
           const data = {
             register_id: updatePPDB.id,
+            invoice: `INV/${updatePPDB.code_pendaftaran}`,
             tanggal_transaksi: new Date().toISOString().split("T")[0],
           };
 
@@ -544,9 +549,9 @@ class RegisterController {
             .where("id", item.siswa_id)
             .first();
 
-          const dataSiswaAward = await SiswaAward.query()
+          const dataSiswaAwards = await SiswaAward.query()
             .where("siswa_id", item.siswa_id)
-            .first();
+            .fetch();
 
           const dataSekolah = await Sekolah.query()
             .where("id", item.sekolah_id)
@@ -612,13 +617,13 @@ class RegisterController {
             ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
             : null;
 
-          const siswaAwards = dataSiswaAward?.toJSON() || null;
-          if (siswaAwards != null) {
-            siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat);
-            siswaAwards.image = siswaAwards.image
-              ? `${baseUrl}/uploads/award_siswa/${siswaAwards.image}`
-              : null;
-          }
+          const siswaAwards = dataSiswaAwards.toJSON().map((award) => ({
+            ...award,
+            tgl_didapat: formatDate(award.tgl_didapat),
+            image: award.image
+              ? `${baseUrl}/uploads/award_siswa/${award.image}`
+              : null,
+          }));
 
           const siswaAddress = dataSiswaAddress?.toJSON() || null;
           const siswaOru = dataSiswaOrtu?.toJSON() || null;

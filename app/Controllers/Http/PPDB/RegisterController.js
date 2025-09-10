@@ -7,7 +7,6 @@ const RegParent = use("App/Models/PPDB/RegParent");
 const Payment = use("App/Models/PPDB/Payment");
 const DaftarUlang = use("App/Models/PPDB/DaftarUlang");
 const WebProfile = use("App/Models/MasterContent/WebProfile");
-const Beasiswa = use("App/Models/Beasiswa");
 const Diskon = use("App/Models/Master/Diskon");
 const WhatsappService = use("App/Services/WhatsappService");
 
@@ -185,9 +184,23 @@ class RegisterController {
         getSiswaPPDB.tempat_lahir = request.input("tempat_lahir");
         getSiswaPPDB.jenis_kelamin = request.input("jenis_kelamin");
         getSiswaPPDB.nisn = request.input("nisn");
-        getSiswaPPDB.beasiswa_id = request.input("beasiswa_id") != 'null'
-          ? request.input("beasiswa_id")
-          : null;
+        getSiswaPPDB.jenis_beasiswa = request.input("jenis_beasiswa");
+        getSiswaPPDB.jumlah_juz = request.input("jumlah_juz");
+        getSiswaPPDB.nama_prestasi = request.input("nama_prestasi");
+
+        const fotoSertifikat = request.file("foto_sertifikat", {
+          extnames: ["jpg", "jpeg", "png", "webp"],
+        });
+
+        if (fotoSertifikat) {
+          const fileName = `${Date.now()}.${fotoSertifikat.extname}`;
+          await fotoSertifikat.move("public/uploads/foto_sertifikat", {
+            name: fileName,
+            overwrite: true,
+          });
+          getSiswaPPDB.foto_sertifikat = fileName;
+        }
+
         getSiswaPPDB.bahasa_sehari_hari = request.input("bahasa_sehari_hari");
         getSiswaPPDB.kebutuhan_spesial =
           request.input("kebutuhan_spesial") == "true" ? "1" : "0";
@@ -1158,7 +1171,10 @@ class RegisterController {
         }
         // kirim whatsapp
         if (user && user.no_handphone) {
-          await WhatsappService.sendApprovalMessage(user.no_handphone,data.code_pendaftaran);
+          await WhatsappService.sendApprovalMessage(
+            user.no_handphone,
+            data.code_pendaftaran
+          );
         }
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
@@ -1222,7 +1238,10 @@ class RegisterController {
 
         // kirim whatsapp
         if (user && user.no_handphone) {
-          await WhatsappService.sendRejectedMessage(user.no_handphone,data.code_pendaftaran);
+          await WhatsappService.sendRejectedMessage(
+            user.no_handphone,
+            data.code_pendaftaran
+          );
         }
       } else {
         return response.status(400).json({

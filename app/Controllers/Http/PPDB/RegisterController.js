@@ -10,8 +10,8 @@ const WebProfile = use("App/Models/MasterContent/WebProfile");
 const Diskon = use("App/Models/Master/Diskon");
 const WhatsappService = use("App/Services/WhatsappService");
 
-const Sekolah = use("App/Models/MasterData/Sekolah");
 const User = use("App/Models/User");
+const Sekolah = use("App/Models/MasterData/Sekolah");
 const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
 const moment = require("moment");
 const Database = use("Database"); // Adonis v4
@@ -54,7 +54,27 @@ class RegisterController {
 
       const now = new Date();
       const tanggal = moment(now).format("DDMMYYYY");
-      const prefix = `DM2627_${tanggal}`;
+
+      const dataNow = moment()
+      const year = dataNow.year()
+      const month = dataNow.month() + 1 // moment bulan mulai dari 0, jadi kita +1
+
+      let tahunAwal, tahunAkhir
+
+      if (month >= 1 && month <= 6) {
+        // Januari - Juni
+        tahunAwal = year
+        tahunAkhir = year + 1
+      } else {
+        // Juli - Desember
+        tahunAwal = year + 1
+        tahunAkhir = year + 2
+      }
+
+      // Ambil 2 digit terakhir
+      const periodik = `${tahunAwal.toString().slice(2)}${tahunAkhir.toString().slice(2)}`
+      const periodikYear = `${tahunAwal}/${tahunAkhir}`
+      const prefix = `DM${periodik}_${tanggal}`;
       // Query pada transaction
       const lastRegister = await RegisterPPDB.query(trx)
         .where("code_pendaftaran", "like", `${prefix}%`)
@@ -82,6 +102,7 @@ class RegisterController {
         registed_by: auth.user.id,
         siswa_id: SiswaId.id,
         status_pendaftaran: "P00",
+        tahun_periodik : periodikYear
       };
       const RegisterID = await RegisterPPDB.create(data, trx);
 
@@ -90,7 +111,9 @@ class RegisterController {
         status_code: "200",
         status: "success",
         message: "Pendaftaran berhasil, silahkan login",
-        data: data,
+        data: {
+          id:RegisterID.id
+        },
       });
     } catch (error) {
       await trx.rollback();
@@ -106,7 +129,7 @@ class RegisterController {
     const trx = await Database.beginTransaction();
     try {
       const updatePPDB = await RegisterPPDB.query()
-        .where("code_pendaftaran", request.input("code_ppdb"))
+        .where("id", request.input("id"))
         .first();
 
       if (request.input("step") == "1") {
@@ -114,11 +137,41 @@ class RegisterController {
           .where("id", request.input("sekolah_id"))
           .first();
 
-        const now = new Date();
-        const currentYear = now.getFullYear().toString().slice(-2); // Get last two digits of current year
-        const nextYear = (now.getFullYear() + 1).toString().slice(-2); // Get last two digits of next year
+        // check batas usia
+        const tglLahir = moment(request.input("tgl_lahir"), "YYYY-MM-DD")
+        const umur = moment().diff(tglLahir, "years") // hitung umur dalam tahun
 
-        const prefix = `DM${currentYear}${nextYear}_${SekolahData.code_formulir}.`;
+        if (umur < SekolahData.batas_usia_min || umur > SekolahData.batas_usia_max) {
+          return response.status(500).json({
+            status: umur < SekolahData.batas_usia_min,
+            message: "Usia Calon Peserta Didik tidak memenuhi syarat batas minimum dan maximum usia",
+          });
+        }
+
+        const now = new Date();
+
+        const tanggal = moment(now).format("DDMMYYYY");
+
+        const dataNow = moment()
+        const year = dataNow.year()
+        const month = dataNow.month() + 1 // moment bulan mulai dari 0, jadi kita +1
+
+        let tahunAwal, tahunAkhir
+
+        if (month >= 1 && month <= 6) {
+          // Januari - Juni
+          tahunAwal = year
+          tahunAkhir = year + 1
+        } else {
+          // Juli - Desember
+          tahunAwal = year + 1
+          tahunAkhir = year + 2
+        }
+
+        // Ambil 2 digit terakhir
+        const periodik = `${tahunAwal.toString().slice(2)}${tahunAkhir.toString().slice(2)}`
+
+        const prefix = `DM${periodik}_${SekolahData.code_formulir}.`;
 
         // Query pada transaction
         const lastRegister = await RegisterPPDB.query(trx)
@@ -142,11 +195,71 @@ class RegisterController {
         updatePPDB.sekolah_id = request.input("sekolah_id");
         updatePPDB.grade_id = request.input("grade_id");
         updatePPDB.tanggal_pendaftaran = new Date().toISOString().slice(0, 10);
-        updatePPDB.biaya_admin = SekolahData.biaya_admin;
-        updatePPDB.biaya_pendaftaran = SekolahData.biaya_pendaftaran;
+
+        let biaya_form =  SekolahData.biaya_admin;
+        let biaya_uang_pangkal =  SekolahData.biaya_pendaftaran;
+        if(SekolahData.is_multi_biaya == 1){
+          const grades = await SekolahGrade.query()
+                            .where("id", request.input("grade_id"))
+                            .first();
+
+          biaya_form = grades.biaya_formulir;
+          biaya_uang_pangkal = grades.biaya_uang_pangkal;
+        }
+
+        updatePPDB.biaya_admin = biaya_form;
+        updatePPDB.biaya_pendaftaran = biaya_uang_pangkal;
         updatePPDB.is_need_test = SekolahData.is_need_test;
         updatePPDB.save();
+
+
+        const getSiswaPPDB = await SiswaPpdb.query()
+          .where("id", updatePPDB.siswa_id)
+          .first();
+
+        getSiswaPPDB.nama_depan = request.input("nama_depan");
+        getSiswaPPDB.nama_belakang = request.input("nama_belakang");
+        getSiswaPPDB.tgl_lahir = request.input("tgl_lahir");
+        getSiswaPPDB.save();
       } else if (request.input("step") == "2") {
+        const cekData = await Payment.query()
+          .where("register_id", updatePPDB.id)
+          .first();
+
+        const bukti_transaksi = request.file("bukti_transaksi", {
+          extnames: ["jpg", "jpeg", "png", "webp"],
+        });
+        if (!cekData) {
+          const data = {
+            register_id: updatePPDB.id,
+            tanggal_transaksi: new Date().toISOString().split("T")[0],
+          };
+
+          if (bukti_transaksi) {
+            const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
+            await bukti_transaksi.move("public/uploads/payment", {
+              name: fileName,
+              overwrite: true,
+            });
+            data.bukti_transfer = fileName;
+          }
+          Payment.create(data);
+
+          updatePPDB.is_submit = "1";
+
+          updatePPDB.save();
+        } else {
+          if (bukti_transaksi) {
+            const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
+            await bukti_transaksi.move("public/uploads/payment", {
+              name: fileName,
+              overwrite: true,
+            });
+            cekData.bukti_transfer = fileName;
+          }
+          cekData.save();
+        }
+      } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
           .first();
@@ -223,51 +336,47 @@ class RegisterController {
         getSiswaPPDB.save();
 
         if (request.input("award") == "Ada") {
-          const awards = request.input("awards") || [];
-          for (let i = 0; i < awards.length; i++) {
-            const awardData = awards[i];
-            let cekAward = null;
-            if (awardData.id) {
-              cekAward = await SiswaAward.query()
-                .where("id", awardData.id)
-                .where("siswa_id", updatePPDB.siswa_id)
-                .first();
-            }
-            if (!cekAward) {
-              const dataAward = {
-                siswa_id: updatePPDB.siswa_id,
-                award: awardData.award_name,
-                tgl_didapat: awardData.award_date,
-              };
-              const award_image = request.file(`awards[${i}][award_image]`, {
-                extnames: ["jpg", "jpeg", "png", "webp"],
+          const cekAward = await SiswaAward.query()
+            .where("siswa_id", updatePPDB.siswa_id)
+            .first();
+          if (!cekAward) {
+            const dataAward = {
+              siswa_id: updatePPDB.siswa_id,
+              award: request.input("award_name"),
+              tgl_didapat: request.input("award_date"),
+            };
+            const award_image = request.file("award_image", {
+              extnames: ["jpg", "jpeg", "png", "webp"],
+            });
+
+            if (award_image) {
+              const fileName = `${Date.now()}.${award_image.extname}`;
+              await award_image.move("public/uploads/award_siswa", {
+                name: fileName,
+                overwrite: true,
               });
-              if (award_image) {
-                const fileName = `${Date.now()}_${i}.${award_image.extname}`;
-                await award_image.move("public/uploads/award_siswa", {
-                  name: fileName,
-                  overwrite: true,
-                });
-                dataAward.image = fileName;
-              }
-              await SiswaAward.create(dataAward);
-            } else {
-              // Update award yang sudah ada
-              const award_image = request.file(`awards[${i}][award_image]`, {
-                extnames: ["jpg", "jpeg", "png", "webp"],
-              });
-              if (award_image) {
-                const fileName = `${Date.now()}_${i}.${award_image.extname}`;
-                await award_image.move("public/uploads/award_siswa", {
-                  name: fileName,
-                  overwrite: true,
-                });
-                cekAward.image = fileName;
-              }
-              cekAward.award = awardData.award_name;
-              cekAward.tgl_didapat = awardData.award_date;
-              await cekAward.save();
+              dataAward.image = fileName;
             }
+
+            await SiswaAward.create(dataAward);
+          } else {
+            const award_image = request.file("award_image", {
+              extnames: ["jpg", "jpeg", "png", "webp"],
+            });
+
+            if (award_image) {
+              const fileName = `${Date.now()}.${award_image.extname}`;
+              await award_image.move("public/uploads/award_siswa", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekAward.image = fileName;
+            }
+            cekAward.siswa_id = updatePPDB.siswa_id;
+            cekAward.award = request.input("award_name");
+            cekAward.tgl_didapat = request.input("award_date");
+
+            await cekAward.save();
           }
         }
 
@@ -291,7 +400,7 @@ class RegisterController {
 
         if (fileAkteLahir) {
           const fileName = `${Date.now()}.${fileAkteLahir.extname}`;
-          await fileAkteLahir.move("public/uploads/ppdb/akte_alhir", {
+          await fileAkteLahir.move("public/uploads/ppdb/akte_lahir", {
             name: fileName,
             overwrite: true,
           });
@@ -318,7 +427,9 @@ class RegisterController {
         updatePPDB.nem = request.input("nilai_nem");
 
         updatePPDB.save();
-      } else if (request.input("step") == "3") {
+      }
+
+      else if (request.input("step") == "4") {
         const cekData = await RegAddress.query()
           .where("register_id", updatePPDB.id)
           .first();
@@ -348,7 +459,7 @@ class RegisterController {
           cekData.zip_code = request.input("zip_code_siswa");
           cekData.save();
         }
-      } else if (request.input("step") == "4") {
+      }else if (request.input("step") == "5") {
         const cekData = await RegParent.query()
           .where("register_id", updatePPDB.id)
           .first();
@@ -460,64 +571,16 @@ class RegisterController {
           cekData.alamat_wali = request.input("alamat_wali");
           cekData.save();
         }
-      } else if (request.input("step") == "5") {
-        const cekData = await Payment.query()
-          .where("register_id", updatePPDB.id)
-          .first();
-
-        const bukti_transaksi = request.file("bukti_transaksi", {
-          extnames: ["jpg", "jpeg", "png", "webp"],
-        });
-        if (!cekData) {
-          const data = {
-            register_id: updatePPDB.id,
-            invoice: `INV/${updatePPDB.code_pendaftaran}`,
-            tanggal_transaksi: new Date().toISOString().split("T")[0],
-          };
-
-          if (bukti_transaksi) {
-            const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
-            await bukti_transaksi.move("public/uploads/payment", {
-              name: fileName,
-              overwrite: true,
-            });
-            data.bukti_transfer = fileName;
-          }
-          Payment.create(data);
-
-          updatePPDB.is_submit = "1";
-
-          updatePPDB.save();
-        } else {
-          if (bukti_transaksi) {
-            const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
-            await bukti_transaksi.move("public/uploads/payment", {
-              name: fileName,
-              overwrite: true,
-            });
-            cekData.bukti_transfer = fileName;
-          }
-          cekData.save();
-        }
-
-        const currentUser = await User.query()
-          .where("id", updatePPDB.registed_by)
-          .first();
-
-        WhatsappService.sendRegisterMessage(
-          currentUser.no_handphone,
-          updatePPDB.code_pendaftaran
-        );
-
-        await trx.commit();
-
-        return response.json({
-          status_code: "200",
-          status: "success",
-          message: "Update berhasil",
-          data: updatePPDB,
-        });
       }
+
+      await trx.commit();
+
+      return response.json({
+        status_code: "200",
+        status: "success",
+        message: "Update berhasil",
+        data: updatePPDB,
+      });
     } catch (error) {
       await trx.rollback();
       return response.status(500).json({
@@ -540,6 +603,13 @@ class RegisterController {
           .where("code_pendaftaran", request.input("register_id"))
           .fetch();
       }
+
+      if (request.input("ids")) {
+        data = await RegisterPPDB.query()
+          .where("registed_by", auth.user.id)
+          .where("id", request.input("ids"))
+          .fetch();
+      }
       const dataRegis = data.toJSON();
 
       await Promise.all(
@@ -549,9 +619,9 @@ class RegisterController {
             .where("id", item.siswa_id)
             .first();
 
-          const dataSiswaAwards = await SiswaAward.query()
+          const dataSiswaAward = await SiswaAward.query()
             .where("siswa_id", item.siswa_id)
-            .fetch();
+            .first();
 
           const dataSekolah = await Sekolah.query()
             .where("id", item.sekolah_id)
@@ -616,14 +686,17 @@ class RegisterController {
           siswa.foto_siswa = siswa.foto_siswa
             ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`
             : null;
+          siswa.foto_sertifikat = siswa.foto_sertifikat
+            ? `${baseUrl}/uploads/foto_sertifikat/${siswa.foto_sertifikat}`
+            : null;
 
-          const siswaAwards = dataSiswaAwards.toJSON().map((award) => ({
-            ...award,
-            tgl_didapat: formatDate(award.tgl_didapat),
-            image: award.image
-              ? `${baseUrl}/uploads/award_siswa/${award.image}`
-              : null,
-          }));
+          const siswaAwards = dataSiswaAward?.toJSON() || null;
+          if (siswaAwards != null) {
+            siswaAwards.tgl_didapat = formatDate(siswaAwards.tgl_didapat);
+            siswaAwards.image = siswaAwards.image
+              ? `${baseUrl}/uploads/award_siswa/${siswaAwards.image}`
+              : null;
+          }
 
           const siswaAddress = dataSiswaAddress?.toJSON() || null;
           const siswaOru = dataSiswaOrtu?.toJSON() || null;
@@ -706,13 +779,7 @@ class RegisterController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik
-          .split("/")
-          .map(Number);
-        query.whereBetween("tanggal_pendaftaran", [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`,
-        ]);
+        query.where('tahun_periodik',filter.tahun_periodik);
       }
 
       const data = await query.fetch();
@@ -1915,10 +1982,18 @@ class RegisterController {
       );
 
       // Ubah jadi format YYYY/YYYY+1
-      const tahunPeriodik = rows.map((row) => {
-        const year = new Date(row.tanggal_pendaftaran).getFullYear();
-        return `${year}/${year + 1}`;
+     const tahunPeriodik = rows.map((row) => {
+        const date = new Date(row.tanggal_pendaftaran);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // getMonth() returns 0-11
+
+        if (month >= 1 && month <= 6) {
+          return `${year}/${year + 1}`;
+        } else {
+          return `${year + 1}/${year + 2}`;
+        }
       });
+
 
       // Hapus duplikat
       const uniqueTahun = [...new Set(tahunPeriodik)];
@@ -1955,6 +2030,8 @@ class RegisterController {
       const diskon = await Diskon.query().where("kode", voucher_diskon).first();
 
       if (!diskon) {
+        register.diskon_id = null;
+        await register.save();
         return response.status(404).json({
           success: false,
           message: "Voucher tidak ditemukan",

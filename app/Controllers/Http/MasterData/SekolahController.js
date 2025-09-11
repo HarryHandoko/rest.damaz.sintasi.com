@@ -24,7 +24,7 @@ class SekolahController {
       dataJSON.data.map(async (dataSekolah) => {
         // Ambil grades
         const grades = await SekolahGrade.query()
-          .select('tbl_sekolah_grades.*','m_sekolas.name as nama_sekolah')
+          .select('tbl_sekolah_grades.*','m_sekolas.name as nama_sekolah','m_sekolas.is_multi_biaya')
           .join('m_sekolas','m_sekolas.id','tbl_sekolah_grades.sekolah_id')
           .where('tbl_sekolah_grades.sekolah_id', dataSekolah.id)
           .orderBy('tbl_sekolah_grades.sort','asc')
@@ -70,7 +70,8 @@ class SekolahController {
     try {
       // Ambil data dari body request
 
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail','slug','code_formulir','moto','visi','misi','sambutan_kepala_unit','biaya_admin_sdit','biaya_pendaftaran_sdit','is_sdit','batas_usia']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','kontent','kontent_detail',
+        'slug','code_formulir','moto','visi','misi','sambutan_kepala_unit','is_multi_biaya','batas_usia_min','batas_usia_max']);
       data.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
       data.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
       const logo = request.file('logo', {
@@ -251,10 +252,12 @@ class SekolahController {
 
   async updateGrade({ request, response }) {
     try {
-      const data = request.only(['name']);
+      const data = request.only(['name','biaya_formulir','biaya_uang_pangkal']);
       const grade = await SekolahGrade.findOrFail(request.input('id'))
 
       grade.name = request.input('name')
+      grade.biaya_formulir = request.input('biaya_formulir')
+      grade.biaya_uang_pangkal = request.input('biaya_uang_pangkal')
       grade.save()
 
       return response.status(201).json({
@@ -271,7 +274,7 @@ class SekolahController {
 
   async update({ request, response }) {
     try {
-      const data = request.only(['name','biaya_admin','biaya_pendaftaran','biaya_admin_sdit','biaya_pendaftaran_sdit','batas_usia']);
+      const data = request.only(['name','biaya_admin','biaya_pendaftaran','is_multi_biaya','batas_usia_max','batas_usia_min']);
       const sekolah = await Sekolah.findOrFail(request.input('id'))
 
       sekolah.name = request.input('name')
@@ -285,10 +288,11 @@ class SekolahController {
       sekolah.visi = request.input('visi')
       sekolah.misi = request.input('misi')
       sekolah.slug = request.input('slug')
-      sekolah.is_sdit = request.input('is_sdit') == 'true' ? 1 : 0;
+      sekolah.is_multi_biaya = request.input('is_multi_biaya') == 'true' ? 1 : 0;
       sekolah.biaya_admin_sdit = request.input('biaya_admin_sdit')
       sekolah.biaya_pendaftaran_sdit = request.input('biaya_pendaftaran_sdit')
-      sekolah.batas_usia = request.input('batas_usia') ? request.input('batas_usia') : null;
+      sekolah.batas_usia_max = request.input('batas_usia_max') ? request.input('batas_usia_max') : null;
+      sekolah.batas_usia_min = request.input('batas_usia_min') ? request.input('batas_usia_min') : null;
       sekolah.is_need_nem = request.input('is_need_nem') == 'true' ? 1 : 0;
       sekolah.is_need_test = request.input('is_need_test') == 'true' ? 1 : 0;
 

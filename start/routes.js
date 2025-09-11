@@ -242,4 +242,9 @@ Route.group(() => {
   Route.get('/whatsapp-setting/get', 'WhatsappSettingController.index')
   Route.post('/whatsapp-setting/post', 'WhatsappSettingController.store')
 
+  // FormReq
+
+  Route.post('/form-req/getdata', 'PPDB/FormReqController.getdata')
+  Route.post('/form-req/approval', 'PPDB/FormReqController.approval')
+
 }).prefix('api').middleware(['auth:jwt', 'apikey'])

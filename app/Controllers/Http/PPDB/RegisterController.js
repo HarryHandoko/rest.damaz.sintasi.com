@@ -226,9 +226,7 @@ class RegisterController {
           .where("register_id", updatePPDB.id)
           .first();
 
-        const bukti_transaksi = request.file("bukti_transaksi", {
-          extnames: ["jpg", "jpeg", "png", "webp"],
-        });
+        const bukti_transaksi = request.file("bukti_transaksi");
         if (!cekData) {
           const data = {
             register_id: updatePPDB.id,
@@ -361,7 +359,7 @@ class RegisterController {
             await SiswaAward.create(dataAward);
           } else {
             const award_image = request.file("award_image", {
-              extnames: ["jpg", "jpeg", "png", "webp"],
+              extnames: ["*"], // accept any file extension
             });
 
             if (award_image) {
@@ -381,9 +379,9 @@ class RegisterController {
         }
 
         // file_raport
-        const fileRaport = request.file("file_raport", {
-          extnames: ["jpg", "jpeg", "png", "webp", "pdf"],
-        });
+        const fileRaport = request.file("file_raport",  {
+              extnames: ["*"], // accept any file extension
+            });
 
         if (fileRaport) {
           const fileName = `${Date.now()}.${fileRaport.extname}`;
@@ -395,8 +393,8 @@ class RegisterController {
         }
         // file_akte_lahir
         const fileAkteLahir = request.file("file_akte_lahir", {
-          extnames: ["jpg", "jpeg", "png", "webp", "pdf"],
-        });
+              extnames: ["*"], // accept any file extension
+            });
 
         if (fileAkteLahir) {
           const fileName = `${Date.now()}.${fileAkteLahir.extname}`;
@@ -408,9 +406,9 @@ class RegisterController {
         }
 
         // file_kartu_keluarga
-        const fileKartuKeluarga = request.file("file_kartu_keluarga", {
-          extnames: ["jpg", "jpeg", "png", "webp", "pdf"],
-        });
+        const fileKartuKeluarga = request.file("file_kartu_keluarga",  {
+              extnames: ["*"], // accept any file extension
+            });
 
         if (fileKartuKeluarga) {
           const fileName = `${Date.now()}.${fileKartuKeluarga.extname}`;
@@ -1460,9 +1458,7 @@ class RegisterController {
         });
       }
 
-      const fileKartuKeluarga = request.file("bukti_pembayaran", {
-        extnames: ["jpg", "jpeg", "png", "webp", "pdf"],
-      });
+      const fileKartuKeluarga = request.file("bukti_pembayaran");
 
       if (fileKartuKeluarga) {
         const fileName = `${Date.now()}.${fileKartuKeluarga.extname}`;

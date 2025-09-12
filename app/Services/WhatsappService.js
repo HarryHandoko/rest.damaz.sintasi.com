@@ -6,6 +6,7 @@ const RegisterPPDB = use("App/Models/PPDB/RegisterPpdb");
 const SiswaPPDB = use("App/Models/PPDB/SiswaPpdb");
 const Sekolah = use("App/Models/MasterData/Sekolah");
 const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
+const RegParent = use("App/Models/PPDB/RegParent");
 const moment = require("moment");
 
 class WhatsappService {
@@ -57,8 +58,10 @@ class WhatsappService {
         { message },
         { headers: { "secret-key": setting.api_key } }
       );
+
       return response.data;
     } catch (error) {
+      console.log(error)
       throw new Error(`Failed to send message: ${error.message}`);
     }
   }
@@ -81,49 +84,65 @@ class WhatsappService {
     const sekolah = await Sekolah.query().where("id", ppdb.sekolah_id).first();
     const grade = await SekolahGrade.query().where("id", ppdb.grade_id).first();
 
+    const orangTua = await RegParent.query()
+      .where("register_id", ppdb.id)
+      .first();
+
+    let noHpOrtu = null;
+    if (orangTua) {
+      noHpOrtu =
+        orangTua.no_telepon_ibu && orangTua.no_telepon_ibu !== "-"
+          ? orangTua.no_telepon_ibu
+          : orangTua.no_telepon_ayah && orangTua.no_telepon_ayah !== "-"
+          ? orangTua.no_telepon_ayah
+          : orangTua.no_telepon_wali && orangTua.no_telepon_wali !== "-"
+          ? orangTua.no_telepon_wali
+          : null;
+    }
+
     return {
       nama: `${siswa.nama_depan} ${siswa.nama_belakang}`,
       sekolah: sekolah.name,
       jenjang: grade.name,
       jenis_kelamin: siswa.jenis_kelamin,
       kode_pendaftaran: ppdb.code_pendaftaran,
+      no_hp_ortu: noHpOrtu,
     };
   }
 
-  async sendRegisterMessage(phoneNumber, kodePendaftaran) {
+  async sendRegisterMessage(kodePendaftaran) {
     const setting = await this.getSetting();
     let template = setting.format_pesan_registrasi;
     if (!template) throw new Error("Template pesan registrasi belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
-    return await this.sendMessage(message, phoneNumber);
+    return await this.sendMessage(message, data.no_hp_ortu);
   }
-
 
   /**
    * @param {string} phoneNumber
    * @param {{ nama: string, jenjang: string, kategori: string, jenis_kelamin: string }} data
    */
-  async sendApprovalMessage(phoneNumber, kodePendaftaran) {
+  async sendApprovalMessage(kodePendaftaran) {
     const setting = await this.getSetting();
     let template = setting.format_pesan_diterima;
     if (!template) throw new Error("Template pesan diterima belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
-    return await this.sendMessage(message, phoneNumber);
+    return await this.sendMessage(message, data.no_hp_ortu);
   }
 
   /**
    * @param {string} phoneNumber
    * @param {{ nama: string, jenjang: string, kategori: string, jenis_kelamin: string }} data
    */
-  async sendRejectedMessage(phoneNumber, kodePendaftaran) {
+  async sendRejectedMessage(kodePendaftaran) {
     const setting = await this.getSetting();
     let template = setting.format_pesan_ditolak;
     if (!template) throw new Error("Template pesan ditolak belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
-    return await this.sendMessage(message, phoneNumber);
+    return await this.sendMessage(message, data.no_hp_ortu);
   }
 }
 

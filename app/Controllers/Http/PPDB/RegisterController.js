@@ -55,25 +55,27 @@ class RegisterController {
       const now = new Date();
       const tanggal = moment(now).format("DDMMYYYY");
 
-      const dataNow = moment()
-      const year = dataNow.year()
-      const month = dataNow.month() + 1 // moment bulan mulai dari 0, jadi kita +1
+      const dataNow = moment();
+      const year = dataNow.year();
+      const month = dataNow.month() + 1; // moment bulan mulai dari 0, jadi kita +1
 
-      let tahunAwal, tahunAkhir
+      let tahunAwal, tahunAkhir;
 
       if (month >= 1 && month <= 6) {
         // Januari - Juni
-        tahunAwal = year
-        tahunAkhir = year + 1
+        tahunAwal = year;
+        tahunAkhir = year + 1;
       } else {
         // Juli - Desember
-        tahunAwal = year + 1
-        tahunAkhir = year + 2
+        tahunAwal = year + 1;
+        tahunAkhir = year + 2;
       }
 
       // Ambil 2 digit terakhir
-      const periodik = `${tahunAwal.toString().slice(2)}${tahunAkhir.toString().slice(2)}`
-      const periodikYear = `${tahunAwal}/${tahunAkhir}`
+      const periodik = `${tahunAwal.toString().slice(2)}${tahunAkhir
+        .toString()
+        .slice(2)}`;
+      const periodikYear = `${tahunAwal}/${tahunAkhir}`;
       const prefix = `DM${periodik}_${tanggal}`;
       // Query pada transaction
       const lastRegister = await RegisterPPDB.query(trx)
@@ -102,7 +104,7 @@ class RegisterController {
         registed_by: auth.user.id,
         siswa_id: SiswaId.id,
         status_pendaftaran: "P00",
-        tahun_periodik : periodikYear
+        tahun_periodik: periodikYear,
       };
       const RegisterID = await RegisterPPDB.create(data, trx);
 
@@ -112,7 +114,7 @@ class RegisterController {
         status: "success",
         message: "Pendaftaran berhasil, silahkan login",
         data: {
-          id:RegisterID.id
+          id: RegisterID.id,
         },
       });
     } catch (error) {
@@ -138,13 +140,17 @@ class RegisterController {
           .first();
 
         // check batas usia
-        const tglLahir = moment(request.input("tgl_lahir"), "YYYY-MM-DD")
-        const umur = moment().diff(tglLahir, "years") // hitung umur dalam tahun
+        const tglLahir = moment(request.input("tgl_lahir"), "YYYY-MM-DD");
+        const umur = moment().diff(tglLahir, "years"); // hitung umur dalam tahun
 
-        if (umur < SekolahData.batas_usia_min || umur > SekolahData.batas_usia_max) {
+        if (
+          umur < SekolahData.batas_usia_min ||
+          umur > SekolahData.batas_usia_max
+        ) {
           return response.status(500).json({
             status: umur < SekolahData.batas_usia_min,
-            message: "Usia Calon Peserta Didik tidak memenuhi syarat batas minimum dan maximum usia",
+            message:
+              "Usia Calon Peserta Didik tidak memenuhi syarat batas minimum dan maximum usia",
           });
         }
 
@@ -152,24 +158,26 @@ class RegisterController {
 
         const tanggal = moment(now).format("DDMMYYYY");
 
-        const dataNow = moment()
-        const year = dataNow.year()
-        const month = dataNow.month() + 1 // moment bulan mulai dari 0, jadi kita +1
+        const dataNow = moment();
+        const year = dataNow.year();
+        const month = dataNow.month() + 1; // moment bulan mulai dari 0, jadi kita +1
 
-        let tahunAwal, tahunAkhir
+        let tahunAwal, tahunAkhir;
 
         if (month >= 1 && month <= 6) {
           // Januari - Juni
-          tahunAwal = year
-          tahunAkhir = year + 1
+          tahunAwal = year;
+          tahunAkhir = year + 1;
         } else {
           // Juli - Desember
-          tahunAwal = year + 1
-          tahunAkhir = year + 2
+          tahunAwal = year + 1;
+          tahunAkhir = year + 2;
         }
 
         // Ambil 2 digit terakhir
-        const periodik = `${tahunAwal.toString().slice(2)}${tahunAkhir.toString().slice(2)}`
+        const periodik = `${tahunAwal.toString().slice(2)}${tahunAkhir
+          .toString()
+          .slice(2)}`;
 
         const prefix = `DM${periodik}_${SekolahData.code_formulir}.`;
 
@@ -196,12 +204,12 @@ class RegisterController {
         updatePPDB.grade_id = request.input("grade_id");
         updatePPDB.tanggal_pendaftaran = new Date().toISOString().slice(0, 10);
 
-        let biaya_form =  SekolahData.biaya_admin;
-        let biaya_uang_pangkal =  SekolahData.biaya_pendaftaran;
-        if(SekolahData.is_multi_biaya == 1){
+        let biaya_form = SekolahData.biaya_admin;
+        let biaya_uang_pangkal = SekolahData.biaya_pendaftaran;
+        if (SekolahData.is_multi_biaya == 1) {
           const grades = await SekolahGrade.query()
-                            .where("id", request.input("grade_id"))
-                            .first();
+            .where("id", request.input("grade_id"))
+            .first();
 
           biaya_form = grades.biaya_formulir;
           biaya_uang_pangkal = grades.biaya_uang_pangkal;
@@ -211,7 +219,6 @@ class RegisterController {
         updatePPDB.biaya_pendaftaran = biaya_uang_pangkal;
         updatePPDB.is_need_test = SekolahData.is_need_test;
         updatePPDB.save();
-
 
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
@@ -230,6 +237,7 @@ class RegisterController {
         if (!cekData) {
           const data = {
             register_id: updatePPDB.id,
+            invoice: `INV/${updatePPDB.code_pendaftaran}`,
             tanggal_transaksi: new Date().toISOString().split("T")[0],
           };
 
@@ -379,9 +387,9 @@ class RegisterController {
         }
 
         // file_raport
-        const fileRaport = request.file("file_raport",  {
-              extnames: ["*"], // accept any file extension
-            });
+        const fileRaport = request.file("file_raport", {
+          extnames: ["*"], // accept any file extension
+        });
 
         if (fileRaport) {
           const fileName = `${Date.now()}.${fileRaport.extname}`;
@@ -393,8 +401,8 @@ class RegisterController {
         }
         // file_akte_lahir
         const fileAkteLahir = request.file("file_akte_lahir", {
-              extnames: ["*"], // accept any file extension
-            });
+          extnames: ["*"], // accept any file extension
+        });
 
         if (fileAkteLahir) {
           const fileName = `${Date.now()}.${fileAkteLahir.extname}`;
@@ -406,9 +414,9 @@ class RegisterController {
         }
 
         // file_kartu_keluarga
-        const fileKartuKeluarga = request.file("file_kartu_keluarga",  {
-              extnames: ["*"], // accept any file extension
-            });
+        const fileKartuKeluarga = request.file("file_kartu_keluarga", {
+          extnames: ["*"], // accept any file extension
+        });
 
         if (fileKartuKeluarga) {
           const fileName = `${Date.now()}.${fileKartuKeluarga.extname}`;
@@ -425,9 +433,7 @@ class RegisterController {
         updatePPDB.nem = request.input("nilai_nem");
 
         updatePPDB.save();
-      }
-
-      else if (request.input("step") == "4") {
+      } else if (request.input("step") == "4") {
         const cekData = await RegAddress.query()
           .where("register_id", updatePPDB.id)
           .first();
@@ -457,18 +463,20 @@ class RegisterController {
           cekData.zip_code = request.input("zip_code_siswa");
           cekData.save();
         }
-      }else if (request.input("step") == "5") {
+      } else if (request.input("step") == "5") {
         const cekData = await RegParent.query()
           .where("register_id", updatePPDB.id)
           .first();
         if (!cekData) {
           let data = null;
-          if(request.input('penanggung_jawab') == 'Orang Tua'){
+          if (request.input("penanggung_jawab") == "Orang Tua") {
             data = {
               register_id: updatePPDB.id,
               nama_ayah: request.input("nama_ayah"),
               pekerjaan_ayah: request.input("pekerjaan_ayah"),
-              pendidikan_terakhir_ayah: request.input("pendidikan_terakhir_ayah"),
+              pendidikan_terakhir_ayah: request.input(
+                "pendidikan_terakhir_ayah"
+              ),
               penghasilan_ayah: request.input("penghasilan_ayah"),
               no_hp_ayah:
                 request.input("no_hp_ayah") == "null"
@@ -499,12 +507,14 @@ class RegisterController {
               nik_ibu: request.input("nik_ibu"),
               penanggung_jawab: request.input("penanggung_jawab"),
             };
-          }else{
+          } else {
             data = {
               register_id: updatePPDB.id,
               nama_wali: request.input("nama_wali"),
               pekerjaan_wali: request.input("pekerjaan_wali"),
-              pendidikan_terakhir_wali: request.input("pendidikan_terakhir_wali"),
+              pendidikan_terakhir_wali: request.input(
+                "pendidikan_terakhir_wali"
+              ),
               penghasilan_wali: request.input("penghasilan_wali"),
               no_hp_wali:
                 request.input("no_hp_wali") == "null"
@@ -522,8 +532,7 @@ class RegisterController {
           }
           RegParent.create(data);
         } else {
-
-          if(request.input("penanggung_jawab") == 'Orang Tua'){
+          if (request.input("penanggung_jawab") == "Orang Tua") {
             cekData.nama_ayah = request.input("nama_ayah");
             cekData.pekerjaan_ayah = request.input("pekerjaan_ayah");
             cekData.pendidikan_terakhir_ayah = request.input(
@@ -539,7 +548,9 @@ class RegisterController {
                 ? "-"
                 : request.input("no_telepon_ayah");
             cekData.nik_ayah = request.input("nik_ayah");
-            cekData.is_same_address_ayah = request.input("is_same_address_ayah");
+            cekData.is_same_address_ayah = request.input(
+              "is_same_address_ayah"
+            );
             cekData.alamat_ayah = request.input("alamat_ayah");
 
             cekData.nama_ibu = request.input("nama_ibu");
@@ -560,7 +571,7 @@ class RegisterController {
             cekData.is_same_address_ibu = request.input("is_same_address_ibu");
             cekData.alamat_ibu = request.input("alamat_ibu");
             cekData.penanggung_jawab = request.input("penanggung_jawab");
-          }else{
+          } else {
             cekData.nama_wali = request.input("nama_wali");
             cekData.pekerjaan_wali = request.input("pekerjaan_wali");
             cekData.pendidikan_terakhir_wali = request.input(
@@ -576,7 +587,9 @@ class RegisterController {
                 ? "-"
                 : request.input("no_telepon_wali");
             cekData.nik_wali = request.input("nik_wali");
-            cekData.is_same_address_wali = request.input("is_same_address_wali");
+            cekData.is_same_address_wali = request.input(
+              "is_same_address_wali"
+            );
             cekData.alamat_wali = request.input("alamat_wali");
             cekData.penanggung_jawab = request.input("penanggung_jawab");
           }
@@ -735,7 +748,8 @@ class RegisterController {
           if (dataDiskon) {
             dataRegis[index].voucher_diskon = dataDiskon.kode;
             dataRegis[index].nominal_diskon = dataDiskon.nominal;
-            dataRegis[index].diskon_uang_pangkal = dataDiskon.diskon_uang_pangkal;
+            dataRegis[index].diskon_uang_pangkal =
+              dataDiskon.diskon_uang_pangkal;
           }
 
           dataRegis[index].tgl_test =
@@ -778,7 +792,9 @@ class RegisterController {
       const baseUrl = Env.get("BASE_URL");
       const filter = request.input("filter", {});
 
-      let query = RegisterPPDB.query().where("is_submit", "1").where('is_form_done',1);
+      let query = RegisterPPDB.query()
+        .where("is_submit", "1")
+        .where("is_form_done", 1);
 
       if (filter.status) {
         if (filter.status === "Diterima") {
@@ -791,7 +807,7 @@ class RegisterController {
       }
 
       if (filter.tahun_periodik) {
-        query.where('tahun_periodik',filter.tahun_periodik);
+        query.where("tahun_periodik", filter.tahun_periodik);
       }
 
       const data = await query.fetch();
@@ -1253,13 +1269,8 @@ class RegisterController {
             emailHtml
           );
         }
-        // kirim whatsapp
-        // if (user && user.no_handphone) {
-        //   await WhatsappService.sendApprovalMessage(
-        //     user.no_handphone,
-        //     data.code_pendaftaran
-        //   );
-        // }
+
+        await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
         data.status_pendaftaran = "P02";
@@ -1320,13 +1331,7 @@ class RegisterController {
           emailHtml
         );
 
-        // kirim whatsapp
-        // if (user && user.no_handphone) {
-        //   await WhatsappService.sendRejectedMessage(
-        //     user.no_handphone,
-        //     data.code_pendaftaran
-        //   );
-        // }
+        await WhatsappService.sendRejectedMessage(data.code_pendaftaran);
       } else {
         return response.status(400).json({
           success: false,
@@ -1515,7 +1520,7 @@ class RegisterController {
       }
 
       if (filter.tahun_periodik) {
-        data.where('tahun_periodik',filter.tahun_periodik);
+        data.where("tahun_periodik", filter.tahun_periodik);
       }
 
       // Execute
@@ -1575,14 +1580,14 @@ class RegisterController {
             .where("register_id", item.register_id)
             .first();
 
-
           const dataDiskon = await Diskon.query()
             .where("id", dataRegis[index].diskon_id)
             .first();
           if (dataDiskon) {
             dataRegis[index].voucher_diskon = dataDiskon.kode;
             dataRegis[index].nominal_diskon = dataDiskon.nominal;
-            dataRegis[index].diskon_uang_pangkal = dataDiskon.diskon_uang_pangkal;
+            dataRegis[index].diskon_uang_pangkal =
+              dataDiskon.diskon_uang_pangkal;
           }
 
           // siswa
@@ -1996,7 +2001,7 @@ class RegisterController {
       );
 
       // Ubah jadi format YYYY/YYYY+1
-     const tahunPeriodik = rows.map((row) => {
+      const tahunPeriodik = rows.map((row) => {
         const date = new Date(row.tanggal_pendaftaran);
         const year = date.getFullYear();
         const month = date.getMonth() + 1; // getMonth() returns 0-11
@@ -2007,7 +2012,6 @@ class RegisterController {
           return `${year + 1}/${year + 2}`;
         }
       });
-
 
       // Hapus duplikat
       const uniqueTahun = [...new Set(tahunPeriodik)];
@@ -2075,14 +2079,9 @@ class RegisterController {
     }
   }
 
-
-
   async updateTanggalTest({ request, response }) {
     try {
-      const { code_ppdb, tgl_test } = request.only([
-        "code_ppdb",
-        "tgl_test",
-      ]);
+      const { code_ppdb, tgl_test } = request.only(["code_ppdb", "tgl_test"]);
       const register = await RegisterPPDB.query()
         .where("code_pendaftaran", code_ppdb)
         .first();
@@ -2092,7 +2091,7 @@ class RegisterController {
           message: "Pendaftaran tidak ditemukan",
         });
       }
-      register.tgl_test = tgl_test
+      register.tgl_test = tgl_test;
       await register.save();
 
       response.status(200).json({

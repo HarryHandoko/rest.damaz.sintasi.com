@@ -1993,41 +1993,28 @@ class RegisterController {
     }
   }
 
-  async getTahunPeriodik({ request, response }) {
-    try {
-      // Ambil semua created_at
-      const rows = await Database.from("tbl_register_ppdbs").select(
-        "tanggal_pendaftaran"
-      );
+   async getTahunPeriodik({ request, response }) {
+  try {
+    const rows = await Database.from("tbl_register_ppdbs")
+      .distinct("tahun_periodik")
+      .orderBy("tahun_periodik", "asc");
 
-      // Ubah jadi format YYYY/YYYY+1
-      const tahunPeriodik = rows.map((row) => {
-        const date = new Date(row.tanggal_pendaftaran);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // getMonth() returns 0-11
+    // Convert array of objects → array of string
+    const uniqueTahun = rows.map(row => row.tahun_periodik);
 
-        if (month >= 1 && month <= 6) {
-          return `${year}/${year + 1}`;
-        } else {
-          return `${year + 1}/${year + 2}`;
-        }
-      });
-
-      // Hapus duplikat
-      const uniqueTahun = [...new Set(tahunPeriodik)];
-
-      return response.send({
-        success: true,
-        data: uniqueTahun,
-      });
-    } catch (error) {
-      return response.status(500).send({
-        success: false,
-        message: "Gagal mendapatkan data",
-        error: error.message,
-      });
-    }
+    return response.send({
+      success: true,
+      data: uniqueTahun,
+    });
+  } catch (error) {
+    return response.status(500).send({
+      success: false,
+      message: "Gagal mendapatkan data",
+      error: error.message,
+    });
   }
+}
+
 
   async applyVoucher({ request, response }) {
     try {

@@ -62,11 +62,7 @@ class ProsesTestController {
         }
 
         if (filter.tahun_periodik) {
-          const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-          data.whereBetween('tanggal_pendaftaran', [
-            `${startYear}-01-01`,
-            `${endYear}-12-31`
-          ])
+          data.where('tahun_periodik',filter.tahun_periodik);
         }
 
         data = await data.fetch();

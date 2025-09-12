@@ -464,111 +464,124 @@ class RegisterController {
           .where("register_id", updatePPDB.id)
           .first();
         if (!cekData) {
-          const data = {
-            register_id: updatePPDB.id,
-            nama_ayah: request.input("nama_ayah"),
-            pekerjaan_ayah: request.input("pekerjaan_ayah"),
-            pendidikan_terakhir_ayah: request.input("pendidikan_terakhir_ayah"),
-            penghasilan_ayah: request.input("penghasilan_ayah"),
-            no_hp_ayah:
-              request.input("no_hp_ayah") == "null"
-                ? "-"
-                : request.input("no_hp_ayah"),
-            no_telepon_ayah:
-              request.input("no_telepon_ayah") == "null"
-                ? "-"
-                : request.input("no_telepon_ayah"),
-            alamat_ayah: request.input("alamat_ayah"),
-            is_same_address_ayah: request.input("is_same_address_ayah"),
-            nik_ayah: request.input("nik_ayah"),
+          let data = null;
+          if(request.input('penanggung_jawab') == 'Orang Tua'){
+            data = {
+              register_id: updatePPDB.id,
+              nama_ayah: request.input("nama_ayah"),
+              pekerjaan_ayah: request.input("pekerjaan_ayah"),
+              pendidikan_terakhir_ayah: request.input("pendidikan_terakhir_ayah"),
+              penghasilan_ayah: request.input("penghasilan_ayah"),
+              no_hp_ayah:
+                request.input("no_hp_ayah") == "null"
+                  ? "-"
+                  : request.input("no_hp_ayah"),
+              no_telepon_ayah:
+                request.input("no_telepon_ayah") == "null"
+                  ? "-"
+                  : request.input("no_telepon_ayah"),
+              alamat_ayah: request.input("alamat_ayah"),
+              is_same_address_ayah: request.input("is_same_address_ayah"),
+              nik_ayah: request.input("nik_ayah"),
 
-            nama_ibu: request.input("nama_ibu"),
-            pekerjaan_ibu: request.input("pekerjaan_ibu"),
-            pendidikan_terakhir_ibu: request.input("pendidikan_terakhir_ibu"),
-            penghasilan_ibu: request.input("penghasilan_ibu"),
-            no_hp_ibu:
-              request.input("no_hp_ibu") == "null"
-                ? "-"
-                : request.input("no_hp_ibu"),
-            no_telepon_ibu:
-              request.input("no_telepon_ibu") == "null"
-                ? "-"
-                : request.input("no_telepon_ibu"),
-            alamat_ibu: request.input("alamat_ibu"),
-            is_same_address_ibu: request.input("is_same_address_ibu"),
-            nik_ibu: request.input("nik_ibu"),
-
-            nama_wali: request.input("nama_wali"),
-            pekerjaan_wali: request.input("pekerjaan_wali"),
-            pendidikan_terakhir_wali: request.input("pendidikan_terakhir_wali"),
-            penghasilan_wali: request.input("penghasilan_wali"),
-            no_hp_ibu:
-              request.input("no_hp_ibu") == "null"
-                ? "-"
-                : request.input("no_hp_ibu"),
-            no_telepon_ibu:
-              request.input("no_telepon_ibu") == "null"
-                ? "-"
-                : request.input("no_telepon_ibu"),
-            alamat_wali: request.input("alamat_wali"),
-            is_same_address_wali: request.input("is_same_address_wali"),
-            nik_wali: request.input("nik_wali"),
-          };
+              nama_ibu: request.input("nama_ibu"),
+              pekerjaan_ibu: request.input("pekerjaan_ibu"),
+              pendidikan_terakhir_ibu: request.input("pendidikan_terakhir_ibu"),
+              penghasilan_ibu: request.input("penghasilan_ibu"),
+              no_hp_ibu:
+                request.input("no_hp_ibu") == "null"
+                  ? "-"
+                  : request.input("no_hp_ibu"),
+              no_telepon_ibu:
+                request.input("no_telepon_ibu") == "null"
+                  ? "-"
+                  : request.input("no_telepon_ibu"),
+              alamat_ibu: request.input("alamat_ibu"),
+              is_same_address_ibu: request.input("is_same_address_ibu"),
+              nik_ibu: request.input("nik_ibu"),
+              penanggung_jawab: request.input("penanggung_jawab"),
+            };
+          }else{
+            data = {
+              register_id: updatePPDB.id,
+              nama_wali: request.input("nama_wali"),
+              pekerjaan_wali: request.input("pekerjaan_wali"),
+              pendidikan_terakhir_wali: request.input("pendidikan_terakhir_wali"),
+              penghasilan_wali: request.input("penghasilan_wali"),
+              no_hp_wali:
+                request.input("no_hp_wali") == "null"
+                  ? "-"
+                  : request.input("no_hp_wali"),
+              no_telepon_wali:
+                request.input("no_telepon_wali") == "null"
+                  ? "-"
+                  : request.input("no_telepon_wali"),
+              alamat_wali: request.input("alamat_wali"),
+              is_same_address_wali: request.input("is_same_address_wali"),
+              nik_wali: request.input("nik_wali"),
+              penanggung_jawab: request.input("penanggung_jawab"),
+            };
+          }
           RegParent.create(data);
         } else {
-          cekData.nama_ayah = request.input("nama_ayah");
-          cekData.pekerjaan_ayah = request.input("pekerjaan_ayah");
-          cekData.pendidikan_terakhir_ayah = request.input(
-            "pendidikan_terakhir_ayah"
-          );
-          cekData.penghasilan_ayah = request.input("penghasilan_ayah");
-          cekData.no_hp_ayah =
-            request.input("no_hp_ayah") == "null"
-              ? "-"
-              : request.input("no_hp_ayah");
-          cekData.no_telepon_ayah =
-            request.input("no_telepon_ayah") == "null"
-              ? "-"
-              : request.input("no_telepon_ayah");
-          cekData.nik_ayah = request.input("nik_ayah");
-          cekData.is_same_address_ayah = request.input("is_same_address_ayah");
-          cekData.alamat_ayah = request.input("alamat_ayah");
 
-          cekData.nama_ibu = request.input("nama_ibu");
-          cekData.pekerjaan_ibu = request.input("pekerjaan_ibu");
-          cekData.pendidikan_terakhir_ibu = request.input(
-            "pendidikan_terakhir_ibu"
-          );
-          cekData.penghasilan_ibu = request.input("penghasilan_ibu");
-          cekData.no_hp_ibu =
-            request.input("no_hp_ibu") == "null"
-              ? "-"
-              : request.input("no_hp_ibu");
-          cekData.no_telepon_ibu =
-            request.input("no_telepon_ibu") == "null"
-              ? "-"
-              : request.input("no_telepon_ibu");
-          cekData.nik_ibu = request.input("nik_ibu");
-          cekData.is_same_address_ibu = request.input("is_same_address_ibu");
-          cekData.alamat_ibu = request.input("alamat_ibu");
+          if(request.input("penanggung_jawab") == 'Orang Tua'){
+            cekData.nama_ayah = request.input("nama_ayah");
+            cekData.pekerjaan_ayah = request.input("pekerjaan_ayah");
+            cekData.pendidikan_terakhir_ayah = request.input(
+              "pendidikan_terakhir_ayah"
+            );
+            cekData.penghasilan_ayah = request.input("penghasilan_ayah");
+            cekData.no_hp_ayah =
+              request.input("no_hp_ayah") == "null"
+                ? "-"
+                : request.input("no_hp_ayah");
+            cekData.no_telepon_ayah =
+              request.input("no_telepon_ayah") == "null"
+                ? "-"
+                : request.input("no_telepon_ayah");
+            cekData.nik_ayah = request.input("nik_ayah");
+            cekData.is_same_address_ayah = request.input("is_same_address_ayah");
+            cekData.alamat_ayah = request.input("alamat_ayah");
 
-          cekData.nama_wali = request.input("nama_wali");
-          cekData.pekerjaan_wali = request.input("pekerjaan_wali");
-          cekData.pendidikan_terakhir_wali = request.input(
-            "pendidikan_terakhir_wali"
-          );
-          cekData.penghasilan_wali = request.input("penghasilan_wali");
-          cekData.no_hp_wali =
-            request.input("no_hp_wali") == "null"
-              ? "-"
-              : request.input("no_hp_wali");
-          cekData.no_telepon_wali =
-            request.input("no_telepon_wali") == "null"
-              ? "-"
-              : request.input("no_telepon_wali");
-          cekData.nik_wali = request.input("nik_wali");
-          cekData.is_same_address_wali = request.input("is_same_address_wali");
-          cekData.alamat_wali = request.input("alamat_wali");
+            cekData.nama_ibu = request.input("nama_ibu");
+            cekData.pekerjaan_ibu = request.input("pekerjaan_ibu");
+            cekData.pendidikan_terakhir_ibu = request.input(
+              "pendidikan_terakhir_ibu"
+            );
+            cekData.penghasilan_ibu = request.input("penghasilan_ibu");
+            cekData.no_hp_ibu =
+              request.input("no_hp_ibu") == "null"
+                ? "-"
+                : request.input("no_hp_ibu");
+            cekData.no_telepon_ibu =
+              request.input("no_telepon_ibu") == "null"
+                ? "-"
+                : request.input("no_telepon_ibu");
+            cekData.nik_ibu = request.input("nik_ibu");
+            cekData.is_same_address_ibu = request.input("is_same_address_ibu");
+            cekData.alamat_ibu = request.input("alamat_ibu");
+            cekData.penanggung_jawab = request.input("penanggung_jawab");
+          }else{
+            cekData.nama_wali = request.input("nama_wali");
+            cekData.pekerjaan_wali = request.input("pekerjaan_wali");
+            cekData.pendidikan_terakhir_wali = request.input(
+              "pendidikan_terakhir_wali"
+            );
+            cekData.penghasilan_wali = request.input("penghasilan_wali");
+            cekData.no_hp_wali =
+              request.input("no_hp_wali") == "null"
+                ? "-"
+                : request.input("no_hp_wali");
+            cekData.no_telepon_wali =
+              request.input("no_telepon_wali") == "null"
+                ? "-"
+                : request.input("no_telepon_wali");
+            cekData.nik_wali = request.input("nik_wali");
+            cekData.is_same_address_wali = request.input("is_same_address_wali");
+            cekData.alamat_wali = request.input("alamat_wali");
+            cekData.penanggung_jawab = request.input("penanggung_jawab");
+          }
           cekData.save();
         }
       }
@@ -724,6 +737,7 @@ class RegisterController {
           if (dataDiskon) {
             dataRegis[index].voucher_diskon = dataDiskon.kode;
             dataRegis[index].nominal_diskon = dataDiskon.nominal;
+            dataRegis[index].diskon_uang_pangkal = dataDiskon.diskon_uang_pangkal;
           }
 
           dataRegis[index].tgl_test =
@@ -766,7 +780,7 @@ class RegisterController {
       const baseUrl = Env.get("BASE_URL");
       const filter = request.input("filter", {});
 
-      let query = RegisterPPDB.query().where("is_submit", "1");
+      let query = RegisterPPDB.query().where("is_submit", "1").where('is_form_done',1);
 
       if (filter.status) {
         if (filter.status === "Diterima") {
@@ -1242,12 +1256,12 @@ class RegisterController {
           );
         }
         // kirim whatsapp
-        if (user && user.no_handphone) {
-          await WhatsappService.sendApprovalMessage(
-            user.no_handphone,
-            data.code_pendaftaran
-          );
-        }
+        // if (user && user.no_handphone) {
+        //   await WhatsappService.sendApprovalMessage(
+        //     user.no_handphone,
+        //     data.code_pendaftaran
+        //   );
+        // }
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
         data.status_pendaftaran = "P02";
@@ -1309,12 +1323,12 @@ class RegisterController {
         );
 
         // kirim whatsapp
-        if (user && user.no_handphone) {
-          await WhatsappService.sendRejectedMessage(
-            user.no_handphone,
-            data.code_pendaftaran
-          );
-        }
+        // if (user && user.no_handphone) {
+        //   await WhatsappService.sendRejectedMessage(
+        //     user.no_handphone,
+        //     data.code_pendaftaran
+        //   );
+        // }
       } else {
         return response.status(400).json({
           success: false,
@@ -1380,7 +1394,7 @@ class RegisterController {
         code_registrasi_ulang: kodePendaftaran,
         register_by: auth.user.id,
         status_pembayaran: "00",
-        biaya_pendaftaran: request.input("sekolah")["biaya_pendaftaran"],
+        biaya_pendaftaran: dataPPDB.biaya_pendaftaran,
       });
 
       dataPPDB.is_daftar_ulang = "1";
@@ -1505,13 +1519,7 @@ class RegisterController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik
-          .split("/")
-          .map(Number);
-        data.whereBetween("tbl_daftar_ulangs.created_at", [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`,
-        ]);
+        data.where('tahun_periodik',filter.tahun_periodik);
       }
 
       // Execute
@@ -1570,6 +1578,16 @@ class RegisterController {
           const dataPayment = await Payment.query()
             .where("register_id", item.register_id)
             .first();
+
+
+          const dataDiskon = await Diskon.query()
+            .where("id", dataRegis[index].diskon_id)
+            .first();
+          if (dataDiskon) {
+            dataRegis[index].voucher_diskon = dataDiskon.kode;
+            dataRegis[index].nominal_diskon = dataDiskon.nominal;
+            dataRegis[index].diskon_uang_pangkal = dataDiskon.diskon_uang_pangkal;
+          }
 
           // siswa
           const siswa = dataSiswa?.toJSON() || null;
@@ -2056,6 +2074,38 @@ class RegisterController {
       response.status(500).json({
         success: false,
         message: "Gagal menerapkan voucher",
+        error: err.message,
+      });
+    }
+  }
+
+
+
+  async updateTanggalTest({ request, response }) {
+    try {
+      const { code_ppdb, tgl_test } = request.only([
+        "code_ppdb",
+        "tgl_test",
+      ]);
+      const register = await RegisterPPDB.query()
+        .where("code_pendaftaran", code_ppdb)
+        .first();
+      if (!register) {
+        return response.status(404).json({
+          success: false,
+          message: "Pendaftaran tidak ditemukan",
+        });
+      }
+      register.tgl_test = tgl_test
+      await register.save();
+
+      response.status(200).json({
+        success: true,
+      });
+    } catch (err) {
+      response.status(500).json({
+        success: false,
+        message: "Gagal mengubah tanggal tes",
         error: err.message,
       });
     }

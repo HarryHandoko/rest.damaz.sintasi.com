@@ -21,7 +21,7 @@ class DiskonController {
 
   async store({ request, response }) {
     try {
-      const data = request.only(['nama', 'nominal', 'kode', 'kuota']);
+      const data = request.only(['nama', 'nominal','diskon_uang_pangkal', 'kode', 'kuota']);
 
       await Diskon.create(data)
 
@@ -37,7 +37,7 @@ class DiskonController {
   async update({ request, response }) {
     try {
       const id = request.input('id')
-      const data = request.only(['nama', 'nominal', 'kode', 'kuota'])
+      const data = request.only(['nama', 'nominal', 'diskon_uang_pangkal','kode', 'kuota'])
 
       const diskon = await Diskon.find(id)
 
@@ -48,6 +48,7 @@ class DiskonController {
       }
 
       diskon.nominal = data.nominal
+      diskon.diskon_uang_pangkal = data.diskon_uang_pangkal
       diskon.nama = data.nama
       diskon.kode = data.kode
       diskon.kuota = data.kuota

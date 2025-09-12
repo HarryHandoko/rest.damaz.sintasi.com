@@ -1993,11 +1993,29 @@ class RegisterController {
     }
   }
 
-   async getTahunPeriodik({ request, response }) {
+  async getTahunPeriodik({ request, response }) {
     try {
-      const uniqueTahun = await Database.from("tbl_register_ppdbs")
-        .distinct("tahun_periodik")
-        .orderBy("tahun_periodik", "asc");
+      // Ambil semua created_at
+      const rows = await Database.from("tbl_register_ppdbs").select(
+        "tanggal_pendaftaran"
+      );
+
+      // Ubah jadi format YYYY/YYYY+1
+      const tahunPeriodik = rows.map((row) => {
+        const date = new Date(row.tanggal_pendaftaran);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // getMonth() returns 0-11
+
+        if (month >= 1 && month <= 6) {
+          return `${year}/${year + 1}`;
+        } else {
+          return `${year + 1}/${year + 2}`;
+        }
+      });
+
+      // Hapus duplikat
+      const uniqueTahun = [...new Set(tahunPeriodik)];
+
       return response.send({
         success: true,
         data: uniqueTahun,

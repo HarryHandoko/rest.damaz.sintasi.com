@@ -91,12 +91,12 @@ class WhatsappService {
     let noHpOrtu = null;
     if (orangTua) {
       noHpOrtu =
-        orangTua.no_telepon_ibu && orangTua.no_telepon_ibu !== "-"
-          ? orangTua.no_telepon_ibu
-          : orangTua.no_telepon_ayah && orangTua.no_telepon_ayah !== "-"
-          ? orangTua.no_telepon_ayah
-          : orangTua.no_telepon_wali && orangTua.no_telepon_wali !== "-"
-          ? orangTua.no_telepon_wali
+        orangTua.no_hp_ibu && orangTua.no_hp_ibu !== "-"
+          ? orangTua.no_hp_ibu
+          : orangTua.no_hp_ayah && orangTua.no_hp_ayah !== "-"
+          ? orangTua.no_hp_ayah
+          : orangTua.no_hp_wali && orangTua.no_hp_wali !== "-"
+          ? orangTua.no_hp_wali
           : null;
     }
 

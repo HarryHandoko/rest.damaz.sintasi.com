@@ -4,6 +4,7 @@ const SiswaPpdb = use("App/Models/PPDB/SiswaPpdb");
 const Payment = use("App/Models/PPDB/Payment");
 const User = use("App/Models/User");
 const Sekolah = use("App/Models/MasterData/Sekolah");
+const WhatsappService = use("App/Services/WhatsappService");
 const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
 const Diskon = use("App/Models/Master/Diskon");
 
@@ -136,10 +137,13 @@ class FormReqController {
 
       if(request.input('status') == 1){
         dataPPDB.is_form_done = 1;
+
         dataPPDB.save();
+        WhatsappService.sendApprovalMessage(dataPPDB.code_pendaftaran);
       }else if(request.input('status') == 2){
         dataPPDB.is_form_done = 2;
         dataPPDB.save();
+        WhatsappService.sendRejectedMessage(dataPPDB.code_pendaftaran);
       }
 
       return response.json({

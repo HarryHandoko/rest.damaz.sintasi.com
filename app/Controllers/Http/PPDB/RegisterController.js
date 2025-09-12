@@ -227,7 +227,52 @@ class RegisterController {
         getSiswaPPDB.nama_depan = request.input("nama_depan");
         getSiswaPPDB.nama_belakang = request.input("nama_belakang");
         getSiswaPPDB.tgl_lahir = request.input("tgl_lahir");
+
         getSiswaPPDB.save();
+
+        let orangTua = await RegParent.query()
+          .where("register_id", updatePPDB.id)
+          .first();
+
+        if (orangTua) {
+          orangTua.penanggung_jawab =
+            request.input("penanggung_jawab") != "null"
+              ? request.input("penanggung_jawab")
+              : null;
+          orangTua.no_hp_ayah =
+            request.input("no_hp_ayah") != "null"
+              ? request.input("no_hp_ayah")
+              : null;
+          orangTua.no_hp_ibu =
+            request.input("no_hp_ibu") != "null"
+              ? request.input("no_hp_ibu")
+              : null;
+          orangTua.no_hp_wali =
+            request.input("no_hp_wali") != "null"
+              ? request.input("no_hp_wali")
+              : null;
+          await orangTua.save();
+        } else {
+          orangTua = await RegParent.create({
+            register_id: updatePPDB.id,
+            penanggung_jawab:
+              request.input("penanggung_jawab") != "null"
+                ? request.input("penanggung_jawab")
+                : null,
+            no_hp_ayah:
+              request.input("no_hp_ayah") != "null"
+                ? request.input("no_hp_ayah")
+                : null,
+            no_hp_ibu:
+              request.input("no_hp_ibu") != "null"
+                ? request.input("no_hp_ibu")
+                : null,
+            no_hp_wali:
+              request.input("no_hp_wali") != "null"
+                ? request.input("no_hp_wali")
+                : null,
+          });
+        }
       } else if (request.input("step") == "2") {
         const cekData = await Payment.query()
           .where("register_id", updatePPDB.id)
@@ -265,6 +310,8 @@ class RegisterController {
           }
           cekData.save();
         }
+
+        WhatsappService.sendRegisterMessage(updatePPDB.code_pendaftaran);
       } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)

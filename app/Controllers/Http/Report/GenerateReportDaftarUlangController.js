@@ -73,7 +73,7 @@ class GenerateReportDaftarController {
       }
 
       if (filter.tahun_periodik) {
-        data.where('tbl_daftar_ulangs.tahun_periodik', filter.tahun_periodik)
+        data.where('tbl_register_ppdbs.tahun_periodik', filter.tahun_periodik)
       }
 
       // Execute

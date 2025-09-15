@@ -299,7 +299,7 @@ class GenerateReportSeleksiController {
 
       return response.send({
         success: true,
-        download_url: `${process.env.APP_URL}/${fileName}`
+        download_url: `${baseUrl}/${fileName}`
       })
 
     } catch (error) {

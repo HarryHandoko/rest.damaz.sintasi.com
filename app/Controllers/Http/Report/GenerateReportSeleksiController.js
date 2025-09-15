@@ -72,11 +72,7 @@ class GenerateReportSeleksiController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        query.whereBetween('tanggal_pendaftaran', [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`
-        ])
+        query.where('tahun_periodik', filter.tahun_periodik)
       }
 
 

@@ -73,11 +73,7 @@ class GenerateReportDaftarController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        data.whereBetween('tbl_daftar_ulangs.created_at', [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`
-        ])
+        data.where('tbl_daftar_ulangs.tahun_periodik', filter.tahun_periodik)
       }
 
       // Execute

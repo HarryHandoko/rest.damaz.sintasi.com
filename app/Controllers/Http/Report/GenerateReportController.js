@@ -332,7 +332,7 @@ class GenerateReportController {
       }
 
       if (filter.tahun_periodik) {
-        query.whereBetween('tahun_periodik', filter.tahun_periodik)
+        query.where('tahun_periodik', filter.tahun_periodik)
       }
 
       const data = await query.fetch()

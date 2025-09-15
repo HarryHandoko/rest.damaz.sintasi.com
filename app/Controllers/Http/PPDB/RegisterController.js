@@ -273,6 +273,8 @@ class RegisterController {
                 : null,
           });
         }
+
+        WhatsappService.sendBillToUser(updatePPDB.code_pendaftaran);
       } else if (request.input("step") == "2") {
         const cekData = await Payment.query()
           .where("register_id", updatePPDB.id)
@@ -312,6 +314,7 @@ class RegisterController {
         }
 
         WhatsappService.sendRegisterMessage(updatePPDB.code_pendaftaran);
+        WhatsappService.sendBillToKeuangan(updatePPDB.code_pendaftaran);
       } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
@@ -2040,28 +2043,27 @@ class RegisterController {
     }
   }
 
-   async getTahunPeriodik({ request, response }) {
-  try {
-    const rows = await Database.from("tbl_register_ppdbs")
-      .distinct("tahun_periodik")
-      .orderBy("tahun_periodik", "asc");
+  async getTahunPeriodik({ request, response }) {
+    try {
+      const rows = await Database.from("tbl_register_ppdbs")
+        .distinct("tahun_periodik")
+        .orderBy("tahun_periodik", "asc");
 
-    // Convert array of objects → array of string
-    const uniqueTahun = rows.map(row => row.tahun_periodik);
+      // Convert array of objects → array of string
+      const uniqueTahun = rows.map((row) => row.tahun_periodik);
 
-    return response.send({
-      success: true,
-      data: uniqueTahun,
-    });
-  } catch (error) {
-    return response.status(500).send({
-      success: false,
-      message: "Gagal mendapatkan data",
-      error: error.message,
-    });
+      return response.send({
+        success: true,
+        data: uniqueTahun,
+      });
+    } catch (error) {
+      return response.status(500).send({
+        success: false,
+        message: "Gagal mendapatkan data",
+        error: error.message,
+      });
+    }
   }
-}
-
 
   async applyVoucher({ request, response }) {
     try {

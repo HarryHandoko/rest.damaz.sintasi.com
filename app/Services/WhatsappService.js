@@ -4,7 +4,10 @@ const axios = require("axios");
 const WhatsappSetting = use("App/Models/WhatsappSetting");
 const RegisterPPDB = use("App/Models/PPDB/RegisterPpdb");
 const SiswaPPDB = use("App/Models/PPDB/SiswaPpdb");
+const Payment = use("App/Models/PPDB/Payment");
 const Sekolah = use("App/Models/MasterData/Sekolah");
+const Diskon = use("App/Models/Master/Diskon");
+const BankAccount = use("App/Models/Master/BankAccount");
 const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
 const RegParent = use("App/Models/PPDB/RegParent");
 const moment = require("moment");
@@ -61,7 +64,7 @@ class WhatsappService {
 
       return response.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new Error(`Failed to send message: ${error.message}`);
     }
   }
@@ -143,6 +146,79 @@ class WhatsappService {
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
     return await this.sendMessage(message, data.no_hp_ortu);
+  }
+
+  async sendBillToUser(kodePendaftaran) {
+    const setting = await this.getSetting();
+
+    const data = await this.getData(kodePendaftaran);
+
+    const ppdb = await RegisterPPDB.query()
+      .where("code_pendaftaran", kodePendaftaran)
+      .first();
+
+    const sekolah = await Sekolah.query().where("id", ppdb.sekolah_id).first();
+    const dataDiskon = await Diskon.query().where("id", ppdb.diskon_id).first();
+    const bank = await BankAccount.query().where("is_active", "1").first();
+
+    const nominalDiskon = dataDiskon ? dataDiskon.nominal : 0;
+
+    let message = `SIT Darul Maza
+
+Pembayaran Formulir PSMB
+
+Order ID: ${ppdb.code_pendaftaran}
+
+• Nominal Pembayaran: Rp. ${sekolah.biaya_admin}
+• Diskon: Rp. ${nominalDiskon}
+• Kode Unik: INV/${ppdb.code_pendaftaran}
+• Jumlah Bayar: Rp. ${sekolah.biaya_admin - nominalDiskon}
+
+Nomer Rekening: ${bank.no_rek}
+Atas Nama: ${bank.nama_akun_bank}
+Bank: ${bank.name}
+
+Upload bukti pembayaran:
+https://spmb.darulmaza.sch.id/`;
+
+    return await this.sendMessage(message, data.no_hp_ortu);
+  }
+
+  async sendBillToKeuangan(kodePendaftaran) {
+    const setting = await this.getSetting();
+    if (!setting.no_handphone_keuangan)
+      throw new Error("Nomor keuangan belum disetting");
+
+    const data = await this.getData(kodePendaftaran);
+    const ppdb = await RegisterPPDB.query()
+      .where("code_pendaftaran", kodePendaftaran)
+      .first();
+
+    const sekolah = await Sekolah.query().where("id", ppdb.sekolah_id).first();
+    const dataDiskon = await Diskon.query().where("id", ppdb.diskon_id).first();
+    const bank = await BankAccount.query().where("is_active", "1").first();
+
+    const dataPayment = await Payment.query()
+      .where("register_id", ppdb.id)
+      .first();
+
+    const nominalDiskon = dataDiskon ? dataDiskon.nominal : 0;
+    const message = `EAM SIT Darul Maza
+
+Ada pembayaran masuk
+
+Order ID: ${ppdb.code_pendaftaran}
+
+- Nama Siswa: ${data.nama}
+- Unit: ${data.jenjang}
+- Nominal Pembayaran: Rp. ${sekolah.biaya_admin}
+- Kode Unik : INV/${ppdb.code_pendaftaran}
+- Jumlah Bayar: Rp. ${sekolah.biaya_admin - nominalDiskon}
+
+Silahkan cek bukti bayar yang di upload
+
+https://spmb.darulmaza.sch.id/uploads/payment/${dataPayment.bukti_transfer}`;
+    return await this.sendMessage(message, setting.no_handphone_keuangan);
   }
 }
 

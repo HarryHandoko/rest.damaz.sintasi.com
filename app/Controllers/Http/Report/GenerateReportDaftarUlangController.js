@@ -336,11 +336,7 @@ class GenerateReportDaftarController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        query.whereBetween('tbl_daftar_ulangs.created_at', [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`
-        ])
+        query.where('tbl_register_ppdbs.tahun_periodik', filter.tahun_periodik);
       }
 
       // Execute

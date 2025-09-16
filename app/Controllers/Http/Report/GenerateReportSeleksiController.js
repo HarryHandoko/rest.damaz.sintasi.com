@@ -72,11 +72,7 @@ class GenerateReportSeleksiController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        query.whereBetween('tanggal_pendaftaran', [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`
-        ])
+        query.where('tahun_periodik', filter.tahun_periodik)
       }
 
 
@@ -303,7 +299,7 @@ class GenerateReportSeleksiController {
 
       return response.send({
         success: true,
-        download_url: `${process.env.APP_URL}/${fileName}`
+        download_url: `${baseUrl}/${fileName}`
       })
 
     } catch (error) {
@@ -340,11 +336,8 @@ class GenerateReportSeleksiController {
       }
 
       if (filter.tahun_periodik) {
-        const [startYear, endYear] = filter.tahun_periodik.split('/').map(Number)
-        query.whereBetween('tanggal_pendaftaran', [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`
-        ])
+
+        query.whereBetween("tahun_periodik", tahun_periodik);
       }
 
       const data = await query.fetch()

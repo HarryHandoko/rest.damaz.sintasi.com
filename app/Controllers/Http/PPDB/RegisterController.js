@@ -1131,11 +1131,7 @@ class RegisterController {
 
       // .count() returns an array with string value, so we extract and convert to number
       if (tahun_periodik) {
-        const [startYear, endYear] = tahun_periodik.split("/").map(Number);
-        data.whereBetween("tanggal_pendaftaran", [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`,
-        ]);
+        data.whereBetween("tahun_periodik", tahun_periodik);
       }
       if (dataUser.role_name == "Admin") {
         const totalPendaftar = await data.where("is_submit", "1").count();

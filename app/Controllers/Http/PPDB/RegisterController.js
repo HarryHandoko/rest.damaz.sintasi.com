@@ -1131,7 +1131,7 @@ class RegisterController {
 
       // .count() returns an array with string value, so we extract and convert to number
       if (tahun_periodik) {
-        data.whereBetween("tahun_periodik", tahun_periodik);
+        data.where("tahun_periodik", tahun_periodik);
       }
       if (dataUser.role_name == "Admin") {
         const totalPendaftar = await data.where("is_submit", "1").count();

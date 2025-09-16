@@ -243,6 +243,11 @@ Route.group(() => {
   Route.get('/whatsapp-setting/get', 'WhatsappSettingController.index')
   Route.post('/whatsapp-setting/post', 'WhatsappSettingController.store')
 
+  // Whatsapp Log
+  Route.get('/whatsapp-log/get', 'WhatsappLogController.index')
+  Route.get('/whatsapp-log/stats', 'WhatsappLogController.stats')
+  // Route.post('/whatsapp-log/show/:kodePendaftaran', 'WhatsappLogController.show')
+
   // FormReq
 
   Route.post('/form-req/getdata', 'PPDB/FormReqController.getdata')

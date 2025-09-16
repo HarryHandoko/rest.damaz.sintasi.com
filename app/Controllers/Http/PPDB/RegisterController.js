@@ -8,7 +8,7 @@ const Payment = use("App/Models/PPDB/Payment");
 const DaftarUlang = use("App/Models/PPDB/DaftarUlang");
 const WebProfile = use("App/Models/MasterContent/WebProfile");
 const Diskon = use("App/Models/Master/Diskon");
-const WhatsappService = use("App/Services/WhatsappService");
+const WhatsappBackgroundService = use("App/Services/WhatsappBackgroundService");
 
 const User = use("App/Models/User");
 const Sekolah = use("App/Models/MasterData/Sekolah");
@@ -274,7 +274,11 @@ class RegisterController {
           });
         }
 
-        WhatsappService.sendBillToUser(updatePPDB.code_pendaftaran);
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendBillToUser",
+          updatePPDB.code_pendaftaran,
+          3
+        );
       } else if (request.input("step") == "2") {
         const cekData = await Payment.query()
           .where("register_id", updatePPDB.id)
@@ -313,8 +317,17 @@ class RegisterController {
           cekData.save();
         }
 
-        WhatsappService.sendRegisterMessage(updatePPDB.code_pendaftaran);
-        WhatsappService.sendBillToKeuangan(updatePPDB.code_pendaftaran);
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendRegisterMessage",
+          updatePPDB.code_pendaftaran,
+          3
+        );
+
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendBillToKeuangan",
+          updatePPDB.code_pendaftaran,
+          3
+        );
       } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
@@ -1260,14 +1273,24 @@ class RegisterController {
         }
         if (payment) payment.status_payment = "01";
 
-        await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
+        // await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
+
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendApprovalMessage",
+          data.code_pendaftaran,
+          3
+        );
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
         data.status_pendaftaran = "P02";
         data.tgl_test = null;
         if (payment) payment.status_payment = "02";
 
-        await WhatsappService.sendRejectedMessage(data.code_pendaftaran);
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendRejectedMessage",
+          data.code_pendaftaran,
+          3
+        );
       } else {
         return response.status(400).json({
           success: false,

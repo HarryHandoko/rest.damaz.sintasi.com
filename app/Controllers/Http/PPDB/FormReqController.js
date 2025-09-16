@@ -1,10 +1,10 @@
-'use strict'
+"use strict";
 const RegisterPPDB = use("App/Models/PPDB/RegisterPpdb");
 const SiswaPpdb = use("App/Models/PPDB/SiswaPpdb");
 const Payment = use("App/Models/PPDB/Payment");
 const User = use("App/Models/User");
 const Sekolah = use("App/Models/MasterData/Sekolah");
-const WhatsappService = use("App/Services/WhatsappService");
+const WhatsappBackgroundService = use("App/Services/WhatsappBackgroundService");
 const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
 const Diskon = use("App/Models/Master/Diskon");
 
@@ -32,15 +32,13 @@ const formatDateNormal = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-
 class FormReqController {
-  async getdata({request, response, auth}){
+  async getdata({ request, response, auth }) {
     try {
-
       const baseUrl = Env.get("BASE_URL");
       const filter = request.input("filter", {});
 
-      let query = RegisterPPDB.query().where('is_submit',1);
+      let query = RegisterPPDB.query().where("is_submit", 1);
 
       if (filter.status) {
         if (filter.status === "Diterima") {
@@ -53,7 +51,7 @@ class FormReqController {
       }
 
       if (filter.tahun_periodik) {
-        query.where('tahun_periodik',filter.tahun_periodik);
+        query.where("tahun_periodik", filter.tahun_periodik);
       }
 
       const data = await query.fetch();
@@ -64,7 +62,6 @@ class FormReqController {
           const dataSiswa = await SiswaPpdb.query()
             .where("id", item.siswa_id)
             .first();
-
 
           const dataPayment = await Payment.query()
             .where("register_id", item.id)
@@ -87,12 +84,10 @@ class FormReqController {
           if (dataDiskon) {
             dataRegis[index].voucher_diskon = dataDiskon.kode;
             dataRegis[index].nominal_diskon = dataDiskon.nominal;
-          }else{
-
-            dataRegis[index].voucher_diskon = '-';
+          } else {
+            dataRegis[index].voucher_diskon = "-";
             dataRegis[index].nominal_diskon = 0;
           }
-
 
           const dataRegister = await User.query()
             .where("id", item.registed_by)
@@ -106,14 +101,11 @@ class FormReqController {
             .where("id", item.grade_id)
             .first();
 
-
-
           dataRegis[index].siswa = dataSiswa;
           dataRegis[index].payment = PaymentData;
           dataRegis[index].register = dataRegister?.toJSON() || null;
           dataRegis[index].sekolah = dataSekolah?.toJSON() || null;
           dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null;
-
         })
       );
 
@@ -130,26 +122,35 @@ class FormReqController {
     }
   }
 
-  async approval ({request,response}){
+  async approval({ request, response }) {
     try {
+      const dataPPDB = await RegisterPPDB.query()
+        .where("id", request.input("id"))
+        .first();
 
-      const dataPPDB = await RegisterPPDB.query().where('id',request.input('id')).first();
-
-      if(request.input('status') == 1){
+      if (request.input("status") == 1) {
         dataPPDB.is_form_done = 1;
 
         dataPPDB.save();
-        WhatsappService.sendApprovalMessage(dataPPDB.code_pendaftaran);
-      }else if(request.input('status') == 2){
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendApprovalMessage",
+          dataPPDB.code_pendaftaran,
+          3
+        );
+      } else if (request.input("status") == 2) {
         dataPPDB.is_form_done = 2;
         dataPPDB.save();
-        WhatsappService.sendRejectedMessage(dataPPDB.code_pendaftaran);
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendRejectedMessage",
+          dataPPDB.code_pendaftaran,
+          3
+        );
       }
 
       return response.json({
         status_code: "200",
-        message : 'Berhasil merubah status formulir',
-        data : dataPPDB
+        message: "Berhasil merubah status formulir",
+        data: dataPPDB,
       });
     } catch (error) {
       return response.status(500).json({
@@ -161,4 +162,4 @@ class FormReqController {
   }
 }
 
-module.exports = FormReqController
+module.exports = FormReqController;

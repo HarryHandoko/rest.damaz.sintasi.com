@@ -13,7 +13,14 @@ class WhatsappSettingController {
   }
 
   async store({ request, response }) {
-    const data = request.only(["api_key", "no_handphone", "format_pesan_registrasi", "format_pesan_diterima", "format_pesan_ditolak"]);
+    const data = request.only([
+      "api_key",
+      "no_handphone",
+      "format_pesan_registrasi",
+      "format_pesan_diterima",
+      "format_pesan_ditolak",
+      "format_pesan_keuangan",
+    ]);
     let setting = await WhatsappSetting.first();
 
     if (setting) {

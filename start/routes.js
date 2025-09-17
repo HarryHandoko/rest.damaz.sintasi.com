@@ -246,7 +246,8 @@ Route.group(() => {
   // Whatsapp Log
   Route.get('/whatsapp-log/get', 'WhatsappLogController.index')
   Route.get('/whatsapp-log/stats', 'WhatsappLogController.stats')
-  // Route.post('/whatsapp-log/show/:kodePendaftaran', 'WhatsappLogController.show')
+  Route.post('/whatsapp-log/resend', 'WhatsappLogController.resend')
+  Route.post('/whatsapp-log/bulk-resend', 'WhatsappLogController.bulkResend')
 
   // FormReq
 

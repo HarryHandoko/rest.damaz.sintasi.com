@@ -230,6 +230,14 @@ class RegisterController {
 
         getSiswaPPDB.save();
 
+        const sumberInformasi = request.input("sumber_informasi");
+
+        if (sumberInformasi && Array.isArray(sumberInformasi)) {
+          updatePPDB.sumber_informasi = JSON.stringify(sumberInformasi);
+        }
+
+        await updatePPDB.save();
+
         let orangTua = await RegParent.query()
           .where("register_id", updatePPDB.id)
           .first();
@@ -804,6 +812,9 @@ class RegisterController {
           dataRegis[index].siswa_address = siswaAddress;
           dataRegis[index].siswa_parent = siswaOru;
           dataRegis[index].payment = PaymentData;
+          dataRegis[index].sumber_informasi = JSON.parse(
+            dataRegis[index].sumber_informasi || "[]"
+          );
 
           const dataDiskon = await Diskon.query()
             .where("id", dataRegis[index].diskon_id)

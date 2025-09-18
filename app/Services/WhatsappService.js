@@ -78,6 +78,11 @@ class WhatsappService {
     return result;
   }
 
+  // Fungsi untuk format angka ke format rupiah
+  formatRupiah(number) {
+    return new Intl.NumberFormat('id-ID').format(number);
+  }
+
   async getData(kodePendaftaran) {
     const ppdb = await RegisterPPDB.query()
       .where("code_pendaftaran", kodePendaftaran)
@@ -169,10 +174,10 @@ Pembayaran Formulir PSMB
 
 Order ID: ${ppdb.code_pendaftaran}
 
-• Nominal Pembayaran: Rp. ${sekolah.biaya_admin}
-• Diskon: Rp. ${nominalDiskon}
+• Nominal Pembayaran: Rp ${this.formatRupiah(sekolah.biaya_admin)}
+• Diskon: Rp ${this.formatRupiah(nominalDiskon)}
 • Kode Unik: INV/${ppdb.code_pendaftaran}
-• Jumlah Bayar: Rp. ${sekolah.biaya_admin - nominalDiskon}
+• Jumlah Bayar: Rp ${this.formatRupiah(sekolah.biaya_admin - nominalDiskon)}
 
 Nomer Rekening: ${bank.no_rek}
 Atas Nama: ${bank.nama_akun_bank}
@@ -211,9 +216,9 @@ Order ID: ${ppdb.code_pendaftaran}
 
 - Nama Siswa: ${data.nama}
 - Unit: ${data.jenjang}
-- Nominal Pembayaran: Rp. ${sekolah.biaya_admin}
+- Nominal Pembayaran: Rp ${this.formatRupiah(sekolah.biaya_admin)}
 - Kode Unik : INV/${ppdb.code_pendaftaran}
-- Jumlah Bayar: Rp. ${sekolah.biaya_admin - nominalDiskon}
+- Jumlah Bayar: Rp ${this.formatRupiah(sekolah.biaya_admin - nominalDiskon)}
 
 Silahkan cek bukti bayar yang di upload
 

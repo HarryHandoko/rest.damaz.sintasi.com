@@ -7,8 +7,6 @@ const Database = use("Database");
 class WhatsappLogController {
   async index({ request, response }) {
     try {
-      const page = request.input("page", 1);
-      const limit = request.input("limit", 20);
       const status = request.input("status");
 
       let query = WhatsappLog.query().orderBy("created_at", "desc");
@@ -17,7 +15,7 @@ class WhatsappLogController {
         query = query.where("status", status);
       }
 
-      const logs = await query.paginate(page, limit);
+      const logs = await query.fetch()
       return response.json(logs);
     } catch (error) {
       return response.status(500).json({ message: error.message });

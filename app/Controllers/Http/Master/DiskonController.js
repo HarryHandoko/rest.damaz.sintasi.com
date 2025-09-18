@@ -4,9 +4,9 @@ const Diskon = use("App/Models/Master/Diskon")
 
 class DiskonController {
   async index({ request, response }) {
-    const page = request.input('page', 1)
-    const perPage = request.input('perPage', 10)
     const search = request.input('search', '')
+
+    console.log('Backend received - Search:', search)
 
     const dataQuery = Diskon.query()
 
@@ -14,12 +14,20 @@ class DiskonController {
       dataQuery.where('nama', 'like', `%${search}%`)
     }
 
-    const data = await dataQuery.paginate(page, perPage)
+    try {
+      // Get all data without pagination
+      const data = await dataQuery.fetch()
 
-    return response.json(data)
-  }
+      const result = {
+        data: data.toJSON()
+      }
 
-  async store({ request, response }) {
+      return response.json(result)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      return response.status(500).json({ message: 'Error fetching data', error: error.message })
+    }
+  }  async store({ request, response }) {
     try {
       const data = request.only(['nama', 'nominal','diskon_uang_pangkal', 'kode', 'kuota']);
 

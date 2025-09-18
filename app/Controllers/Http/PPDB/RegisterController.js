@@ -326,12 +326,6 @@ class RegisterController {
         }
 
         WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendRegisterMessage",
-          updatePPDB.code_pendaftaran,
-          3
-        );
-
-        WhatsappBackgroundService.fireAndForgetWithRetry(
           "sendBillToKeuangan",
           updatePPDB.code_pendaftaran,
           3
@@ -666,6 +660,12 @@ class RegisterController {
           }
           cekData.save();
         }
+
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendRegisterMessage",
+          updatePPDB.code_pendaftaran,
+          3
+        );
       }
 
       await trx.commit();

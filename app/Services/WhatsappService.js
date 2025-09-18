@@ -170,7 +170,7 @@ class WhatsappService {
 
     let message = `SIT Darul Maza
 
-Pembayaran Formulir PSMB
+Pembayaran Formulir SPMB
 
 Nomor Formulir: ${ppdb.code_pendaftaran}
 

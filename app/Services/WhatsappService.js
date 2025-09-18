@@ -172,11 +172,11 @@ class WhatsappService {
 
 Pembayaran Formulir PSMB
 
-Order ID: ${ppdb.code_pendaftaran}
+Nomor Formulir: ${ppdb.code_pendaftaran}
 
 • Nominal Pembayaran: Rp ${this.formatRupiah(sekolah.biaya_admin)}
 • Diskon: Rp ${this.formatRupiah(nominalDiskon)}
-• Kode Unik: INV/${ppdb.code_pendaftaran}
+• Order ID: INV/${ppdb.code_pendaftaran}
 • Jumlah Bayar: Rp ${this.formatRupiah(sekolah.biaya_admin - nominalDiskon)}
 
 Nomer Rekening: ${bank.no_rek}

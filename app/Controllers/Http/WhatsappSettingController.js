@@ -16,6 +16,7 @@ class WhatsappSettingController {
     const data = request.only([
       "api_key",
       "no_handphone",
+      "no_handphone_keuangan",
       "format_pesan_registrasi",
       "format_pesan_diterima",
       "format_pesan_ditolak",

@@ -1286,22 +1286,22 @@ class RegisterController {
 
         // await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
 
-        WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendApprovalMessage",
-          data.code_pendaftaran,
-          3
-        );
+        // WhatsappBackgroundService.fireAndForgetWithRetry(
+        //   "sendApprovalMessage",
+        //   data.code_pendaftaran,
+        //   3
+        // );
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
         data.status_pendaftaran = "P02";
         data.tgl_test = null;
         if (payment) payment.status_payment = "02";
 
-        WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendRejectedMessage",
-          data.code_pendaftaran,
-          3
-        );
+        // WhatsappBackgroundService.fireAndForgetWithRetry(
+        //   "sendRejectedMessage",
+        //   data.code_pendaftaran,
+        //   3
+        // );
       } else {
         return response.status(400).json({
           success: false,
@@ -1748,11 +1748,11 @@ class RegisterController {
             await dataSiswa.save();
           }
           data.status_pembayaran = "01";
-          WhatsappBackgroundService.fireAndForgetWithRetry(
-            "sendRegUlangDisetujui",
-            data.code_registrasi_ulang,
-            3
-          );
+          // WhatsappBackgroundService.fireAndForgetWithRetry(
+          //   "sendRegUlangDisetujui",
+          //   data.code_registrasi_ulang,
+          //   3
+          // );
           data.save();
         } else if (request.input("type") == "Reject") {
           data.status_pembayaran = "02";

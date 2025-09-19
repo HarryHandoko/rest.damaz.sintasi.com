@@ -925,19 +925,20 @@ class RegisterController {
             .first();
 
           // Konversi Ortu JSON
-          const dataOrtuWali = dataSiswaOrtu.toJSON();
+          const dataOrtuWali = dataSiswaOrtu.toJSON() || null;
 
-          dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
-            ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
-            : null;
-          dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
-            ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
-            : null;
+          if (dataOrtuWali != null) {
+            dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
+              ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
+              : null;
+            dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
+              ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
+              : null;
 
-          dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
-            ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
-            : null;
-
+            dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
+              ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
+              : null;
+          }
           const dataPayment = await Payment.query()
             .where("register_id", item.id)
             .first();
@@ -1114,19 +1115,20 @@ class RegisterController {
             .first();
 
             // Konversi Ortu JSON
-          const dataOrtuWali = dataSiswaOrtu.toJSON();
+          const dataOrtuWali = dataSiswaOrtu.toJSON() || null;
 
-          dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
-            ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
-            : null;
-          dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
-            ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
-            : null;
+          if (dataOrtuWali != null) {
+            dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
+              ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
+              : null;
+            dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
+              ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
+              : null;
 
-          dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
-            ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
-            : null;
-
+            dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
+              ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
+              : null;
+          }
           const dataPayment = await Payment.query()
             .where("register_id", item.id)
             .first();

@@ -205,23 +205,19 @@ class ProsesTestController {
       .where('tbl_users.id',auth.user.id).first();
 
       let data = RegisterPPDB.query();
-      const tahun_periodik = request.input('tahun_periodik');
+      const tahun_periodik = request.input('filter')['tahun_periodik'];
       const status = request.input('status');
 
       // .count() returns an array with string value, so we extract and convert to number
       if (tahun_periodik) {
-        const [startYear, endYear] = tahun_periodik.split('/').map(Number)
-        data.whereBetween('tanggal_pendaftaran', [
-          `${startYear}-01-01`,
-          `${endYear}-12-31`
-        ])
+        data.where('tanggal_pendaftaran', tahun_periodik)
       }
 
       // .count() returns an array with string value, so we extract and convert to number
-      const totalPendaftar = await data.where('is_need_test','1').where('is_submit', '1').count()
-      const totalDiterima = await data.where('is_need_test','1').where('status_test', '01').where('is_submit', '1').count()
-      const totalDitolak = await data.where('is_need_test','1').where('status_test', '02').where('is_submit', '1').count()
-      const totalDalamProses = await data.where('is_need_test','1').where('status_test', '00').where('is_submit', '1').count()
+      const totalPendaftar = await RegisterPPDB.query().where('tahun_periodik', tahun_periodik).where('is_need_test','1').where('is_submit', '1').where('is_form_done',1).where('is_done_submit',1).count()
+      const totalDiterima = await RegisterPPDB.query().where('tahun_periodik', tahun_periodik).where('is_need_test','1').where('status_test', '01').where('is_form_done',1).where('is_done_submit',1).count()
+      const totalDitolak = await RegisterPPDB.query().where('tahun_periodik', tahun_periodik).where('is_need_test','1').where('status_test', '02').where('is_form_done',1).where('is_done_submit',1).count()
+      const totalDalamProses = await RegisterPPDB.query().where('tahun_periodik', tahun_periodik).where('is_need_test','1').where('status_test', '00').where('is_form_done',1).where('is_done_submit',1).count()
 
       return response.json({
         success: true,
@@ -333,7 +329,7 @@ class ProsesTestController {
 
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendPraTestDiterima",
-            updatePPDB.code_pendaftaran,
+            data.code_pendaftaran,
             3
           );
       } else if (type === 'Reject') {
@@ -387,7 +383,7 @@ class ProsesTestController {
 
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendPraTestDitolak",
-            updatePPDB.code_pendaftaran,
+            data.code_pendaftaran,
             3
           );
       } else {

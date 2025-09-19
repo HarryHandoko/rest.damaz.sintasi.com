@@ -180,8 +180,10 @@ Route.group(() => {
   Route.post('/register-ppdb/pendaftaran-ulang-approval', 'PPDB/RegisterController.ApprovalRegisUlang')
   Route.post('/register-ppdb/apply-voucher', 'PPDB/RegisterController.applyVoucher')
   Route.post('/register-ppdb/update-tanggal-test', 'PPDB/RegisterController.updateTanggalTest')
+  Route.post('/register-ppdb/kirim-berkas', 'PPDB/RegisterController.kirimBerkas')
 
 
+  Route.get('/register-ppdb/statistik-req-form', 'PPDB/RegisterController.statistikReqForm')
   Route.get('/register-ppdb/statistik-pendaftar', 'PPDB/RegisterController.statistikPendaftar')
   Route.get('/register-ppdb/statistik-pendaftar-ulang', 'PPDB/RegisterController.statistikPendaftarUlang')
   Route.get('/register-ppdb/ref-tahun-periodik', 'PPDB/RegisterController.getTahunPeriodik')

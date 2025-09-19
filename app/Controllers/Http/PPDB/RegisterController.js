@@ -404,9 +404,7 @@ class RegisterController {
         getSiswaPPDB.jumlah_juz = request.input("jumlah_juz");
         getSiswaPPDB.nama_prestasi = request.input("nama_prestasi");
 
-        const fotoSertifikat = request.file("foto_sertifikat", {
-          extnames: ["jpg", "jpeg", "png", "webp"],
-        });
+        const fotoSertifikat = request.file("foto_sertifikat");
 
         if (fotoSertifikat) {
           const fileName = `${Date.now()}.${fotoSertifikat.extname}`;
@@ -424,9 +422,7 @@ class RegisterController {
           request.input("is_alumni") == "true" ? "1" : "0";
 
         // Foto Siswa
-        const fotoSiswa = request.file("foto_siswa", {
-          extnames: ["jpg", "jpeg", "png", "webp"],
-        });
+        const fotoSiswa = request.file("foto_siswa");
 
         if (fotoSiswa) {
           const fileName = `${Date.now()}.${fotoSiswa.extname}`;
@@ -448,9 +444,7 @@ class RegisterController {
               award: request.input("award_name"),
               tgl_didapat: request.input("award_date"),
             };
-            const award_image = request.file("award_image", {
-              extnames: ["jpg", "jpeg", "png", "webp"],
-            });
+            const award_image = request.file("award_image");
 
             if (award_image) {
               const fileName = `${Date.now()}.${award_image.extname}`;
@@ -463,9 +457,7 @@ class RegisterController {
 
             await SiswaAward.create(dataAward);
           } else {
-            const award_image = request.file("award_image", {
-              extnames: ["*"], // accept any file extension
-            });
+            const award_image = request.file("award_image");
 
             if (award_image) {
               const fileName = `${Date.now()}.${award_image.extname}`;
@@ -484,9 +476,7 @@ class RegisterController {
         }
 
         // file_raport
-        const fileRaport = request.file("file_raport", {
-          extnames: ["*"], // accept any file extension
-        });
+        const fileRaport = request.file("file_raport");
 
         if (fileRaport) {
           const fileName = `${Date.now()}.${fileRaport.extname}`;
@@ -497,9 +487,7 @@ class RegisterController {
           updatePPDB.file_raport = fileName;
         }
         // file_akte_lahir
-        const fileAkteLahir = request.file("file_akte_lahir", {
-          extnames: ["*"], // accept any file extension
-        });
+        const fileAkteLahir = request.file("file_akte_lahir");
 
         if (fileAkteLahir) {
           const fileName = `${Date.now()}.${fileAkteLahir.extname}`;
@@ -511,9 +499,7 @@ class RegisterController {
         }
 
         // file_kartu_keluarga
-        const fileKartuKeluarga = request.file("file_kartu_keluarga", {
-          extnames: ["*"], // accept any file extension
-        });
+        const fileKartuKeluarga = request.file("file_kartu_keluarga");
 
         if (fileKartuKeluarga) {
           const fileName = `${Date.now()}.${fileKartuKeluarga.extname}`;
@@ -604,6 +590,44 @@ class RegisterController {
               nik_ibu: request.input("nik_ibu"),
               penanggung_jawab: request.input("penanggung_jawab"),
             };
+
+
+
+            // ktp_ayah
+            const fileKTPAyah = request.file("ktp_ayah");
+
+            if (fileKTPAyah) {
+              const fileName = `${Date.now()}.${fileKTPAyah.extname}`;
+              await fileKTPAyah.move("public/uploads/ppdb/ktp_ayah", {
+                name: fileName,
+                overwrite: true,
+              });
+              data.ktp_ayah = fileName;
+            }
+
+            // ktp_ibu
+            const fileKTPIbu = request.file("ktp_ibu");
+
+            if (fileKTPIbu) {
+              const fileName = `${Date.now()}.${fileKTPIbu.extname}`;
+              await fileKTPIbu.move("public/uploads/ppdb/ktp_ibu", {
+                name: fileName,
+                overwrite: true,
+              });
+              data.ktp_ibu = fileName;
+            }
+
+            // ktp_wali
+            const fileKTPWali = request.file("ktp_wali");
+
+            if (fileKTPWali) {
+              const fileName = `${Date.now()}.${fileKTPWali.extname}`;
+              await fileKTPWali.move("public/uploads/ppdb/ktp_wali", {
+                name: fileName,
+                overwrite: true,
+              });
+              data.ktp_wali = fileName;
+            }
           } else {
             data = {
               register_id: updatePPDB.id,
@@ -626,10 +650,85 @@ class RegisterController {
               nik_wali: request.input("nik_wali"),
               penanggung_jawab: request.input("penanggung_jawab"),
             };
+
+
+
+            // ktp_ayah
+            const fileKTPAyah = request.file("ktp_ayah");
+
+            if (fileKTPAyah) {
+              const fileName = `${Date.now()}.${fileKTPAyah.extname}`;
+              await fileKTPAyah.move("public/uploads/ppdb/ktp_ayah", {
+                name: fileName,
+                overwrite: true,
+              });
+              data.ktp_ayah = fileName;
+            }
+
+            // ktp_ibu
+            const fileKTPIbu = request.file("ktp_ibu");
+
+            if (fileKTPIbu) {
+              const fileName = `${Date.now()}.${fileKTPIbu.extname}`;
+              await fileKTPIbu.move("public/uploads/ppdb/ktp_ibu", {
+                name: fileName,
+                overwrite: true,
+              });
+              data.ktp_ibu = fileName;
+            }
+
+            // ktp_wali
+            const fileKTPWali = request.file("ktp_wali");
+
+
+            if (fileKTPWali) {
+              const fileName = `${Date.now()}.${fileKTPWali.extname}`;
+              await fileKTPWali.move("public/uploads/ppdb/ktp_wali", {
+                name: fileName,
+                overwrite: true,
+              });
+              data.ktp_wali = fileName;
+            }
           }
           RegParent.create(data);
         } else {
           if (request.input("penanggung_jawab") == "Orang Tua") {
+            // ktp_ayah
+            const fileKTPAyah = request.file("ktp_ayah");
+
+            if (fileKTPAyah) {
+              const fileName = `${Date.now()}.${fileKTPAyah.extname}`;
+              await fileKTPAyah.move("public/uploads/ppdb/ktp_ayah", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekData.ktp_ayah = fileName;
+            }
+
+            // ktp_ibu
+            const fileKTPIbu = request.file("ktp_ibu");
+
+            if (fileKTPIbu) {
+              const fileName = `${Date.now()}.${fileKTPIbu.extname}`;
+              await fileKTPIbu.move("public/uploads/ppdb/ktp_ibu", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekData.ktp_ibu = fileName;
+            }
+
+            // ktp_wali
+            const fileKTPWali = request.file("ktp_wali");
+
+
+            if (fileKTPWali) {
+              const fileName = `${Date.now()}.${fileKTPWali.extname}`;
+              await fileKTPWali.move("public/uploads/ppdb/ktp_wali", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekData.ktp_wali = fileName;
+            }
             cekData.nama_ayah = request.input("nama_ayah");
             cekData.pekerjaan_ayah = request.input("pekerjaan_ayah");
             cekData.pendidikan_terakhir_ayah = request.input(
@@ -669,6 +768,44 @@ class RegisterController {
             cekData.alamat_ibu = request.input("alamat_ibu");
             cekData.penanggung_jawab = request.input("penanggung_jawab");
           } else {
+
+
+            // ktp_ayah
+            const fileKTPAyah = request.file("ktp_ayah");
+
+            if (fileKTPAyah) {
+              const fileName = `${Date.now()}.${fileKTPAyah.extname}`;
+              await fileKTPAyah.move("public/uploads/ppdb/ktp_ayah", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekData.ktp_ayah = fileName;
+            }
+
+            // ktp_ibu
+            const fileKTPIbu = request.file("ktp_ibu");
+
+            if (fileKTPIbu) {
+              const fileName = `${Date.now()}.${fileKTPIbu.extname}`;
+              await fileKTPIbu.move("public/uploads/ppdb/ktp_ibu", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekData.ktp_ibu = fileName;
+            }
+
+            // ktp_wali
+            const fileKTPWali = request.file("ktp_wali");
+
+
+            if (fileKTPWali) {
+              const fileName = `${Date.now()}.${fileKTPWali.extname}`;
+              await fileKTPWali.move("public/uploads/ppdb/ktp_wali", {
+                name: fileName,
+                overwrite: true,
+              });
+              cekData.ktp_wali = fileName;
+            }
             cekData.nama_wali = request.input("nama_wali");
             cekData.pekerjaan_wali = request.input("pekerjaan_wali");
             cekData.pendidikan_terakhir_wali = request.input(
@@ -786,6 +923,21 @@ class RegisterController {
           const dataSiswaOrtu = await RegParent.query()
             .where("register_id", item.id)
             .first();
+
+          // Konversi Ortu JSON
+          const dataOrtuWali = dataSiswaOrtu.toJSON();
+
+          dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
+            ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
+            : null;
+          dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
+            ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
+            : null;
+
+          dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
+            ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
+            : null;
+
           const dataPayment = await Payment.query()
             .where("register_id", item.id)
             .first();
@@ -820,7 +972,6 @@ class RegisterController {
           }
 
           const siswaAddress = dataSiswaAddress?.toJSON() || null;
-          const siswaOru = dataSiswaOrtu?.toJSON() || null;
 
           const PaymentData = dataPayment?.toJSON() || null;
           if (PaymentData != null) {
@@ -836,7 +987,7 @@ class RegisterController {
           dataRegis[index].siswa = siswa;
           dataRegis[index].siswa_award = siswaAwards;
           dataRegis[index].siswa_address = siswaAddress;
-          dataRegis[index].siswa_parent = siswaOru;
+          dataRegis[index].siswa_parent = dataOrtuWali;
           dataRegis[index].payment = PaymentData;
           dataRegis[index].sumber_informasi = JSON.parse(
             dataRegis[index].sumber_informasi || "[]"
@@ -961,6 +1112,21 @@ class RegisterController {
           const dataSiswaOrtu = await RegParent.query()
             .where("register_id", item.id)
             .first();
+
+            // Konversi Ortu JSON
+          const dataOrtuWali = dataSiswaOrtu.toJSON();
+
+          dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
+            ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
+            : null;
+          dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
+            ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
+            : null;
+
+          dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
+            ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
+            : null;
+
           const dataPayment = await Payment.query()
             .where("register_id", item.id)
             .first();
@@ -992,7 +1158,6 @@ class RegisterController {
           }
 
           const siswaAddress = dataSiswaAddress?.toJSON() || null;
-          const siswaOru = dataSiswaOrtu?.toJSON() || null;
 
           const PaymentData = dataPayment?.toJSON() || null;
           if (PaymentData != null) {
@@ -1008,7 +1173,7 @@ class RegisterController {
           dataRegis[index].siswa = siswa;
           dataRegis[index].siswa_award = siswaAwards;
           dataRegis[index].siswa_address = siswaAddress;
-          dataRegis[index].siswa_parent = siswaOru;
+          dataRegis[index].siswa_parent = dataOrtuWali;
           dataRegis[index].tgl_test =
             dataRegis[index].tgl_test != null
               ? formatDateNormal(dataRegis[index].tgl_test)
@@ -1184,18 +1349,22 @@ class RegisterController {
         data.where("tahun_periodik", tahun_periodik);
       }
       if (dataUser.role_name == "Admin") {
-        const totalPendaftar = await data.where("is_submit", "1").count();
+        const totalPendaftar = await data.where("is_submit", "1")
+          .where("is_form_done", "1").count();
         const totalDiterima = await data
           .where("status_pendaftaran", "P01")
           .where("is_submit", "1")
+          .where("is_form_done", "1")
           .count();
         const totalDitolak = await data
           .where("status_pendaftaran", "P02")
           .where("is_submit", "1")
+          .where("is_form_done", "1")
           .count();
         const totalDalamProses = await data
           .where("status_pendaftaran", "P00")
           .where("is_submit", "1")
+          .where("is_form_done", "1")
           .count();
 
         return response.json({
@@ -1926,7 +2095,7 @@ class RegisterController {
         await register.save();
         return response.status(404).json({
           success: false,
-          message: "Voucher tidak ditemukan",
+          message: "Voucher tidak ditemukan / Kouta Voucher Sudah Habis",
         });
       }
 
@@ -1976,6 +2145,81 @@ class RegisterController {
         success: false,
         message: "Gagal mengubah tanggal tes",
         error: err.message,
+      });
+    }
+  }
+
+
+
+  async kirimBerkas({ request, response }) {
+    try {
+      const { id } = request.only(["id"]);
+      const register = await RegisterPPDB.query()
+        .where("id", id)
+        .first();
+      if (!register) {
+        return response.status(404).json({
+          success: false,
+          message: "Pendaftaran tidak ditemukan",
+        });
+      }
+      register.is_done_submit = 1;
+      await register.save();
+
+      response.status(200).json({
+        success: true,
+      });
+    } catch (err) {
+      response.status(500).json({
+        success: false,
+        message: "Gagal mengubah tanggal tes",
+        error: err.message,
+      });
+    }
+  }
+
+  async statistikReqForm({ request, response, auth }) {
+    try {
+
+      let data = RegisterPPDB.query();
+      const tahun_periodik = request.input("tahun_periodik");
+
+      // .count() returns an array with string value, so we extract and convert to number
+      if (tahun_periodik) {
+        data.where("tahun_periodik", tahun_periodik);
+      }
+
+      const totalPendaftar = await RegisterPPDB.query().where("tahun_periodik", tahun_periodik).where("is_submit", "1").count();
+      const totalDalamProses = await RegisterPPDB.query()
+        .where("tahun_periodik", tahun_periodik)
+        .where("is_submit", "1")
+        .where("is_form_done", "0")
+        .count();
+      const totalDiterima = await RegisterPPDB.query()
+        .where("tahun_periodik", tahun_periodik)
+        .where("is_form_done", "1")
+        .where("is_submit", "1")
+        .count();
+      const totalDitolak = await RegisterPPDB.query()
+        .where("tahun_periodik", tahun_periodik)
+        .where("is_form_done", "2")
+        .where("is_submit", "1")
+        .count();
+
+      return response.json({
+        success: true,
+        data: {
+          total: Number(totalPendaftar[0]["count(*)"]),
+          diterima: Number(totalDiterima[0]["count(*)"]),
+          ditolak: Number(totalDitolak[0]["count(*)"]),
+          diproses: Number(totalDalamProses[0]["count(*)"]),
+        },
+      });
+    } catch (error) {
+      return response.status(500).json({
+        success: false,
+        message: "Terjadi kesalahan",
+        error: error.message,
       });
     }
   }

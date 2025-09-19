@@ -232,9 +232,7 @@ class RegisterController {
 
         const sumberInformasi = request.input("sumber_informasi");
 
-        if (sumberInformasi && Array.isArray(sumberInformasi)) {
-          updatePPDB.sumber_informasi = JSON.stringify(sumberInformasi);
-        }
+        updatePPDB.sumber_informasi = JSON.stringify(sumberInformasi);
 
         await updatePPDB.save();
 
@@ -242,7 +240,16 @@ class RegisterController {
           .where("register_id", updatePPDB.id)
           .first();
 
+        let shouldSendWhatsapp = false;
+        let oldPhoneNumbers = {};
+
         if (orangTua) {
+          oldPhoneNumbers = {
+            no_hp_ayah: orangTua.no_hp_ayah,
+            no_hp_ibu: orangTua.no_hp_ibu,
+            no_hp_wali: orangTua.no_hp_wali,
+          };
+
           orangTua.penanggung_jawab =
             request.input("penanggung_jawab") != "null"
               ? request.input("penanggung_jawab")
@@ -259,9 +266,17 @@ class RegisterController {
             request.input("no_hp_wali") != "null"
               ? request.input("no_hp_wali")
               : null;
+
+          // Cek apakah ada perubahan nomor HP
+          shouldSendWhatsapp =
+            (oldPhoneNumbers.no_hp_ayah !== orangTua.no_hp_ayah ||
+              oldPhoneNumbers.no_hp_ibu !== orangTua.no_hp_ibu ||
+              oldPhoneNumbers.no_hp_wali !== orangTua.no_hp_wali) &&
+            (orangTua.no_hp_ayah || orangTua.no_hp_ibu || orangTua.no_hp_wali);
+
           await orangTua.save();
         } else {
-          orangTua = await RegParent.create({
+          const newData = {
             register_id: updatePPDB.id,
             penanggung_jawab:
               request.input("penanggung_jawab") != "null"
@@ -279,14 +294,25 @@ class RegisterController {
               request.input("no_hp_wali") != "null"
                 ? request.input("no_hp_wali")
                 : null,
-          });
+          };
+
+          orangTua = await RegParent.create(newData);
+
+          // Kirim WhatsApp hanya jika ada nomor HP yang valid
+          shouldSendWhatsapp = !!(
+            newData.no_hp_ayah ||
+            newData.no_hp_ibu ||
+            newData.no_hp_wali
+          );
         }
 
-        WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendBillToUser",
-          updatePPDB.code_pendaftaran,
-          3
-        );
+        if (shouldSendWhatsapp) {
+          WhatsappBackgroundService.fireAndForgetWithRetry(
+            "sendBillToUser",
+            updatePPDB.code_pendaftaran,
+            3
+          );
+        }
       } else if (request.input("step") == "2") {
         const cekData = await Payment.query()
           .where("register_id", updatePPDB.id)
@@ -313,6 +339,18 @@ class RegisterController {
           updatePPDB.is_submit = "1";
 
           updatePPDB.save();
+
+          WhatsappBackgroundService.fireAndForgetWithRetry(
+            "sendRegisterMessage",
+            updatePPDB.code_pendaftaran,
+            3
+          );
+
+          WhatsappBackgroundService.fireAndForgetWithRetry(
+            "sendBillToKeuangan",
+            updatePPDB.code_pendaftaran,
+            3
+          );
         } else {
           if (bukti_transaksi) {
             const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
@@ -324,18 +362,6 @@ class RegisterController {
           }
           cekData.save();
         }
-
-        WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendRegisterMessage",
-          updatePPDB.code_pendaftaran,
-          3
-        );
-
-        WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendBillToKeuangan",
-          updatePPDB.code_pendaftaran,
-          3
-        );
       } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
@@ -820,10 +846,10 @@ class RegisterController {
             .where("id", dataRegis[index].diskon_id)
             .first();
           if (dataDiskon) {
-            dataRegis[index].voucher_diskon = dataDiskon.kode;
-            dataRegis[index].nominal_diskon = dataDiskon.nominal;
+            dataRegis[index].voucher_diskon = dataDiskon?.kode;
+            dataRegis[index].nominal_diskon = Number(dataDiskon?.nominal) ?? 0;
             dataRegis[index].diskon_uang_pangkal =
-              dataDiskon.diskon_uang_pangkal;
+              Number(dataDiskon?.diskon_uang_pangkal) ?? 0
           }
 
           dataRegis[index].tgl_test =
@@ -1553,12 +1579,10 @@ class RegisterController {
           const dataDiskon = await Diskon.query()
             .where("id", dataRegis[index].diskon_id)
             .first();
-          if (dataDiskon) {
-            dataRegis[index].voucher_diskon = dataDiskon.kode;
-            dataRegis[index].nominal_diskon = dataDiskon.nominal;
+            dataRegis[index].voucher_diskon = dataDiskon?.kode;
+            dataRegis[index].nominal_diskon = Number(dataDiskon?.nominal) ?? 0;
             dataRegis[index].diskon_uang_pangkal =
-              dataDiskon.diskon_uang_pangkal;
-          }
+              Number(dataDiskon?.diskon_uang_pangkal) ?? 0;
 
           // siswa
           const siswa = dataSiswa?.toJSON() || null;
@@ -1899,7 +1923,7 @@ class RegisterController {
 
       const diskon = await Diskon.query().where("kode", voucher_diskon).first();
 
-      if (!diskon) {
+      if (!diskon || diskon.kuota <= 0) {
         register.diskon_id = null;
         await register.save();
         return response.status(404).json({

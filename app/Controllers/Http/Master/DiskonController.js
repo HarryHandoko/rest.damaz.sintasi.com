@@ -56,7 +56,7 @@ class DiskonController {
       }
 
       diskon.nominal = data.nominal
-      diskon.diskon_uang_pangkal = data.diskon_uang_pangkal
+      diskon.diskon_uang_pangkal = data.diskon_uang_pangkal ?? 0
       diskon.nama = data.nama
       diskon.kode = data.kode
       diskon.kuota = data.kuota

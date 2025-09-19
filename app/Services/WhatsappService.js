@@ -78,9 +78,12 @@ class WhatsappService {
     return result;
   }
 
-  // Fungsi untuk format angka ke format rupiah
   formatRupiah(number) {
-    return new Intl.NumberFormat('id-ID').format(number);
+    return new Intl.NumberFormat("id-ID").format(number);
+  }
+
+  isValidPhoneNumber(phone) {
+    return phone && phone !== "-" && phone.toString().startsWith("08");
   }
 
   async getData(kodePendaftaran) {
@@ -98,14 +101,13 @@ class WhatsappService {
 
     let noHpOrtu = null;
     if (orangTua) {
-      noHpOrtu =
-        orangTua.no_hp_ibu && orangTua.no_hp_ibu !== "-"
-          ? orangTua.no_hp_ibu
-          : orangTua.no_hp_ayah && orangTua.no_hp_ayah !== "-"
-          ? orangTua.no_hp_ayah
-          : orangTua.no_hp_wali && orangTua.no_hp_wali !== "-"
-          ? orangTua.no_hp_wali
-          : null;
+      noHpOrtu = this.isValidPhoneNumber(orangTua.no_hp_ibu)
+        ? orangTua.no_hp_ibu
+        : this.isValidPhoneNumber(orangTua.no_hp_ayah)
+        ? orangTua.no_hp_ayah
+        : this.isValidPhoneNumber(orangTua.no_hp_wali)
+        ? orangTua.no_hp_wali
+        : null;
     }
 
     return {
@@ -224,6 +226,34 @@ Silahkan cek bukti bayar yang di upload
 
 https://spmb.darulmaza.sch.id/uploads/payment/${dataPayment.bukti_transfer}`;
     return await this.sendMessage(message, setting.no_handphone_keuangan);
+  }
+
+  async sendPendaftaranFormulirDisetujui(kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_pendaftaran_formulir_diterima;
+    if (!template) throw new Error("Template pesan formulir belum disetting");
+    const data = await this.getData(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, data.no_hp_ortu);
+  }
+
+  async sendPendaftaranFormulirDitolak(kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_pendaftaran_formulir_ditolak;
+    if (!template) throw new Error("Template pesan formulir belum disetting");
+    const data = await this.getData(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, data.no_hp_ortu);
+  }
+
+  async sendRegUlangDisetujui(kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_keuangan;
+    if (!template)
+      throw new Error("Template pesan registrasi ulang belum disetting");
+    const data = await this.getDataRegUlang(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, data.no_hp_ortu);
   }
 }
 

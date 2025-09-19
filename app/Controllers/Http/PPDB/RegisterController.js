@@ -1748,6 +1748,11 @@ class RegisterController {
             await dataSiswa.save();
           }
           data.status_pembayaran = "01";
+          WhatsappBackgroundService.fireAndForgetWithRetry(
+            "sendRegUlangDisetujui",
+            data.code_registrasi_ulang,
+            3
+          );
           data.save();
         } else if (request.input("type") == "Reject") {
           data.status_pembayaran = "02";

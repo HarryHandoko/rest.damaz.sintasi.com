@@ -133,7 +133,7 @@ class FormReqController {
 
         dataPPDB.save();
         WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendApprovalMessage",
+          "sendPendaftaranFormulirDisetujui",
           dataPPDB.code_pendaftaran,
           3
         );
@@ -141,7 +141,7 @@ class FormReqController {
         dataPPDB.is_form_done = 2;
         dataPPDB.save();
         WhatsappBackgroundService.fireAndForgetWithRetry(
-          "sendRejectedMessage",
+          "sendPendaftaranFormulirDitolak",
           dataPPDB.code_pendaftaran,
           3
         );

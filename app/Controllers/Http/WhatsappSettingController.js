@@ -21,6 +21,8 @@ class WhatsappSettingController {
       "format_pesan_diterima",
       "format_pesan_ditolak",
       "format_pesan_keuangan",
+      "format_pesan_pendaftaran_formulir_diterima",
+      "format_pesan_pendaftaran_formulir_ditolak",
     ]);
     let setting = await WhatsappSetting.first();
 

@@ -18,9 +18,7 @@ class WhatsappService {
   }
 
   async getSetting() {
-    if (!this.whatsappSetting) {
-      this.whatsappSetting = await WhatsappSetting.query().first();
-    }
+    this.whatsappSetting = await WhatsappSetting.query().first();
     return this.whatsappSetting;
   }
 

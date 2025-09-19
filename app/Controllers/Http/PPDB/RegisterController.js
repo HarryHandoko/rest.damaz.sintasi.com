@@ -1310,24 +1310,24 @@ class RegisterController {
         }
         if (payment) payment.status_payment = "01";
 
-        // await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
+        await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
 
-        // WhatsappBackgroundService.fireAndForgetWithRetry(
-        //   "sendApprovalMessage",
-        //   data.code_pendaftaran,
-        //   3
-        // );
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendApprovalMessage",
+          data.code_pendaftaran,
+          3
+        );
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
         data.status_pendaftaran = "P02";
         data.tgl_test = null;
         if (payment) payment.status_payment = "02";
 
-        // WhatsappBackgroundService.fireAndForgetWithRetry(
-        //   "sendRejectedMessage",
-        //   data.code_pendaftaran,
-        //   3
-        // );
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendRejectedMessage",
+          data.code_pendaftaran,
+          3
+        );
       } else {
         return response.status(400).json({
           success: false,

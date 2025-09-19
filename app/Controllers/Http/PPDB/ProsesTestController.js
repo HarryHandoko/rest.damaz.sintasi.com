@@ -21,6 +21,7 @@ const fs = require('fs')
 const uuid = require('uuid') // To generate unique file names
 const { register } = require('module')
 const EmailService = use('App/Services/EmailService')
+const pusher = use('App/Services/Pusher')
 
 const formatDate = (date) => {
   if (!date) return null
@@ -301,7 +302,9 @@ class ProsesTestController {
 
       await data.save()
       if (payment) await payment.save()
-
+      await pusher.trigger('ppdb', 'acc_account', {
+        registed_by: data.registed_by,
+      })
       return response.status(200).json({
         success: true,
         message: `Pendaftaran berhasil di-${type === 'Approve' ? 'setujui' : 'tolak'}`,
@@ -313,6 +316,8 @@ class ProsesTestController {
         error: error.message,
       })
     }
+
+
   }
 
 }

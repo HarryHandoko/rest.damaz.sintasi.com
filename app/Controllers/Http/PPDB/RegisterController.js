@@ -25,6 +25,7 @@ const fs = require("fs");
 const uuid = require("uuid"); // To generate unique file names
 const { register } = require("module");
 const EmailService = use("App/Services/EmailService");
+const pusher = use('App/Services/Pusher')
 
 const formatDate = (date) => {
   if (!date) return null;
@@ -307,6 +308,9 @@ class RegisterController {
         }
 
         if (shouldSendWhatsapp) {
+          await pusher.trigger('ppdb', 'acc_account', {
+            registed_by: updatePPDB.registed_by,
+          })
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendBillToUser",
             updatePPDB.code_pendaftaran,
@@ -351,6 +355,10 @@ class RegisterController {
             updatePPDB.code_pendaftaran,
             3
           );
+
+          await pusher.trigger('ppdb', 'acc_account', {
+            registed_by: updatePPDB.registed_by,
+          })
         } else {
           if (bukti_transaksi) {
             const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
@@ -362,6 +370,9 @@ class RegisterController {
           }
           cekData.save();
         }
+        await pusher.trigger('ppdb', 'reqform', {
+          id: updatePPDB.id,
+        })
       } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
@@ -1510,6 +1521,9 @@ class RegisterController {
       await data.save();
       if (payment) await payment.save();
 
+      await pusher.trigger('ppdb', 'acc_account', {
+        registed_by: data.registed_by,
+      })
       return response.status(200).json({
         success: true,
         message: `Pendaftaran berhasil di-${
@@ -1645,6 +1659,10 @@ class RegisterController {
       }
       data.status_pembayaran = "00";
       data.save();
+
+      await pusher.trigger('ppdb', 'reqform', {
+        id: data.id,
+      })
       return response.status(200).json({
         success: true,
         message: "Berhasil mengirim pembayaran",
@@ -1954,6 +1972,10 @@ class RegisterController {
 
           data.save();
         }
+
+        await pusher.trigger('ppdb', 'acc_account', {
+          registed_by: data.registed_by,
+        })
       }
 
       return response.status(200).json({
@@ -2169,7 +2191,9 @@ class RegisterController {
       }
       register.is_done_submit = 1;
       await register.save();
-
+      await pusher.trigger('ppdb', 'reqform', {
+        id: register.id,
+      })
       response.status(200).json({
         success: true,
       });

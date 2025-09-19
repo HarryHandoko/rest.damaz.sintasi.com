@@ -1116,9 +1116,10 @@ class RegisterController {
             .first();
 
             // Konversi Ortu JSON
-          const dataOrtuWali = dataSiswaOrtu.toJSON() || null;
+          let dataOrtuWali =  null;
 
-          if (dataOrtuWali != null) {
+          if (dataSiswaOrtu != null) {
+            dataOrtuWali = dataSiswaOrtu.toJSON();
             dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
               ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
               : null;

@@ -279,108 +279,14 @@ class ProsesTestController {
         .first()
 
       if (type === 'Approve') {
-        data.status_test = '01';
-
-        // Kirim Email
-        if (user && user.email) {
-          const emailHtml = `
-            <h2>Halo ${user.nama_depan},</h2>
-
-            <p>
-              dari hasil tes seleksi yang dilakukan, siswa dibawah ini :
-            </p>
-
-            <table cellpadding="6" cellspacing="0" border="0" style="border-collapse: collapse; font-family: sans-serif;">
-              <tr>
-                <td><strong>Nama Siswa</strong></td>
-                <td>: ${dataSiswa.nama_depan + ' ' +  dataSiswa.nama_belakang || '-'}</td>
-              </tr>
-              <tr>
-                <td><strong>Sekolah</strong></td>
-                <td>: ${dataSekolah.name || '-'}</td>
-              </tr>
-              <tr>
-                <td><strong>Jejang</strong></td>
-                <td>: ${dataSekolahGrade.name || '-'}</td>
-              </tr>
-              <tr>
-                <td><strong>Kode Pendaftaran</strong></td>
-                <td>: ${data.code_pendaftaran}</td>
-              </tr>
-              <tr>
-                <td><strong>Tempat, Tanggal Lahir</strong></td>
-                <td>: ${dataSiswa.tempat_lahir || '-'},  ${moment(dataSiswa.tgl_lahir).locale('id').format('D MMMM YYYY')}</td>
-              </tr>
-              <tr>
-                <td><strong>Alamat</strong></td>
-                <td>: ${dataSiswaAddress.alamat || '-'}</td>
-              </tr>
-            </table>
-            <p>telah dinyatakan <strong>LULUS</strong></p>
-            <p>Silakan lanjutkan proses berikutnya melalui portal PPDB kami.</p>
-
-            <br>
-
-            <p>Salam,<br><strong>Tim PPDB SDIT Darul Maza</strong></p>
-          `
-
-          await EmailService.send(user.email, 'Pengumuman Hasil Tes Seleksi', emailHtml)
-        }
-
+          data.status_test = '01';
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendPraTestDiterima",
             data.code_pendaftaran,
             3
           );
       } else if (type === 'Reject') {
-        data.status_test = '02'
-
-        const fullName =
-          (dataSiswa.nama_depan || '') + ' ' + (dataSiswa.nama_belakang || '')
-
-        const emailHtml = `
-          <h2>Halo ${user.nama_depan},</h2>
-
-          <p>
-            Mohon maaf, hasil dari tes seleksi siswa dibawah ini:
-          </p>
-
-          <table cellpadding="6" cellspacing="0" border="0" style="border-collapse: collapse; font-family: sans-serif;">
-            <tr>
-              <td><strong>Nama Siswa</strong></td>
-              <td>: ${fullName.trim() || '-'}</td>
-            </tr>
-            <tr>
-              <td><strong>Sekolah</strong></td>
-              <td>: ${dataSekolah?.name || '-'}</td>
-            </tr>
-            <tr>
-              <td><strong>Jenjang</strong></td>
-              <td>: ${dataSekolahGrade?.name || '-'}</td>
-            </tr>
-            <tr>
-              <td><strong>Kode Pendaftaran</strong></td>
-              <td>: ${data.code_pendaftaran}</td>
-            </tr>
-            <tr>
-              <td><strong>Tempat, Tanggal Lahir</strong></td>
-              <td>: ${dataSiswa.tempat_lahir || '-'}, ${moment(dataSiswa.tgl_lahir).locale('id').format('D MMMM YYYY')}</td>
-            </tr>
-            <tr>
-              <td><strong>Alamat</strong></td>
-              <td>: ${dataSiswaAddress?.alamat || '-'}</td>
-            </tr>
-          </table>
-          <p>dinyatkan <strong>TIDAK LULUS</strong></p>
-          <p>Silakan hubungi tim kami melalui portal PPDB jika Anda membutuhkan klarifikasi lebih lanjut.</p>
-
-          <br>
-
-          <p>Salam,<br><strong>Tim PPDB SDIT Darul Maza</strong></p>
-        `
-
-        await EmailService.send(user.email, 'Pengumuman Hasil Tes Seleksi', emailHtml)
-
+          data.status_test = '02'
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendPraTestDitolak",
             data.code_pendaftaran,

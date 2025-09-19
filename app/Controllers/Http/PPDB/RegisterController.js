@@ -1310,8 +1310,6 @@ class RegisterController {
         }
         if (payment) payment.status_payment = "01";
 
-        await WhatsappService.sendApprovalMessage(data.code_pendaftaran);
-
         WhatsappBackgroundService.fireAndForgetWithRetry(
           "sendApprovalMessage",
           data.code_pendaftaran,

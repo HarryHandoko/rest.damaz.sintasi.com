@@ -133,7 +133,7 @@ class WhatsappService {
    */
   async sendApprovalMessage(kodePendaftaran) {
     const setting = await this.getSetting();
-    let template = setting.format_pesan_diterima;
+    let template = setting.format_pesan_admisi_diterima;
     if (!template) throw new Error("Template pesan diterima belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
@@ -146,7 +146,7 @@ class WhatsappService {
    */
   async sendRejectedMessage(kodePendaftaran) {
     const setting = await this.getSetting();
-    let template = setting.format_pesan_ditolak;
+    let template = setting.format_pesan_admisi_ditolak;
     if (!template) throw new Error("Template pesan ditolak belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
@@ -250,6 +250,24 @@ https://spmb.darulmaza.sch.id/uploads/payment/${dataPayment.bukti_transfer}`;
     if (!template)
       throw new Error("Template pesan registrasi ulang belum disetting");
     const data = await this.getDataRegUlang(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, data.no_hp_ortu);
+  }
+
+  async sendPraTestDiterima(kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_pra_test_diterima;
+    if (!template) throw new Error("Template pesan pra test diterima belum disetting");
+    const data = await this.getData(kodePendaftaran);
+    const message = this.replacePlaceholders(template, data);
+    return await this.sendMessage(message, data.no_hp_ortu);
+  }
+
+  async sendPraTestDitolak(kodePendaftaran) {
+    const setting = await this.getSetting();
+    let template = setting.format_pesan_pra_test_ditolak;
+    if (!template) throw new Error("Template pesan pra test ditolak belum disetting");
+    const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
     return await this.sendMessage(message, data.no_hp_ortu);
   }

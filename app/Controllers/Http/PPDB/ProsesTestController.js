@@ -7,6 +7,7 @@ const RegParent = use('App/Models/PPDB/RegParent')
 const Payment = use('App/Models/PPDB/Payment')
 const DaftarUlang = use('App/Models/PPDB/DaftarUlang')
 const Sekolah = use('App/Models/MasterData/Sekolah')
+const WhatsappBackgroundService = use('App/Services/WhatsappBackgroundService')
 const User = use('App/Models/User')
 const SekolahGrade = use('App/Models/MasterData/SekolahGrade')
 
@@ -329,6 +330,12 @@ class ProsesTestController {
 
           await EmailService.send(user.email, 'Pengumuman Hasil Tes Seleksi', emailHtml)
         }
+
+          WhatsappBackgroundService.fireAndForgetWithRetry(
+            "sendPraTestDiterima",
+            updatePPDB.code_pendaftaran,
+            3
+          );
       } else if (type === 'Reject') {
         data.status_test = '02'
 
@@ -378,6 +385,11 @@ class ProsesTestController {
 
         await EmailService.send(user.email, 'Pengumuman Hasil Tes Seleksi', emailHtml)
 
+          WhatsappBackgroundService.fireAndForgetWithRetry(
+            "sendPraTestDitolak",
+            updatePPDB.code_pendaftaran,
+            3
+          );
       } else {
         return response.status(400).json({
           success: false,

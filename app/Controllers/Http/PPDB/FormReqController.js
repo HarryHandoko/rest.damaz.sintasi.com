@@ -132,19 +132,19 @@ class FormReqController {
         dataPPDB.is_form_done = 1;
 
         dataPPDB.save();
-        // WhatsappBackgroundService.fireAndForgetWithRetry(
-        //   "sendPendaftaranFormulirDisetujui",
-        //   dataPPDB.code_pendaftaran,
-        //   3
-        // );
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendPendaftaranFormulirDisetujui",
+          dataPPDB.code_pendaftaran,
+          3
+        );
       } else if (request.input("status") == 2) {
         dataPPDB.is_form_done = 2;
         dataPPDB.save();
-        // WhatsappBackgroundService.fireAndForgetWithRetry(
-        //   "sendPendaftaranFormulirDitolak",
-        //   dataPPDB.code_pendaftaran,
-        //   3
-        // );
+        WhatsappBackgroundService.fireAndForgetWithRetry(
+          "sendPendaftaranFormulirDitolak",
+          dataPPDB.code_pendaftaran,
+          3
+        );
       }
 
       return response.json({

@@ -7,6 +7,7 @@ const Sekolah = use("App/Models/MasterData/Sekolah");
 const WhatsappBackgroundService = use("App/Services/WhatsappBackgroundService");
 const SekolahGrade = use("App/Models/MasterData/SekolahGrade");
 const Diskon = use("App/Models/Master/Diskon");
+const RegParent = use("App/Models/PPDB/RegParent");
 
 const moment = require("moment");
 const Database = use("Database"); // Adonis v4
@@ -102,11 +103,34 @@ class FormReqController {
             .where("id", item.grade_id)
             .first();
 
+
+          const dataSiswaOrtu = await RegParent.query()
+          .where("register_id", item.id)
+          .first();
+
+            // Konversi Ortu JSON
+          let dataOrtuWali =  null;
+
+          if (dataSiswaOrtu != null) {
+            dataOrtuWali = dataSiswaOrtu.toJSON();
+            dataOrtuWali.ktp_ayah = dataOrtuWali.ktp_ayah
+              ? `${baseUrl}/uploads/ppdb/ktp_ayah/${dataOrtuWali.ktp_ayah}`
+              : null;
+            dataOrtuWali.ktp_ibu = dataOrtuWali.ktp_ibu
+              ? `${baseUrl}/uploads/ppdb/ktp_ibu/${dataOrtuWali.ktp_ibu}`
+              : null;
+
+            dataOrtuWali.ktp_wali = dataOrtuWali.ktp_wali
+              ? `${baseUrl}/uploads/ppdb/ktp_wali/${dataOrtuWali.ktp_wali}`
+              : null;
+          }
+
           dataRegis[index].siswa = dataSiswa;
           dataRegis[index].payment = PaymentData;
           dataRegis[index].register = dataRegister?.toJSON() || null;
           dataRegis[index].sekolah = dataSekolah?.toJSON() || null;
           dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null;
+          dataRegis[index].siswa_parent = dataOrtuWali;
         })
       );
 

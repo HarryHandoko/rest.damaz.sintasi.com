@@ -11,6 +11,7 @@ const Diskon = use("App/Models/Master/Diskon");
 const moment = require("moment");
 const Database = use("Database"); // Adonis v4
 const Env = use("Env"); // for Adonis 4.x
+const pusher = use('App/Services/Pusher')
 
 const formatDate = (date) => {
   if (!date) return null;
@@ -146,6 +147,10 @@ class FormReqController {
           3
         );
       }
+
+      await pusher.trigger('ppdb', 'acc_account', {
+        registed_by: dataPPDB.registed_by,
+      })
 
       return response.json({
         status_code: "200",

@@ -95,11 +95,22 @@ class WhatsappLogController {
         });
       }
 
-      // Resend the WhatsApp message with retry
-      WhatsappBackgroundService.fireAndForgetWithRetry(
+      // Update log status untuk retry dan reset error details
+      log.status = "retrying";
+      log.attempt = (log.attempt || 0) + 1;
+      log.started_at = new Date();
+      log.completed_at = null;
+      log.processing_time_ms = null;
+      log.error_details = null;
+      log.response_data = null;
+      await log.save();
+
+      // Resend the WhatsApp message dengan log ID yang sama
+      WhatsappBackgroundService.fireAndForgetWithRetryExistingLog(
         log.method,
         log.kode_pendaftaran,
-        3
+        3,
+        log.id
       );
 
       return response.json({
@@ -107,6 +118,7 @@ class WhatsappLogController {
         log_id: log.id,
         kode_pendaftaran: log.kode_pendaftaran,
         method: log.method,
+        attempt: log.attempt,
       });
     } catch (error) {
       console.error("Error resending message:", error);
@@ -144,14 +156,26 @@ class WhatsappLogController {
 
       const resendCount = logs.rows.length;
 
-      // Resend each failed message
-      logs.rows.forEach((log) => {
-        WhatsappBackgroundService.fireAndForgetWithRetry(
+      // Update each log status dan resend
+      for (const log of logs.rows) {
+        // Update log status untuk retry
+        log.status = "retrying";
+        log.attempt = (log.attempt || 0) + 1;
+        log.started_at = new Date();
+        log.completed_at = null;
+        log.processing_time_ms = null;
+        log.error_details = null;
+        log.response_data = null;
+        await log.save();
+
+        // Resend dengan log ID yang sama
+        WhatsappBackgroundService.fireAndForgetWithRetryExistingLog(
           log.method,
           log.kode_pendaftaran,
-          3
+          3,
+          log.id
         );
-      });
+      }
 
       return response.json({
         message: `${resendCount} messages resend initiated successfully`,
@@ -160,6 +184,7 @@ class WhatsappLogController {
           id: log.id,
           kode_pendaftaran: log.kode_pendaftaran,
           method: log.method,
+          attempt: log.attempt,
         })),
       });
     } catch (error) {

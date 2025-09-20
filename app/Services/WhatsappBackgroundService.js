@@ -132,6 +132,98 @@ class WhatsappBackgroundService {
   }
 
   /**
+   * Fire and forget with retry using existing log entry
+   * @param {string} method
+   * @param {string} kodePendaftaran
+   * @param {number} maxRetries
+   * @param {number} existingLogId - ID of existing log to update
+   */
+  fireAndForgetWithRetryExistingLog(method, kodePendaftaran, maxRetries = 3, existingLogId = null) {
+    setImmediate(async () => {
+      let log = null;
+
+      try {
+        if (existingLogId) {
+          // Get existing log
+          log = await WhatsappLog.find(existingLogId);
+          if (!log) {
+            console.error(`Log with ID ${existingLogId} not found, creating new log`);
+            log = await WhatsappLog.logStart(kodePendaftaran, method, maxRetries);
+          }
+        } else {
+          // Create new log if no existing log ID provided
+          log = await WhatsappLog.logStart(kodePendaftaran, method, maxRetries);
+        }
+      } catch (error) {
+        console.error("Failed to get/create log entry:", error.message);
+      }
+
+      const attemptSend = async (attempt) => {
+        const startTime = Date.now();
+
+        try {
+          console.log(
+            `Background (Resend): Attempt ${attempt}/${maxRetries} - ${method} for ${kodePendaftaran} [Log ID: ${
+              log?.id || "N/A"
+            }]`
+          );
+
+          // Execute WhatsApp service method
+          const result = await WhatsappService[method](kodePendaftaran);
+          const processingTime = Date.now() - startTime;
+
+          // Log success
+          if (log) {
+            await log.logSuccess(result, processingTime);
+          }
+
+          console.log(
+            `Background (Resend): ${method} completed for ${kodePendaftaran} on attempt ${attempt} [Log ID: ${
+              log?.id || "N/A"
+            }] in ${processingTime}ms`
+          );
+        } catch (error) {
+          console.error(
+            `Background (Resend): Attempt ${attempt} failed for ${kodePendaftaran} [Log ID: ${
+              log?.id || "N/A"
+            }]:`,
+            error.message
+          );
+
+          // Log error/retry
+          if (log) {
+            await log.logError(error, attempt);
+          }
+
+          if (attempt < maxRetries) {
+            const retryDelay = Math.pow(2, attempt) * 1000; // Exponential backoff
+            console.log(
+              `Background (Resend): Retrying in ${retryDelay}ms... [Log ID: ${
+                log?.id || "N/A"
+              }]`
+            );
+
+            // Log retry attempt
+            if (log) {
+              await log.logRetry(attempt + 1);
+            }
+
+            setTimeout(() => attemptSend(attempt + 1), retryDelay);
+          } else {
+            console.error(
+              `Background (Resend): All ${maxRetries} attempts failed for ${kodePendaftaran} [Log ID: ${
+                log?.id || "N/A"
+              }]`
+            );
+          }
+        }
+      };
+
+      attemptSend(1);
+    });
+  }
+
+  /**
    * Fire and forget with delay and database logging
    * @param {string} method
    * @param {string} kodePendaftaran
@@ -246,6 +338,7 @@ class WhatsappBackgroundService {
       .orderBy("created_at", "desc")
       .fetch();
   }
+
 }
 
 module.exports = new WhatsappBackgroundService();

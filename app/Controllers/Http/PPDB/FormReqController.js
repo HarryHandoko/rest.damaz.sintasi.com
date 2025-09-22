@@ -16,10 +16,11 @@ const pusher = use('App/Services/Pusher')
 
 const formatDate = (date) => {
   if (!date) return null;
-  // Pastikan date bertipe Date, jika bukan, parse dulu
   const d = new Date(date);
-  // Hasilnya string "YYYY-MM-DD"
-  return d.toISOString().slice(0, 10);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 const formatDateNormal = (date) => {
   if (!date) return null;

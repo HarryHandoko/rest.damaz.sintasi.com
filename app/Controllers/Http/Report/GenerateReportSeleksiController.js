@@ -25,15 +25,14 @@ const View = use('View')
 const fs = require('fs')
 const uuid = require('uuid')
 const archiver = require('archiver')
-
-
 const formatDate = (date) => {
-  if (!date) return null
-  // Pastikan date bertipe Date, jika bukan, parse dulu
-  const d = new Date(date)
-  // Hasilnya string "YYYY-MM-DD"
-  return d.toISOString().slice(0, 10)
-}
+  if (!date) return null;
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 const formatDateNormal = (date) => {
   if (!date) return null
 

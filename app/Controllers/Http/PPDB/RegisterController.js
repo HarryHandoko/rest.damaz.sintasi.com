@@ -1158,7 +1158,7 @@ class RegisterController {
             usia--;
           }
           siswa.usia = usia;
-          siswa.tgl_lahir = formatDate(siswa.tgl_lahir+"T00:00:00");
+          siswa.tgl_lahir = formatDate(siswa.tgl_lahir);
 
           siswa.foto_siswa = siswa.foto_siswa
             ? `${baseUrl}/uploads/foto_siswa/${siswa.foto_siswa}`

@@ -58,6 +58,7 @@ module.exports = {
       password: Env.get("DB_PASSWORD", ""),
       database: Env.get("DB_DATABASE", ""),
       charset: "utf8mb4",
+      timezone: '+07:00'
     },
   },
 

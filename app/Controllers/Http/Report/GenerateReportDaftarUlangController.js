@@ -32,8 +32,6 @@ const formatDate = (date) => {
   if (!date) return null
   // Pastikan date bertipe Date, jika bukan, parse dulu
   const d = new Date(date)
-    .setZone('Asia/Jakarta') // pastikan sesuai TZ server
-    .toFormat('yyyy-MM-dd')
   // Hasilnya string "YYYY-MM-DD"
   return d.toISOString().slice(0, 10)
 }
@@ -41,8 +39,6 @@ const formatDateNormal = (date) => {
   if (!date) return null
 
   const d = new Date(date)
-    .setZone('Asia/Jakarta') // pastikan sesuai TZ server
-    .toFormat('yyyy-MM-dd')
 
   // Ambil hari, bulan, tahun
   const day = String(d.getDate()).padStart(2, '0')

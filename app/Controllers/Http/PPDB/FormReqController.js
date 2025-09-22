@@ -24,9 +24,7 @@ const formatDate = (date) => {
 const formatDateNormal = (date) => {
   if (!date) return null;
 
-  const d = new Date(date)
-    .setZone('Asia/Jakarta') // pastikan sesuai TZ server
-    .toFormat('yyyy-MM-dd');
+  const d = new Date(date);
 
   // Ambil hari, bulan, tahun
   const day = String(d.getDate()).padStart(2, "0");

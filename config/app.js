@@ -28,7 +28,7 @@ module.exports = {
   |
   */
   appKey: Env.getOrFail('APP_KEY'),
-
+  timezone: 'Asia/Jakarta',
   http: {
     /*
     |--------------------------------------------------------------------------

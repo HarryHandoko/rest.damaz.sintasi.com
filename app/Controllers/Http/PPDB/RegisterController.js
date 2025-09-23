@@ -25,14 +25,14 @@ const fs = require("fs");
 const uuid = require("uuid"); // To generate unique file names
 const { register } = require("module");
 const EmailService = use("App/Services/EmailService");
-const pusher = use('App/Services/Pusher')
+const pusher = use("App/Services/Pusher");
 
 const formatDate = (date) => {
   if (!date) return null;
   const d = new Date(date);
   const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 const formatDateNormal = (date) => {
@@ -309,9 +309,9 @@ class RegisterController {
         }
 
         if (shouldSendWhatsapp) {
-          await pusher.trigger('ppdb', 'acc_account', {
+          await pusher.trigger("ppdb", "acc_account", {
             registed_by: updatePPDB.registed_by,
-          })
+          });
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendBillToUser",
             updatePPDB.code_pendaftaran,
@@ -357,9 +357,9 @@ class RegisterController {
             3
           );
 
-          await pusher.trigger('ppdb', 'acc_account', {
+          await pusher.trigger("ppdb", "acc_account", {
             registed_by: updatePPDB.registed_by,
-          })
+          });
         } else {
           if (bukti_transaksi) {
             const fileName = `${Date.now()}.${bukti_transaksi.extname}`;
@@ -371,9 +371,9 @@ class RegisterController {
           }
           cekData.save();
         }
-        await pusher.trigger('ppdb', 'reqform', {
+        await pusher.trigger("ppdb", "reqform", {
           id: updatePPDB.id,
-        })
+        });
       } else if (request.input("step") == "3") {
         const getSiswaPPDB = await SiswaPpdb.query()
           .where("id", updatePPDB.siswa_id)
@@ -603,8 +603,6 @@ class RegisterController {
               penanggung_jawab: request.input("penanggung_jawab"),
             };
 
-
-
             // ktp_ayah
             const fileKTPAyah = request.file("ktp_ayah");
 
@@ -663,8 +661,6 @@ class RegisterController {
               penanggung_jawab: request.input("penanggung_jawab"),
             };
 
-
-
             // ktp_ayah
             const fileKTPAyah = request.file("ktp_ayah");
 
@@ -691,7 +687,6 @@ class RegisterController {
 
             // ktp_wali
             const fileKTPWali = request.file("ktp_wali");
-
 
             if (fileKTPWali) {
               const fileName = `${Date.now()}.${fileKTPWali.extname}`;
@@ -731,7 +726,6 @@ class RegisterController {
 
             // ktp_wali
             const fileKTPWali = request.file("ktp_wali");
-
 
             if (fileKTPWali) {
               const fileName = `${Date.now()}.${fileKTPWali.extname}`;
@@ -780,8 +774,6 @@ class RegisterController {
             cekData.alamat_ibu = request.input("alamat_ibu");
             cekData.penanggung_jawab = request.input("penanggung_jawab");
           } else {
-
-
             // ktp_ayah
             const fileKTPAyah = request.file("ktp_ayah");
 
@@ -808,7 +800,6 @@ class RegisterController {
 
             // ktp_wali
             const fileKTPWali = request.file("ktp_wali");
-
 
             if (fileKTPWali) {
               const fileName = `${Date.now()}.${fileKTPWali.extname}`;
@@ -937,7 +928,7 @@ class RegisterController {
             .first();
 
           // Konversi Ortu JSON
-          let dataOrtuWali =  null;
+          let dataOrtuWali = null;
 
           if (dataSiswaOrtu != null) {
             dataOrtuWali = dataSiswaOrtu.toJSON();
@@ -1014,7 +1005,7 @@ class RegisterController {
             dataRegis[index].voucher_diskon = dataDiskon?.kode;
             dataRegis[index].nominal_diskon = Number(dataDiskon?.nominal) ?? 0;
             dataRegis[index].diskon_uang_pangkal =
-              Number(dataDiskon?.diskon_uang_pangkal) ?? 0
+              Number(dataDiskon?.diskon_uang_pangkal) ?? 0;
           }
 
           dataRegis[index].tgl_test =
@@ -1127,8 +1118,8 @@ class RegisterController {
             .where("register_id", item.id)
             .first();
 
-            // Konversi Ortu JSON
-          let dataOrtuWali =  null;
+          // Konversi Ortu JSON
+          let dataOrtuWali = null;
 
           if (dataSiswaOrtu != null) {
             dataOrtuWali = dataSiswaOrtu.toJSON();
@@ -1365,8 +1356,10 @@ class RegisterController {
         data.where("tahun_periodik", tahun_periodik);
       }
       if (dataUser.role_name == "Admin") {
-        const totalPendaftar = await data.where("is_submit", "1")
-          .where("is_form_done", "1").count();
+        const totalPendaftar = await data
+          .where("is_submit", "1")
+          .where("is_form_done", "1")
+          .count();
         const totalDiterima = await data
           .where("status_pendaftaran", "P01")
           .where("is_submit", "1")
@@ -1522,9 +1515,9 @@ class RegisterController {
       await data.save();
       if (payment) await payment.save();
 
-      await pusher.trigger('ppdb', 'acc_account', {
+      await pusher.trigger("ppdb", "acc_account", {
         registed_by: data.registed_by,
-      })
+      });
       return response.status(200).json({
         success: true,
         message: `Pendaftaran berhasil di-${
@@ -1661,9 +1654,9 @@ class RegisterController {
       data.status_pembayaran = "00";
       data.save();
 
-      await pusher.trigger('ppdb', 'reqform', {
+      await pusher.trigger("ppdb", "reqform", {
         id: data.id,
-      })
+      });
       return response.status(200).json({
         success: true,
         message: "Berhasil mengirim pembayaran",
@@ -1769,10 +1762,10 @@ class RegisterController {
           const dataDiskon = await Diskon.query()
             .where("id", dataRegis[index].diskon_id)
             .first();
-            dataRegis[index].voucher_diskon = dataDiskon?.kode;
-            dataRegis[index].nominal_diskon = Number(dataDiskon?.nominal) ?? 0;
-            dataRegis[index].diskon_uang_pangkal =
-              Number(dataDiskon?.diskon_uang_pangkal) ?? 0;
+          dataRegis[index].voucher_diskon = dataDiskon?.kode;
+          dataRegis[index].nominal_diskon = Number(dataDiskon?.nominal) ?? 0;
+          dataRegis[index].diskon_uang_pangkal =
+            Number(dataDiskon?.diskon_uang_pangkal) ?? 0;
 
           // siswa
           const siswa = dataSiswa?.toJSON() || null;
@@ -1974,9 +1967,9 @@ class RegisterController {
           data.save();
         }
 
-        await pusher.trigger('ppdb', 'acc_account', {
+        await pusher.trigger("ppdb", "acc_account", {
           registed_by: data.registed_by,
-        })
+        });
       }
 
       return response.status(200).json({
@@ -2128,6 +2121,14 @@ class RegisterController {
 
       if (register.diskon_id !== diskon.id) {
         diskon.kuota = Math.max(0, diskon.kuota - 1); // Kurangi kuota tapi tidak boleh kurang dari 0
+
+        // kembalikan kuota diskon lama
+        const oldDiskon = await Diskon.query()
+          .where("id", register.diskon_id)
+          .first();
+
+        oldDiskon.kuota = oldDiskon.kuota + 1;
+        await oldDiskon.save();
       }
       register.diskon_id = diskon.id;
 
@@ -2176,14 +2177,10 @@ class RegisterController {
     }
   }
 
-
-
   async kirimBerkas({ request, response }) {
     try {
       const { id } = request.only(["id"]);
-      const register = await RegisterPPDB.query()
-        .where("id", id)
-        .first();
+      const register = await RegisterPPDB.query().where("id", id).first();
       if (!register) {
         return response.status(404).json({
           success: false,
@@ -2192,9 +2189,9 @@ class RegisterController {
       }
       register.is_done_submit = 1;
       await register.save();
-      await pusher.trigger('ppdb', 'reqform', {
+      await pusher.trigger("ppdb", "reqform", {
         id: register.id,
-      })
+      });
       response.status(200).json({
         success: true,
       });
@@ -2209,7 +2206,6 @@ class RegisterController {
 
   async statistikReqForm({ request, response, auth }) {
     try {
-
       let data = RegisterPPDB.query();
       const tahun_periodik = request.input("tahun_periodik");
 
@@ -2218,7 +2214,10 @@ class RegisterController {
         data.where("tahun_periodik", tahun_periodik);
       }
 
-      const totalPendaftar = await RegisterPPDB.query().where("tahun_periodik", tahun_periodik).where("is_submit", "1").count();
+      const totalPendaftar = await RegisterPPDB.query()
+        .where("tahun_periodik", tahun_periodik)
+        .where("is_submit", "1")
+        .count();
       const totalDalamProses = await RegisterPPDB.query()
         .where("tahun_periodik", tahun_periodik)
         .where("is_submit", "1")

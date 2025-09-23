@@ -2127,8 +2127,11 @@ class RegisterController {
           .where("id", register.diskon_id)
           .first();
 
+          if(oldDiskon){
+
         oldDiskon.kuota = oldDiskon.kuota + 1;
         await oldDiskon.save();
+          }
       }
       register.diskon_id = diskon.id;
 

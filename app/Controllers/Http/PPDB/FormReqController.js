@@ -12,14 +12,14 @@ const RegParent = use("App/Models/PPDB/RegParent");
 const moment = require("moment");
 const Database = use("Database"); // Adonis v4
 const Env = use("Env"); // for Adonis 4.x
-const pusher = use('App/Services/Pusher')
+const pusher = use("App/Services/Pusher");
 
 const formatDate = (date) => {
   if (!date) return null;
   const d = new Date(date);
   const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 const formatDateNormal = (date) => {
@@ -53,6 +53,14 @@ class FormReqController {
         }
       }
 
+      if (filter.sekolah_id) {
+        query.where("sekolah_id", filter.sekolah_id);
+      }
+
+      if (filter.grade_id) {
+        query.where("grade_id", filter.grade_id);
+      }
+
       if (filter.tahun_periodik) {
         query.where("tahun_periodik", filter.tahun_periodik);
       }
@@ -73,7 +81,7 @@ class FormReqController {
           const PaymentData = dataPayment?.toJSON() || null;
           if (PaymentData != null) {
             PaymentData.tanggal_transaksi = formatDate(
-              PaymentData.tanggal_transaksi
+              PaymentData.tanggal_transaksi,
             );
             PaymentData.bukti_transfer = PaymentData.bukti_transfer
               ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
@@ -104,13 +112,12 @@ class FormReqController {
             .where("id", item.grade_id)
             .first();
 
-
           const dataSiswaOrtu = await RegParent.query()
-          .where("register_id", item.id)
-          .first();
+            .where("register_id", item.id)
+            .first();
 
-            // Konversi Ortu JSON
-          let dataOrtuWali =  null;
+          // Konversi Ortu JSON
+          let dataOrtuWali = null;
 
           if (dataSiswaOrtu != null) {
             dataOrtuWali = dataSiswaOrtu.toJSON();
@@ -132,7 +139,7 @@ class FormReqController {
           dataRegis[index].sekolah = dataSekolah?.toJSON() || null;
           dataRegis[index].sekolah_grade = dataSekolahGrade?.toJSON() || null;
           dataRegis[index].siswa_parent = dataOrtuWali;
-        })
+        }),
       );
 
       return response.json({
@@ -161,7 +168,7 @@ class FormReqController {
         WhatsappBackgroundService.fireAndForgetWithRetry(
           "sendPendaftaranFormulirDisetujui",
           dataPPDB.code_pendaftaran,
-          3
+          3,
         );
       } else if (request.input("status") == 2) {
         dataPPDB.is_form_done = 2;
@@ -169,13 +176,13 @@ class FormReqController {
         WhatsappBackgroundService.fireAndForgetWithRetry(
           "sendPendaftaranFormulirDitolak",
           dataPPDB.code_pendaftaran,
-          3
+          3,
         );
       }
 
-      await pusher.trigger('ppdb', 'acc_account', {
+      await pusher.trigger("ppdb", "acc_account", {
         registed_by: dataPPDB.registed_by,
-      })
+      });
 
       return response.json({
         status_code: "200",

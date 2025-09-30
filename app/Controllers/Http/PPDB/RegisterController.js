@@ -98,7 +98,7 @@ class RegisterController {
         {
           registed_by: auth.user.id,
         },
-        trx
+        trx,
       );
 
       const data = {
@@ -315,7 +315,7 @@ class RegisterController {
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendBillToUser",
             updatePPDB.code_pendaftaran,
-            3
+            3,
           );
         }
       } else if (request.input("step") == "2") {
@@ -348,13 +348,13 @@ class RegisterController {
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendRegisterMessage",
             updatePPDB.code_pendaftaran,
-            3
+            3,
           );
 
           WhatsappBackgroundService.fireAndForgetWithRetry(
             "sendBillToKeuangan",
             updatePPDB.code_pendaftaran,
-            3
+            3,
           );
 
           await pusher.trigger("ppdb", "acc_account", {
@@ -523,7 +523,7 @@ class RegisterController {
         }
 
         updatePPDB.status_pendaftaran_siswa = request.input(
-          "status_pendaftaran_siswa"
+          "status_pendaftaran_siswa",
         );
         updatePPDB.nem = request.input("nilai_nem");
 
@@ -570,7 +570,7 @@ class RegisterController {
               nama_ayah: request.input("nama_ayah"),
               pekerjaan_ayah: request.input("pekerjaan_ayah"),
               pendidikan_terakhir_ayah: request.input(
-                "pendidikan_terakhir_ayah"
+                "pendidikan_terakhir_ayah",
               ),
               penghasilan_ayah: request.input("penghasilan_ayah"),
               no_hp_ayah:
@@ -644,7 +644,7 @@ class RegisterController {
               nama_wali: request.input("nama_wali"),
               pekerjaan_wali: request.input("pekerjaan_wali"),
               pendidikan_terakhir_wali: request.input(
-                "pendidikan_terakhir_wali"
+                "pendidikan_terakhir_wali",
               ),
               penghasilan_wali: request.input("penghasilan_wali"),
               no_hp_wali:
@@ -738,7 +738,7 @@ class RegisterController {
             cekData.nama_ayah = request.input("nama_ayah");
             cekData.pekerjaan_ayah = request.input("pekerjaan_ayah");
             cekData.pendidikan_terakhir_ayah = request.input(
-              "pendidikan_terakhir_ayah"
+              "pendidikan_terakhir_ayah",
             );
             cekData.penghasilan_ayah = request.input("penghasilan_ayah");
             cekData.no_hp_ayah =
@@ -751,14 +751,14 @@ class RegisterController {
                 : request.input("no_telepon_ayah");
             cekData.nik_ayah = request.input("nik_ayah");
             cekData.is_same_address_ayah = request.input(
-              "is_same_address_ayah"
+              "is_same_address_ayah",
             );
             cekData.alamat_ayah = request.input("alamat_ayah");
 
             cekData.nama_ibu = request.input("nama_ibu");
             cekData.pekerjaan_ibu = request.input("pekerjaan_ibu");
             cekData.pendidikan_terakhir_ibu = request.input(
-              "pendidikan_terakhir_ibu"
+              "pendidikan_terakhir_ibu",
             );
             cekData.penghasilan_ibu = request.input("penghasilan_ibu");
             cekData.no_hp_ibu =
@@ -812,7 +812,7 @@ class RegisterController {
             cekData.nama_wali = request.input("nama_wali");
             cekData.pekerjaan_wali = request.input("pekerjaan_wali");
             cekData.pendidikan_terakhir_wali = request.input(
-              "pendidikan_terakhir_wali"
+              "pendidikan_terakhir_wali",
             );
             cekData.penghasilan_wali = request.input("penghasilan_wali");
             cekData.no_hp_wali =
@@ -825,7 +825,7 @@ class RegisterController {
                 : request.input("no_telepon_wali");
             cekData.nik_wali = request.input("nik_wali");
             cekData.is_same_address_wali = request.input(
-              "is_same_address_wali"
+              "is_same_address_wali",
             );
             cekData.alamat_wali = request.input("alamat_wali");
             cekData.penanggung_jawab = request.input("penanggung_jawab");
@@ -902,19 +902,19 @@ class RegisterController {
               "indonesia_provinces.name as provinsi",
               "indonesia_cities.name as kota",
               "indonesia_districts.name as district",
-              "indonesia_villages.name as desa"
+              "indonesia_villages.name as desa",
             )
             .joinRaw(
-              `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`
+              `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`,
             )
             .joinRaw(
-              `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`
+              `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`,
             )
             .joinRaw(
-              `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`
+              `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`,
             )
             .joinRaw(
-              `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`
+              `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`,
             )
             .where("tbl_register_ppdb_addresses.register_id", item.id)
             .first();
@@ -981,7 +981,7 @@ class RegisterController {
           const PaymentData = dataPayment?.toJSON() || null;
           if (PaymentData != null) {
             PaymentData.tanggal_transaksi = formatDate(
-              PaymentData.tanggal_transaksi
+              PaymentData.tanggal_transaksi,
             );
             PaymentData.bukti_transfer = PaymentData.bukti_transfer
               ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
@@ -995,7 +995,7 @@ class RegisterController {
           dataRegis[index].siswa_parent = dataOrtuWali;
           dataRegis[index].payment = PaymentData;
           dataRegis[index].sumber_informasi = JSON.parse(
-            dataRegis[index].sumber_informasi || "[]"
+            dataRegis[index].sumber_informasi || "[]",
           );
 
           const dataDiskon = await Diskon.query()
@@ -1027,7 +1027,7 @@ class RegisterController {
             .file_kartu_keluarga
             ? `${baseUrl}/uploads/ppdb/kartu_keluarga/${dataRegis[index].file_kartu_keluarga}`
             : null;
-        })
+        }),
       );
 
       return response.json({
@@ -1060,6 +1060,14 @@ class RegisterController {
         } else if (filter.status === "Dalam Proses") {
           query.where("status_pendaftaran", "P00");
         }
+      }
+
+      if (filter.sekolah_id) {
+        query.where("sekolah_id", filter.sekolah_id);
+      }
+
+      if (filter.grade_id) {
+        query.where("grade_id", filter.grade_id);
       }
 
       if (filter.tahun_periodik) {
@@ -1097,19 +1105,19 @@ class RegisterController {
               "indonesia_provinces.name as provinsi",
               "indonesia_cities.name as kota",
               "indonesia_districts.name as district",
-              "indonesia_villages.name as desa"
+              "indonesia_villages.name as desa",
             )
             .joinRaw(
-              `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`
+              `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`,
             )
             .joinRaw(
-              `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`
+              `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`,
             )
             .joinRaw(
-              `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`
+              `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`,
             )
             .joinRaw(
-              `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`
+              `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`,
             )
             .where("tbl_register_ppdb_addresses.register_id", item.id)
             .first();
@@ -1169,7 +1177,7 @@ class RegisterController {
           const PaymentData = dataPayment?.toJSON() || null;
           if (PaymentData != null) {
             PaymentData.tanggal_transaksi = formatDate(
-              PaymentData.tanggal_transaksi
+              PaymentData.tanggal_transaksi,
             );
             PaymentData.bukti_transfer = PaymentData.bukti_transfer
               ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
@@ -1199,7 +1207,7 @@ class RegisterController {
             .file_kartu_keluarga
             ? `${baseUrl}/uploads/ppdb/kartu_keluarga/${dataRegis[index].file_kartu_keluarga}`
             : null;
-        })
+        }),
       );
 
       return response.json({
@@ -1463,19 +1471,19 @@ class RegisterController {
           "indonesia_provinces.name as provinsi",
           "indonesia_cities.name as kota",
           "indonesia_districts.name as district",
-          "indonesia_villages.name as desa"
+          "indonesia_villages.name as desa",
         )
         .joinRaw(
-          `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`
+          `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`,
         )
         .joinRaw(
-          `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`
+          `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`,
         )
         .joinRaw(
-          `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`
+          `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`,
         )
         .joinRaw(
-          `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`
+          `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`,
         )
         .where("tbl_register_ppdb_addresses.register_id", data.id)
         .first();
@@ -1491,7 +1499,7 @@ class RegisterController {
         WhatsappBackgroundService.fireAndForgetWithRetry(
           "sendApprovalMessage",
           data.code_pendaftaran,
-          3
+          3,
         );
       } else if (type === "Reject") {
         data.petugas_id = auth.user.id;
@@ -1502,7 +1510,7 @@ class RegisterController {
         WhatsappBackgroundService.fireAndForgetWithRetry(
           "sendRejectedMessage",
           data.code_pendaftaran,
-          3
+          3,
         );
       } else {
         return response.status(400).json({
@@ -1647,7 +1655,7 @@ class RegisterController {
           {
             name: fileName,
             overwrite: true,
-          }
+          },
         );
         data.bukti_pembayaran = fileName;
       }
@@ -1683,7 +1691,7 @@ class RegisterController {
         .join(
           "tbl_register_ppdbs",
           "tbl_register_ppdbs.id",
-          "tbl_daftar_ulangs.register_id"
+          "tbl_daftar_ulangs.register_id",
         )
         .select("tbl_daftar_ulangs.*", "tbl_register_ppdbs.*"); // select all base columns
 
@@ -1696,6 +1704,14 @@ class RegisterController {
         } else if (filter.status === "Ditolak") {
           data.where("tbl_daftar_ulangs.status_pembayaran", "02");
         }
+      }
+
+      if (filter.sekolah_id) {
+        query.where("sekolah_id", filter.sekolah_id);
+      }
+
+      if (filter.grade_id) {
+        query.where("grade_id", filter.grade_id);
       }
 
       if (filter.tahun_periodik) {
@@ -1730,19 +1746,19 @@ class RegisterController {
               "indonesia_provinces.name as provinsi",
               "indonesia_cities.name as kota",
               "indonesia_districts.name as district",
-              "indonesia_villages.name as desa"
+              "indonesia_villages.name as desa",
             )
             .joinRaw(
-              `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`
+              `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`,
             )
             .joinRaw(
-              `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`
+              `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`,
             )
             .joinRaw(
-              `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`
+              `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`,
             )
             .joinRaw(
-              `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`
+              `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`,
             )
             .where("tbl_register_ppdb_addresses.register_id", item.register_id)
             .first();
@@ -1797,7 +1813,7 @@ class RegisterController {
           const PaymentData = dataPayment?.toJSON() || null;
           if (PaymentData) {
             PaymentData.tanggal_transaksi = formatDate(
-              PaymentData.tanggal_transaksi
+              PaymentData.tanggal_transaksi,
             );
             PaymentData.bukti_transfer = PaymentData.bukti_transfer
               ? `${baseUrl}/uploads/payment/${PaymentData.bukti_transfer}`
@@ -1830,7 +1846,7 @@ class RegisterController {
             .file_kartu_keluarga
             ? `${baseUrl}/uploads/ppdb/kartu_keluarga/${dataRegis[index].file_kartu_keluarga}`
             : null;
-        })
+        }),
       );
 
       return response.json({
@@ -1911,19 +1927,19 @@ class RegisterController {
             "indonesia_provinces.name as provinsi",
             "indonesia_cities.name as kota",
             "indonesia_districts.name as district",
-            "indonesia_villages.name as desa"
+            "indonesia_villages.name as desa",
           )
           .joinRaw(
-            `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`
+            `JOIN indonesia_provinces ON CONVERT(indonesia_provinces.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.provinsi_id`,
           )
           .joinRaw(
-            `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`
+            `JOIN indonesia_cities ON CONVERT(indonesia_cities.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.city_id`,
           )
           .joinRaw(
-            `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`
+            `JOIN indonesia_districts ON CONVERT(indonesia_districts.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.district_id`,
           )
           .joinRaw(
-            `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`
+            `JOIN indonesia_villages ON CONVERT(indonesia_villages.code USING utf8mb4) COLLATE utf8mb4_general_ci = tbl_register_ppdb_addresses.subdistrict_id`,
           )
           .where("tbl_register_ppdb_addresses.register_id", dataRegist.id)
           .first();
@@ -1932,7 +1948,7 @@ class RegisterController {
           const sekolahId = dataRegist.sekolah_id.toString().padStart(2, "0");
           const gradeId = dataRegist.grade_id.toString().padStart(2, "0");
           const tanggalRegistrasiUlang = moment(
-            dataRegist.tanggal_registrasi
+            dataRegist.tanggal_registrasi,
           ).format("YY"); // Misal hasil: 2507
 
           const prefix = `${sekolahId}${gradeId}${tanggalRegistrasiUlang}`;
@@ -1996,7 +2012,7 @@ class RegisterController {
         .join(
           "tbl_register_ppdb_siswas",
           "tbl_register_ppdb_siswas.id",
-          "tbl_register_ppdbs.siswa_id"
+          "tbl_register_ppdbs.siswa_id",
         )
         .firstOrFail();
 
@@ -2127,11 +2143,10 @@ class RegisterController {
           .where("id", register.diskon_id)
           .first();
 
-          if(oldDiskon){
-
-        oldDiskon.kuota = oldDiskon.kuota + 1;
-        await oldDiskon.save();
-          }
+        if (oldDiskon) {
+          oldDiskon.kuota = oldDiskon.kuota + 1;
+          await oldDiskon.save();
+        }
       }
       register.diskon_id = diskon.id;
 

@@ -338,6 +338,16 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ayah || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ayah || '-' }}</td>
       </tr>
+      <tr>
+        <td></td>
+        <td>f. KTP</td>
+        <td class="sep">:</td>
+        <td>
+          <div>
+            <img src="{{ data.siswa_parent.ktp_ayah }}" alt="KTP Ayah" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+          </div>
+        </td>
+      </tr>
     </table>
 
     {{-- === IBU === --}}
@@ -382,6 +392,16 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ibu || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ibu || '-' }}</td>
       </tr>
+      <tr>
+        <td></td>
+        <td>f. KTP</td>
+        <td class="sep">:</td>
+        <td>
+          <div>
+            <img src="{{ data.siswa_parent.ktp_ibu }}" alt="KTP Ibu" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+          </div>
+        </td>
+      </tr>
     </table>
 
     {{-- === WALI === --}}
@@ -425,6 +445,16 @@
         <td>e. Telp / HP</td>
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_wali || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_wali || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>f. KTP</td>
+        <td class="sep">:</td>
+        <td>
+          <div>
+            <img src="{{ data.siswa_parent.ktp_wali }}" alt="KTP Wali" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+          </div>
+        </td>
       </tr>
     </table>
 

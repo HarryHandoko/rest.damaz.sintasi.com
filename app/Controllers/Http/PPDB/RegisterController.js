@@ -1276,7 +1276,7 @@ class RegisterController {
 
   async generatePDF({ request, response, auth }) {
     try {
-      const baseUrl = Env.get("BASE_URL");
+      const baseUrl = Env.get("APP_URL");
       const qrText = "https://ppdb.bandung.go.id/";
 
       // Generate QR as base64 PNG (Data URL)
@@ -1290,6 +1290,8 @@ class RegisterController {
         ? `${baseUrl}/uploads/web_profile/${dataProfileSekolah.kopsurat}`
         : null;
       const logo = `${baseUrl}/uploads/logo.png`;
+
+      console.log("hit");
 
       const birth = formatDateNormal(allData.siswa.tgl_lahir);
       const petugas = await User.find(allData.petugas_id);

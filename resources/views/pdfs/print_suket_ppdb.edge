@@ -64,6 +64,10 @@
 
     .page_break { page-break-before: always; break-before: page; }
 
+    .page-break {
+      page-break-after: always; /* for PDF generation */
+    }
+
     .sign-wrap { display: flex; justify-content: space-between; margin-top: 28px; }
     .sign-col { width: 48%; text-align: center; }
     .sign-space { height: 64px; }
@@ -72,6 +76,21 @@
     .qr-section img { width: 100px; }
 
     .small-note { font-size: 11px; margin-top: 10px; }
+
+        .page {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      page-break-after: always;
+    }
+
+    .page img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body>
@@ -112,7 +131,7 @@
         <td colspan="2"></td>
         <td  rowspan="100">
           <div style="width: 25%; text-align: center;">
-            <img src="{{ data.siswa.foto_siswa }}" alt="Foto Siswa" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+            <img src="{{ data.siswa.foto_siswa }}" alt="Foto Siswa" style="width: 150px; border: 1px solid #ccc; padding: 5px;" />
           </div>
         </td>
       </tr>
@@ -338,16 +357,18 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ayah || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ayah || '-' }}</td>
       </tr>
+      @if(data.siswa_parent.ktp_ayah)
       <tr>
         <td></td>
         <td>f. KTP</td>
         <td class="sep">:</td>
         <td>
           <div>
-            <img src="{{ data.siswa_parent.ktp_ayah }}" alt="KTP Ayah" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+            <img src="{{ data.siswa_parent.ktp_ayah }}" alt="KTP Ayah" style="width: 150px; border: 1px solid #ccc; padding: 5px;" />
           </div>
         </td>
       </tr>
+        @endif
     </table>
 
     {{-- === IBU === --}}
@@ -392,16 +413,18 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ibu || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ibu || '-' }}</td>
       </tr>
+      @if(data.siswa_parent.ktp_ibu)
       <tr>
         <td></td>
         <td>f. KTP</td>
         <td class="sep">:</td>
         <td>
           <div>
-            <img src="{{ data.siswa_parent.ktp_ibu }}" alt="KTP Ibu" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+            <img src="{{ data.siswa_parent.ktp_ibu }}" alt="KTP Ibu" style="width: 150px; border: 1px solid #ccc; padding: 5px;" />
           </div>
         </td>
       </tr>
+      @endif
     </table>
 
     {{-- === WALI === --}}
@@ -446,46 +469,39 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_wali || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_wali || '-' }}</td>
       </tr>
+      @if(data.siswa_parent.ktp_wali)
       <tr>
         <td></td>
         <td>f. KTP</td>
         <td class="sep">:</td>
         <td>
           <div>
-            <img src="{{ data.siswa_parent.ktp_wali }}" alt="KTP Wali" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
+            <img src="{{ data.siswa_parent.ktp_wali }}" alt="KTP Wali" style="width: 150px;border: 1px solid #ccc; padding: 5px;" />
           </div>
         </td>
       </tr>
+      @endif
     </table>
 
-    <div class="section-title">DATA LAINNYA</div>
+    <div class="page-break"></div>
 
-    <table class="info-table" style="margin-top:10px;">
-      <tr>
-        <td class="num">1.</td>
-        <td class="wide">Raport</td>
-        <td class="sep">:</td>
-        <td>
-          <img src="{{ data.file_raport }}" alt="Raport" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
-        </td>
-      </tr>
-      <tr>
-        <td class="num">2.</td>
-        <td class="wide">File Akte Lahir</td>
-        <td class="sep">:</td>
-        <td>
-          <img src="{{ data.file_akte_lahir }}" alt="Raport" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
-        </td>
-      </tr>
-      <tr>
-        <td class="num">3.</td>
-        <td class="wide">File Kartu Keluarga</td>
-        <td class="sep">:</td>
-        <td>
-          <img src="{{ data.file_kartu_keluarga }}" alt="Raport" style="width: 120px;height: 170px; border: 1px solid #ccc; padding: 5px;" />
-        </td>
-      </tr>
-    </table>
+  @if(data.file_raport)
+  <div class="page">
+    <img src="{{ data.file_raport }}" alt="Raport" />
+  </div>
+  @endif
+
+  @if(data.file_akte_lahir)
+  <div class="page">
+    <img src="{{ data.file_akte_lahir }}" alt="Akte Lahir" />
+  </div>
+  @endif
+
+  @if(data.file_kartu_keluarga)
+  <div class="page">
+    <img src="{{ data.file_kartu_keluarga }}" alt="Kartu Keluarga" />
+  </div>
+  @endif
 
 
     <div class="sign-wrap">

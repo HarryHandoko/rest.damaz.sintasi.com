@@ -1049,8 +1049,22 @@ class RegisterController {
       const filter = request.input("filter", {});
 
       let query = RegisterPPDB.query()
-        .where("is_submit", "1")
-        .where("is_form_done", 1);
+        .where("is_submit", 1)
+        .where("is_form_done", 1)
+        .join(
+          "tbl_register_ppdb_siswas as siswa",
+          "siswa.id",
+          "tbl_register_ppdbs.siswa_id",
+        )
+        .select("tbl_register_ppdbs.*");
+
+      if (filter.keyword) {
+        query.where((builder) => {
+          builder
+            .where("siswa.nama_depan", "like", `%${filter.keyword}%`)
+            .orWhere("siswa.nama_belakang", "like", `%${filter.keyword}%`);
+        });
+      }
 
       if (filter.status) {
         if (filter.status === "Diterima") {

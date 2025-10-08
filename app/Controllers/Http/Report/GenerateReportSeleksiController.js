@@ -53,9 +53,7 @@ class GenerateReportSeleksiController {
       const baseUrl = Env.get("BASE_URL");
       const filter = request.input("filter", {});
 
-      let query = RegisterPPDB.query()
-        .where("is_need_test", "1")
-        .where("status_pendaftaran", "P01");
+      let query = RegisterPPDB.query().where("is_submit", 1);
 
       if (filter.status) {
         if (filter.status === "Lulus") {

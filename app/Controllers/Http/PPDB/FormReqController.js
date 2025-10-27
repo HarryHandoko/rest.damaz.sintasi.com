@@ -54,7 +54,12 @@ class FormReqController {
         query.where((builder) => {
           builder
             .where("siswa.nama_depan", "like", `%${filter.keyword}%`)
-            .orWhere("siswa.nama_belakang", "like", `%${filter.keyword}%`);
+            .orWhere("siswa.nama_belakang", "like", `%${filter.keyword}%`)
+            .orWhere(
+              "tbl_register_ppdbs.code_pendaftaran",
+              "like",
+              `%${filter.keyword}%`,
+            );
         });
       }
 

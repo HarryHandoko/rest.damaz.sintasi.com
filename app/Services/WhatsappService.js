@@ -54,11 +54,18 @@ class WhatsappService {
     const setting = await this.getSetting();
     try {
       const id = await this.getDeviceIdByPhoneNumber(setting.no_handphone);
-      const response = await axios.post(
-        `${this.baseUrl}/api/devices/${id}/send/${phoneNumber}`,
-        { message },
-        { headers: { "secret-key": setting.api_key } }
-      );
+     const response = await axios.post(
+      `${this.baseUrl}/api/messages/${id}/send/${phoneNumber}`,
+      {
+        message: JSON.stringify(message),
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "secret-key": setting.api_key,
+        },
+      }
+    );
 
       return response.data;
     } catch (error) {

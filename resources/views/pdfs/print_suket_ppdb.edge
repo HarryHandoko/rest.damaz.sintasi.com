@@ -332,7 +332,7 @@
         <td>b. Pendidikan terakhir</td>
         <td class="sep">:</td>
         <td>
-         {{data.siswa_parent.pendidikan_terakhir_ayah}}
+         {{data.siswa_parent.pendidikan_terakhir_ayah || '-'}}
         </td>
       </tr>
       <tr>
@@ -340,7 +340,7 @@
         <td>c. Pekerjaan</td>
         <td class="sep">:</td>
         <td>
-         {{data.siswa_parent.pekerjaan_ayah}}
+         {{data.siswa_parent.pekerjaan_ayah || '-'}}
         </td>
       </tr>
       <tr>
@@ -356,6 +356,12 @@
         <td>e. Telp / HP</td>
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ayah || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ayah || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>f. NIK</td>
+        <td class="sep">:</td>
+        <td>Tlp {{ data.siswa_parent.nik_ayah || '-' }}</td>
       </tr>
     </table>
 
@@ -378,7 +384,7 @@
         <td>b. Pendidikan terakhir</td>
         <td class="sep">:</td>
         <td>
-          {{data.siswa_parent.pendidikan_terakhir_ibu}}
+          {{data.siswa_parent.pendidikan_terakhir_ibu || '-'}}
         </td>
       </tr>
       <tr>
@@ -400,6 +406,12 @@
         <td>e. Telp / HP</td>
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ibu || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ibu || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>f. NIK</td>
+        <td class="sep">:</td>
+        <td>Tlp {{ data.siswa_parent.nik_ibu || '-' }}</td>
       </tr>
     </table>
 
@@ -444,6 +456,12 @@
         <td>e. Telp / HP</td>
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_wali || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_wali || '-' }}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>f. NIK</td>
+        <td class="sep">:</td>
+        <td>Tlp {{ data.siswa_parent.nik_wali || '-' }}</td>
       </tr>
     </table>
 

@@ -248,9 +248,9 @@
         <td class="sep">:</td>
         <td>
           {{ data.siswa_address.alamat }},
-          RT {{ data.siswa_address.rt }} / RW {{ data.siswa_address.rw }},
-          {{ data.siswa_address.desa }}, {{ data.siswa_address.district }}, {{ data.siswa_address.kota }},
-          Provinsi {{ data.siswa_address.provinsi }}
+          RT {{ data.siswa_address.rt || '-' }} / RW {{ data.siswa_address.rw || '-' }},
+          {{ data.siswa_address.desa || '-' }}, {{ data.siswa_address.district || '-' }}, {{ data.siswa_address.kota || '-' }},
+          Provinsi {{ data.siswa_address.provinsi || '-' }}
         </td>
       </tr>
       <tr>
@@ -357,18 +357,6 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ayah || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ayah || '-' }}</td>
       </tr>
-      @if(data.siswa_parent.ktp_ayah)
-      <tr>
-        <td></td>
-        <td>f. KTP</td>
-        <td class="sep">:</td>
-        <td>
-          <div>
-            <img src="{{ data.siswa_parent.ktp_ayah }}" alt="KTP Ayah" style="width: 150px; border: 1px solid #ccc; padding: 5px;" />
-          </div>
-        </td>
-      </tr>
-        @endif
     </table>
 
     {{-- === IBU === --}}
@@ -413,18 +401,6 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_ibu || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_ibu || '-' }}</td>
       </tr>
-      @if(data.siswa_parent.ktp_ibu)
-      <tr>
-        <td></td>
-        <td>f. KTP</td>
-        <td class="sep">:</td>
-        <td>
-          <div>
-            <img src="{{ data.siswa_parent.ktp_ibu }}" alt="KTP Ibu" style="width: 150px; border: 1px solid #ccc; padding: 5px;" />
-          </div>
-        </td>
-      </tr>
-      @endif
     </table>
 
     {{-- === WALI === --}}
@@ -469,18 +445,6 @@
         <td class="sep">:</td>
         <td>Tlp {{ data.siswa_parent.telepon_wali || '-' }} &nbsp;&nbsp; HP {{ data.siswa_parent.no_hp_wali || '-' }}</td>
       </tr>
-      @if(data.siswa_parent.ktp_wali)
-      <tr>
-        <td></td>
-        <td>f. KTP</td>
-        <td class="sep">:</td>
-        <td>
-          <div>
-            <img src="{{ data.siswa_parent.ktp_wali }}" alt="KTP Wali" style="width: 150px;border: 1px solid #ccc; padding: 5px;" />
-          </div>
-        </td>
-      </tr>
-      @endif
     </table>
 
     <div class="page-break"></div>
@@ -494,6 +458,24 @@
   @if(data.file_akte_lahir)
   <div class="page">
     <img src="{{ data.file_akte_lahir }}" alt="Akte Lahir" />
+  </div>
+  @endif
+
+  @if(data.siswa_parent.ktp_ayah)
+  <div class="page">
+    <img src="{{data.siswa_parent.ktp_ayah}}" alt="KTP Ayah" />
+  </div>
+  @endif
+
+  @if(data.siswa_parent.ktp_ibu)
+  <div class="page">
+    <img src="{{data.siswa_parent.ktp_ibu}}" alt="KTP Ibu" />
+  </div>
+  @endif
+
+  @if(data.siswa_parent.ktp_wali)
+  <div class="page">
+    <img src="{{data.siswa_parent.ktp_wali}}" alt="KTP Wali" />
   </div>
   @endif
 

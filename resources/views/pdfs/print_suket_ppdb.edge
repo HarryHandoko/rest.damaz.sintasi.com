@@ -464,6 +464,23 @@
         <td>Tlp {{ data.siswa_parent.nik_wali || '-' }}</td>
       </tr>
     </table>
+    <div class="sign-wrap">
+        <div class="sign-col">
+            <div class="small-note">&nbsp;</div>
+            <div><b>Petugas Pendaftaran</b></div>
+            <div class="sign-space"></div>
+            <br><br>
+            <div>( {{ !petugas ? '.............................................' : petugas.nama_depan + ' ' + petugas.nama_belakang }} )</div>
+        </div>
+        <div class="sign-col">
+            <div>&nbsp;</div>
+            <div class="small-note">&nbsp;</div>
+            <div><b>Orang Tua/Wali</b></div>
+            <div class="sign-space"></div>
+            <br><br>
+            <div>( {{ data.register.nama_depan + ' ' + data.register.nama_belakang }} )</div>
+        </div>
+    </div>
 
 
   @set('hasFile', false)
@@ -534,25 +551,6 @@
       </div>
     @endif
   @endif
-
-
-<div class="sign-wrap">
-    <div class="sign-col">
-        <div class="small-note">&nbsp;</div>
-        <div><b>Petugas Pendaftaran</b></div>
-        <div class="sign-space"></div>
-        <br><br>
-        <div>( {{ !petugas ? '.............................................' : petugas.nama_depan + ' ' + petugas.nama_belakang }} )</div>
-    </div>
-    <div class="sign-col">
-        <div>&nbsp;</div>
-        <div class="small-note">&nbsp;</div>
-        <div><b>Orang Tua/Wali</b></div>
-        <div class="sign-space"></div>
-        <br><br>
-        <div>( {{ data.register.nama_depan + ' ' + data.register.nama_belakang }} )</div>
-    </div>
-</div>
   </main>
 </body>
 </html>

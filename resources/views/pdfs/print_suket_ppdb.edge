@@ -464,12 +464,19 @@
         <td>Tlp {{ data.siswa_parent.nik_wali || '-' }}</td>
       </tr>
     </table>
-@if(
-  data.file_raport
-  || data.file_akte_lahir
-  || data.siswa_parent && (data.siswa_parent.ktp_ayah || data.siswa_parent.ktp_ibu || data.siswa_parent.ktp_wali)
-  || data.file_kartu_keluarga
-)
+@!{
+  const hasFile =
+    data.file_raport ||
+    data.file_akte_lahir ||
+    (data.siswa_parent && (
+      data.siswa_parent.ktp_ayah ||
+      data.siswa_parent.ktp_ibu ||
+      data.siswa_parent.ktp_wali
+    )) ||
+    data.file_kartu_keluarga
+}
+
+@if(hasFile)
   <div class="page-break"></div>
 
   @if(data.file_raport)

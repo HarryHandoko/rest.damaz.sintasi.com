@@ -464,53 +464,39 @@
         <td>Tlp {{ data.siswa_parent.nik_wali || '-' }}</td>
       </tr>
     </table>
+@if(
+  data.file_raport
+  || data.file_akte_lahir
+  || data.siswa_parent && (data.siswa_parent.ktp_ayah || data.siswa_parent.ktp_ibu || data.siswa_parent.ktp_wali)
+  || data.file_kartu_keluarga
+)
+  <div class="page-break"></div>
 
-@set('hasFile', data.file_raport
-    || data.file_akte_lahir
-    || data.siswa_parent?.ktp_ayah
-    || data.siswa_parent?.ktp_ibu
-    || data.siswa_parent?.ktp_wali
-    || data.file_kartu_keluarga)
+  @if(data.file_raport)
+    <div class="page"><img src="{{ data.file_raport }}" alt="Raport" /></div>
+  @endif
 
-@if(hasFile)
-    <div class="page-break"></div>
+  @if(data.file_akte_lahir)
+    <div class="page"><img src="{{ data.file_akte_lahir }}" alt="Akte Lahir" /></div>
+  @endif
 
-    @if(data.file_raport)
-        <div class="page">
-            <img src="{{ data.file_raport }}" alt="Raport" />
-        </div>
-    @endif
+  @if(data.siswa_parent && data.siswa_parent.ktp_ayah)
+    <div class="page"><img src="{{ data.siswa_parent.ktp_ayah }}" alt="KTP Ayah" /></div>
+  @endif
 
-    @if(data.file_akte_lahir)
-        <div class="page">
-            <img src="{{ data.file_akte_lahir }}" alt="Akte Lahir" />
-        </div>
-    @endif
+  @if(data.siswa_parent && data.siswa_parent.ktp_ibu)
+    <div class="page"><img src="{{ data.siswa_parent.ktp_ibu }}" alt="KTP Ibu" /></div>
+  @endif
 
-    @if(data.siswa_parent?.ktp_ayah)
-        <div class="page">
-            <img src="{{ data.siswa_parent.ktp_ayah }}" alt="KTP Ayah" />
-        </div>
-    @endif
+  @if(data.siswa_parent && data.siswa_parent.ktp_wali)
+    <div class="page"><img src="{{ data.siswa_parent.ktp_wali }}" alt="KTP Wali" /></div>
+  @endif
 
-    @if(data.siswa_parent?.ktp_ibu)
-        <div class="page">
-            <img src="{{ data.siswa_parent.ktp_ibu }}" alt="KTP Ibu" />
-        </div>
-    @endif
-
-    @if(data.siswa_parent?.ktp_wali)
-        <div class="page">
-            <img src="{{ data.siswa_parent.ktp_wali }}" alt="KTP Wali" />
-        </div>
-    @endif
-
-    @if(data.file_kartu_keluarga)
-        <div class="page">
-            <img src="{{ data.file_kartu_keluarga }}" alt="Kartu Keluarga" />
-        </div>
-    @endif
+  @if(data.file_kartu_keluarga)
+    <div class="page"><img src="{{ data.file_kartu_keluarga }}" alt="Kartu Keluarga" /></div>
+  @endif
 @endif
+
 
 <div class="sign-wrap">
     <div class="sign-col">

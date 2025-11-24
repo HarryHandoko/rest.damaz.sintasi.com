@@ -14,7 +14,7 @@ const moment = require("moment");
 
 class WhatsappService {
   constructor() {
-    this.baseUrl = "https://wabot.sintasi.com";
+    this.baseUrl = "https://responin.id";
   }
 
   async getSetting() {
@@ -54,18 +54,18 @@ class WhatsappService {
     const setting = await this.getSetting();
     try {
       const id = await this.getDeviceIdByPhoneNumber(setting.no_handphone);
-     const response = await axios.post(
-      `${this.baseUrl}/api/messages/${id}/send/${phoneNumber}`,
-      {
-        message: JSON.stringify(message),
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "secret-key": setting.api_key,
+      const response = await axios.post(
+        `${this.baseUrl}/api/messages/${id}/send/${phoneNumber}`,
+        {
+          message: JSON.stringify(message),
         },
-      }
-    );
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "secret-key": setting.api_key,
+          },
+        }
+      );
 
       return response.data;
     } catch (error) {
@@ -264,7 +264,8 @@ https://spmb.darulmaza.sch.id/uploads/payment/${dataPayment.bukti_transfer}`;
   async sendPraTestDiterima(kodePendaftaran) {
     const setting = await this.getSetting();
     let template = setting.format_pesan_pra_test_diterima;
-    if (!template) throw new Error("Template pesan pra test diterima belum disetting");
+    if (!template)
+      throw new Error("Template pesan pra test diterima belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
     return await this.sendMessage(message, data.no_hp_ortu);
@@ -273,7 +274,8 @@ https://spmb.darulmaza.sch.id/uploads/payment/${dataPayment.bukti_transfer}`;
   async sendPraTestDitolak(kodePendaftaran) {
     const setting = await this.getSetting();
     let template = setting.format_pesan_pra_test_ditolak;
-    if (!template) throw new Error("Template pesan pra test ditolak belum disetting");
+    if (!template)
+      throw new Error("Template pesan pra test ditolak belum disetting");
     const data = await this.getData(kodePendaftaran);
     const message = this.replacePlaceholders(template, data);
     return await this.sendMessage(message, data.no_hp_ortu);
